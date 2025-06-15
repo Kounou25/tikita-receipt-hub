@@ -3,205 +3,221 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
-import { Search, Download, Eye, Filter, Plus } from "lucide-react";
+import QuickNav from "@/components/layout/QuickNav";
+import { Search, Download, Eye, Filter, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const ReceiptHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
 
   const receipts = [
     {
-      id: "R001234",
-      client: "Jean Dupont",
-      amount: "25,000 FCFA",
-      date: "15 Juin 2024",
+      id: "R001",
+      client: "Marie Kouassi",
+      amount: "45,000 FCFA",
+      date: "2024-01-15",
       status: "Payé",
       items: 3
     },
     {
-      id: "R001235",
-      client: "Marie Kouakou",
-      amount: "18,500 FCFA",
-      date: "14 Juin 2024",
+      id: "R002", 
+      client: "Jean Ouattara",
+      amount: "78,500 FCFA",
+      date: "2024-01-14",
       status: "Payé",
-      items: 2
-    },
-    {
-      id: "R001236",
-      client: "Ahmed Hassan",
-      amount: "42,000 FCFA",
-      date: "14 Juin 2024",
-      status: "En attente",
       items: 5
     },
     {
-      id: "R001237",
-      client: "Sophie Martin",
-      amount: "12,500 FCFA",
-      date: "13 Juin 2024",
-      status: "Payé",
-      items: 1
+      id: "R003",
+      client: "Fatou Traoré", 
+      amount: "125,000 FCFA",
+      date: "2024-01-13",
+      status: "En attente",
+      items: 8
     },
     {
-      id: "R001238",
-      client: "Omar Diallo",
-      amount: "35,750 FCFA",
-      date: "12 Juin 2024",
-      status: "Annulé",
-      items: 4
-    },
-    {
-      id: "R001239",
-      client: "Fatou Ba",
-      amount: "21,200 FCFA",
-      date: "11 Juin 2024",
+      id: "R004",
+      client: "Kofi Asante",
+      amount: "32,000 FCFA", 
+      date: "2024-01-12",
       status: "Payé",
       items: 2
+    },
+    {
+      id: "R005",
+      client: "Aminata Diallo",
+      amount: "67,500 FCFA",
+      date: "2024-01-11", 
+      status: "Payé",
+      items: 4
     }
   ];
 
-  const filteredReceipts = receipts.filter((receipt) => {
-    const matchesSearch = receipt.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         receipt.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || receipt.status.toLowerCase() === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Payé":
-        return "bg-green-100 text-green-800";
-      case "En attente":
-        return "bg-orange-100 text-orange-800";
-      case "Annulé":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  const filteredReceipts = receipts.filter(receipt =>
+    receipt.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    receipt.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
       <Header title="Historique des reçus" />
       
       <main className="p-4 md:p-6 space-y-6">
-        {/* Header with actions */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Mes reçus</h2>
-            <p className="text-gray-600">Gérez et consultez tous vos reçus générés</p>
-          </div>
-          <Link to="/generate">
-            <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              Nouveau reçu
-            </Button>
-          </Link>
-        </div>
+        <QuickNav userType="user" />
 
-        {/* Filters */}
-        <Card className="border-gray-200 shadow-sm">
-          <CardContent className="pt-6">
+        {/* Filtres et recherche */}
+        <Card className="border-gray-200">
+          <CardContent className="p-4">
             <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    placeholder="Rechercher par nom de client ou numéro de reçu..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 border-gray-300"
-                  />
-                </div>
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Rechercher par client ou numéro de reçu..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 border-gray-300"
+                />
               </div>
-              
-              <div className="sm:w-48">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="border-gray-300">
-                    <Filter className="w-4 h-4 mr-2" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectItem value="all">Tous les statuts</SelectItem>
-                    <SelectItem value="payé">Payé</SelectItem>
-                    <SelectItem value="en attente">En attente</SelectItem>
-                    <SelectItem value="annulé">Annulé</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm">
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filtrer
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Période
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Receipts List */}
-        <div className="space-y-4">
-          {filteredReceipts.map((receipt) => (
-            <Card key={receipt.id} className="border-gray-200 hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-gray-900">{receipt.client}</h3>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium w-fit ${getStatusColor(receipt.status)}`}
-                      >
-                        {receipt.status}
-                      </span>
+        {/* Liste des reçus */}
+        <Card className="border-gray-200">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Mes reçus ({filteredReceipts.length})</span>
+              <span className="text-sm font-normal text-gray-500">
+                Total: {receipts.reduce((sum, receipt) => sum + parseInt(receipt.amount.replace(/[^\d]/g, '')), 0).toLocaleString()} FCFA
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            {/* Version mobile */}
+            <div className="md:hidden">
+              {filteredReceipts.map((receipt) => (
+                <div key={receipt.id} className="border-b border-gray-200 p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-medium text-gray-900">{receipt.id}</h3>
+                      <p className="text-sm text-gray-600">{receipt.client}</p>
                     </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-600">
-                      <span>Reçu #{receipt.id}</span>
-                      <span>{receipt.items} article(s)</span>
-                      <span>{receipt.date}</span>
-                    </div>
+                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                      receipt.status === "Payé" 
+                        ? "bg-green-100 text-green-800" 
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}>
+                      {receipt.status}
+                    </span>
                   </div>
-
-                  <div className="flex items-center justify-between sm:justify-end gap-4">
-                    <div className="text-right">
-                      <p className="text-xl font-bold text-primary">{receipt.amount}</p>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium text-gray-900">{receipt.amount}</p>
+                      <p className="text-sm text-gray-500">{receipt.date} • {receipt.items} articles</p>
                     </div>
-                    
                     <div className="flex gap-2">
                       <Link to={`/receipts/${receipt.id}`}>
-                        <Button size="sm" variant="outline">
+                        <Button variant="outline" size="sm">
                           <Eye className="w-4 h-4" />
-                          <span className="hidden sm:inline ml-2">Voir</span>
                         </Button>
                       </Link>
-                      <Button size="sm" variant="outline">
+                      <Button variant="outline" size="sm">
                         <Download className="w-4 h-4" />
-                        <span className="hidden sm:inline ml-2">PDF</span>
                       </Button>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              ))}
+            </div>
 
-        {filteredReceipts.length === 0 && (
-          <Card className="border-gray-200 shadow-sm">
-            <CardContent className="py-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun reçu trouvé</h3>
-              <p className="text-gray-600 mb-4">
-                Aucun reçu ne correspond à vos critères de recherche.
-              </p>
-              <Link to="/generate">
-                <Button className="bg-primary hover:bg-primary/90">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Créer votre premier reçu
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        )}
+            {/* Version desktop */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Reçu
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Client
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Montant
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Articles
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Statut
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredReceipts.map((receipt) => (
+                    <tr key={receipt.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{receipt.id}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{receipt.client}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{receipt.amount}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">{receipt.date}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">{receipt.items}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          receipt.status === "Payé" 
+                            ? "bg-green-100 text-green-800" 
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}>
+                          {receipt.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex gap-2">
+                          <Link to={`/receipts/${receipt.id}`}>
+                            <Button variant="outline" size="sm">
+                              <Eye className="w-4 h-4 mr-1" />
+                              Voir
+                            </Button>
+                          </Link>
+                          <Button variant="outline" size="sm">
+                            <Download className="w-4 h-4 mr-1" />
+                            PDF
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       </main>
 
       <MobileNav />

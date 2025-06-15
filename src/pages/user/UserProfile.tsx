@@ -7,23 +7,31 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
-import { Building2, Camera, Crown, Mail, MapPin, Phone, User } from "lucide-react";
+import QuickNav from "@/components/layout/QuickNav";
+import { User, Building2, MapPin, Phone, Mail, Upload, Palette, Save } from "lucide-react";
 
 const UserProfile = () => {
-  const [formData, setFormData] = useState({
-    name: "Jean Dupont",
-    email: "jean.dupont@email.com",
-    phone: "+225 07 12 34 56 78",
-    company: "Boutique Jean",
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState({
+    // Informations personnelles
+    fullName: "John Doe",
+    email: "john.doe@example.com",
+    phone: "+225 01 02 03 04 05",
+    country: "Côte d'Ivoire",
+    
+    // Informations entreprise
+    companyName: "Boutique John",
     slogan: "Votre satisfaction, notre priorité",
-    address: "Cocody, Abidjan, Côte d'Ivoire",
-    nif: "CI-ABJ-01-2024-B12-00123",
-    rccm: "CI-ABJ-2024-B-12345"
+    address: "Cocody, Abidjan",
+    nif: "NIF123456789",
+    rccm: "RCCM987654321",
+    brandColor: "#4CAF50"
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Profile updated:", formData);
+  const handleSave = () => {
+    setIsEditing(false);
+    // Logique de sauvegarde
+    console.log("Profil sauvegardé:", profileData);
   };
 
   return (
@@ -31,152 +39,202 @@ const UserProfile = () => {
       <Header title="Mon Profil" />
       
       <main className="p-4 md:p-6 space-y-6">
-        {/* Profile Header */}
+        <QuickNav userType="user" />
+
+        {/* Informations personnelles */}
         <Card className="border-gray-200">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <div className="relative">
-                <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Building2 className="w-12 h-12 text-primary" />
-                </div>
-                <Button
-                  size="icon"
-                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary hover:bg-primary/90"
-                >
-                  <Camera className="w-4 h-4" />
-                </Button>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5 text-primary" />
+              Informations personnelles
+            </CardTitle>
+            <Button
+              variant={isEditing ? "default" : "outline"}
+              onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+            >
+              {isEditing ? (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Sauvegarder
+                </>
+              ) : (
+                "Modifier"
+              )}
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Nom complet</Label>
+                <Input
+                  id="fullName"
+                  value={profileData.fullName}
+                  onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
+                  disabled={!isEditing}
+                  className="border-gray-300"
+                />
               </div>
-              
-              <div className="text-center md:text-left">
-                <h2 className="text-2xl font-bold text-gray-900">{formData.company}</h2>
-                <p className="text-gray-600 mb-2">{formData.slogan}</p>
-                <div className="flex items-center gap-4 text-sm text-gray-500">
-                  <div className="flex items-center gap-1">
-                    <Crown className="w-4 h-4" />
-                    <span>Plan Premium</span>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={profileData.email}
+                  onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                  disabled={!isEditing}
+                  className="border-gray-300"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Téléphone</Label>
+                <Input
+                  id="phone"
+                  value={profileData.phone}
+                  onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                  disabled={!isEditing}
+                  className="border-gray-300"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="country">Pays</Label>
+                <Input
+                  id="country"
+                  value={profileData.country}
+                  disabled
+                  className="border-gray-300 bg-gray-50"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Informations entreprise */}
+        <Card className="border-gray-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-primary" />
+              Informations entreprise
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="companyName">Nom de l'entreprise</Label>
+                <Input
+                  id="companyName"
+                  value={profileData.companyName}
+                  onChange={(e) => setProfileData({ ...profileData, companyName: e.target.value })}
+                  disabled={!isEditing}
+                  className="border-gray-300"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="slogan">Slogan</Label>
+                <Input
+                  id="slogan"
+                  value={profileData.slogan}
+                  onChange={(e) => setProfileData({ ...profileData, slogan: e.target.value })}
+                  disabled={!isEditing}
+                  className="border-gray-300"
+                />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="address">Adresse</Label>
+                <Textarea
+                  id="address"
+                  value={profileData.address}
+                  onChange={(e) => setProfileData({ ...profileData, address: e.target.value })}
+                  disabled={!isEditing}
+                  className="border-gray-300"
+                  rows={3}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nif">NIF</Label>
+                <Input
+                  id="nif"
+                  value={profileData.nif}
+                  onChange={(e) => setProfileData({ ...profileData, nif: e.target.value })}
+                  disabled={!isEditing}
+                  className="border-gray-300"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="rccm">RCCM</Label>
+                <Input
+                  id="rccm"
+                  value={profileData.rccm}
+                  onChange={(e) => setProfileData({ ...profileData, rccm: e.target.value })}
+                  disabled={!isEditing}
+                  className="border-gray-300"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Personnalisation */}
+        <Card className="border-gray-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="w-5 h-5 text-primary" />
+              Personnalisation
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="brandColor">Couleur de marque</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    id="brandColor"
+                    value={profileData.brandColor}
+                    onChange={(e) => setProfileData({ ...profileData, brandColor: e.target.value })}
+                    disabled={!isEditing}
+                    className="w-12 h-10 border border-gray-300 rounded"
+                  />
+                  <Input
+                    value={profileData.brandColor}
+                    disabled
+                    className="border-gray-300 bg-gray-50"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Logo de l'entreprise</Label>
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <Building2 className="w-8 h-8 text-gray-400" />
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                    <span>Actif</span>
-                  </div>
+                  {isEditing && (
+                    <Button variant="outline" size="sm">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Changer
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Profile Form */}
-        <Card className="border-gray-200">
+        {/* État de l'abonnement */}
+        <Card className="border-primary bg-primary/5">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-900">
-              Informations personnelles
-            </CardTitle>
+            <CardTitle className="text-primary">État de l'abonnement</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nom complet</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Téléphone</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                    <Input
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="company">Nom de l'entreprise</Label>
-                  <div className="relative">
-                    <Building2 className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                    <Input
-                      id="company"
-                      value={formData.company}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-gray-900">Plan Premium</p>
+                <p className="text-sm text-gray-600">Actif jusqu'au 15 juillet 2024</p>
+                <p className="text-sm text-primary">847 / 1,000 reçus utilisés ce mois</p>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="slogan">Slogan</Label>
-                <Input
-                  id="slogan"
-                  value={formData.slogan}
-                  onChange={(e) => setFormData({ ...formData, slogan: e.target.value })}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="address">Adresse</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                  <Textarea
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="pl-10 min-h-[80px]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nif">NIF</Label>
-                  <Input
-                    id="nif"
-                    value={formData.nif}
-                    onChange={(e) => setFormData({ ...formData, nif: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="rccm">RCCM</Label>
-                  <Input
-                    id="rccm"
-                    value={formData.rccm}
-                    onChange={(e) => setFormData({ ...formData, rccm: e.target.value })}
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end">
-                <Button type="submit" className="bg-primary hover:bg-primary/90">
-                  Enregistrer les modifications
-                </Button>
-              </div>
-            </form>
+              <Button variant="outline">
+                Gérer l'abonnement
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </main>

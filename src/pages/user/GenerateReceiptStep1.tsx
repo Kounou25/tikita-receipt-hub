@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
+import QuickNav from "@/components/layout/QuickNav";
 import { ArrowRight, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -16,38 +17,38 @@ const GenerateReceiptStep1 = () => {
       id: "modern",
       name: "Moderne",
       description: "Design épuré et professionnel",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
       popular: true
     },
     {
       id: "classic",
       name: "Classique",
       description: "Style traditionnel et élégant",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
     },
     {
       id: "minimal",
       name: "Minimaliste",
       description: "Simple et efficace",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
     },
     {
       id: "colorful",
       name: "Coloré",
       description: "Design vibrant et attractif",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
     },
     {
       id: "business",
       name: "Business",
       description: "Professionnel pour entreprises",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
     },
     {
       id: "invoice",
       name: "Facture",
       description: "Format facture détaillé",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
     }
   ];
 
@@ -63,6 +64,8 @@ const GenerateReceiptStep1 = () => {
       <Header title="Générer un reçu" />
       
       <main className="p-4 md:p-6 space-y-6">
+        <QuickNav userType="user" />
+
         {/* Progress indicator */}
         <div className="flex items-center justify-center space-x-4 mb-8">
           <div className="flex items-center">
