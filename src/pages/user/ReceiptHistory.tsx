@@ -104,7 +104,7 @@ const ReceiptHistory = () => {
         </div>
 
         {/* Filters */}
-        <Card className="border-gray-200">
+        <Card className="border-gray-200 shadow-sm">
           <CardContent className="pt-6">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
@@ -165,10 +165,12 @@ const ReceiptHistory = () => {
                     </div>
                     
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        <Eye className="w-4 h-4" />
-                        <span className="hidden sm:inline ml-2">Voir</span>
-                      </Button>
+                      <Link to={`/receipts/${receipt.id}`}>
+                        <Button size="sm" variant="outline">
+                          <Eye className="w-4 h-4" />
+                          <span className="hidden sm:inline ml-2">Voir</span>
+                        </Button>
+                      </Link>
                       <Button size="sm" variant="outline">
                         <Download className="w-4 h-4" />
                         <span className="hidden sm:inline ml-2">PDF</span>
@@ -182,7 +184,7 @@ const ReceiptHistory = () => {
         </div>
 
         {filteredReceipts.length === 0 && (
-          <Card className="border-gray-200">
+          <Card className="border-gray-200 shadow-sm">
             <CardContent className="py-12 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="w-8 h-8 text-gray-400" />

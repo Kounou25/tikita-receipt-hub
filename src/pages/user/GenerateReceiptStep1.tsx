@@ -16,38 +16,38 @@ const GenerateReceiptStep1 = () => {
       id: "modern",
       name: "Moderne",
       description: "Design épuré et professionnel",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80",
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
       popular: true
     },
     {
       id: "classic",
       name: "Classique",
       description: "Style traditionnel et élégant",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
     },
     {
       id: "minimal",
       name: "Minimaliste",
       description: "Simple et efficace",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
     },
     {
       id: "colorful",
       name: "Coloré",
       description: "Design vibrant et attractif",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
     },
     {
       id: "business",
       name: "Business",
       description: "Professionnel pour entreprises",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
     },
     {
       id: "invoice",
       name: "Facture",
       description: "Format facture détaillé",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
+      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
     }
   ];
 
@@ -80,60 +80,61 @@ const GenerateReceiptStep1 = () => {
           </div>
         </div>
 
-        <Card className="border-gray-200">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-900">
+        <Card className="border-gray-200 shadow-sm">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-gray-900">
               Choisissez un modèle de reçu
             </CardTitle>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mt-2">
               Sélectionnez le design qui correspond le mieux à votre marque
             </p>
           </CardHeader>
           
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <CardContent className="px-6 pb-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {templates.map((template) => (
                 <div
                   key={template.id}
-                  className={`relative border-2 rounded-lg cursor-pointer transition-all ${
+                  className={`relative border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${
                     selectedTemplate === template.id
-                      ? "border-primary bg-primary/5"
+                      ? "border-primary bg-primary/5 shadow-md"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                   onClick={() => setSelectedTemplate(template.id)}
                 >
                   {template.popular && (
-                    <div className="absolute -top-2 -right-2 bg-secondary text-white text-xs px-2 py-1 rounded-full font-medium">
+                    <div className="absolute -top-2 -right-2 bg-secondary text-white text-xs px-2 py-1 rounded-full font-medium z-10">
                       Populaire
                     </div>
                   )}
                   
                   {selectedTemplate === template.id && (
-                    <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
+                    <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10">
+                      <Check className="w-3 h-3 text-white" />
                     </div>
                   )}
 
-                  <div className="p-4">
-                    <div className="aspect-[3/4] bg-gray-100 rounded-lg mb-3 overflow-hidden">
+                  <div className="p-3">
+                    <div className="aspect-[3/4] bg-gray-100 rounded-lg mb-2 overflow-hidden">
                       <img
                         src={template.thumbnail}
                         alt={template.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <h3 className="font-medium text-gray-900 mb-1">{template.name}</h3>
-                    <p className="text-sm text-gray-600">{template.description}</p>
+                    <h3 className="font-medium text-gray-900 text-sm mb-1">{template.name}</h3>
+                    <p className="text-xs text-gray-600 leading-relaxed">{template.description}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-8 flex justify-end">
+            <div className="mt-8 flex justify-center">
               <Button 
                 onClick={handleContinue}
                 disabled={!selectedTemplate}
-                className="bg-primary hover:bg-primary/90"
+                className="bg-primary hover:bg-primary/90 px-8 py-2 rounded-lg font-medium"
+                size="lg"
               >
                 Continuer
                 <ArrowRight className="w-4 h-4 ml-2" />

@@ -12,6 +12,7 @@ import RegisterStep2 from "./pages/auth/RegisterStep2";
 // User Pages
 import UserDashboard from "./pages/user/UserDashboard";
 import ReceiptHistory from "./pages/user/ReceiptHistory";
+import ReceiptDetails from "./pages/user/ReceiptDetails";
 import UserProfile from "./pages/user/UserProfile";
 import GenerateReceiptStep1 from "./pages/user/GenerateReceiptStep1";
 import GenerateReceiptStep2 from "./pages/user/GenerateReceiptStep2";
@@ -53,6 +54,7 @@ const App = () => (
           {/* User Routes */}
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/receipts" element={<ReceiptHistory />} />
+          <Route path="/receipts/:id" element={<ReceiptDetails />} />
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/generate" element={<GenerateReceiptStep1 />} />
           <Route path="/generate/step2" element={<GenerateReceiptStep2 />} />

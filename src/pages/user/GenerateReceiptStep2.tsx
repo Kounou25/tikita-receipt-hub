@@ -19,13 +19,16 @@ const GenerateReceiptStep2 = () => {
   });
 
   const [items, setItems] = useState([
-    { designation: "", quantity: 1, unitPrice: 0, tva: 0, discount: 0 }
+    { designation: "", quantity: 1, unitPrice: 0 }
   ]);
+
+  const [receiptTva, setReceiptTva] = useState(0);
+  const [receiptDiscount, setReceiptDiscount] = useState(0);
 
   const navigate = useNavigate();
 
   const addItem = () => {
-    setItems([...items, { designation: "", quantity: 1, unitPrice: 0, tva: 0, discount: 0 }]);
+    setItems([...items, { designation: "", quantity: 1, unitPrice: 0 }]);
   };
 
   const removeItem = (index: number) => {
@@ -40,17 +43,20 @@ const GenerateReceiptStep2 = () => {
     setItems(updatedItems);
   };
 
-  const calculateTotal = () => {
+  const calculateSubtotal = () => {
     return items.reduce((total, item) => {
-      const subtotal = item.quantity * item.unitPrice;
-      const withTva = subtotal + (subtotal * item.tva / 100);
-      const withDiscount = withTva - (withTva * item.discount / 100);
-      return total + withDiscount;
+      return total + (item.quantity * item.unitPrice);
     }, 0);
   };
 
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    const withTva = subtotal + (subtotal * receiptTva / 100);
+    const withDiscount = withTva - (withTva * receiptDiscount / 100);
+    return withDiscount;
+  };
+
   const handleGenerate = () => {
-    // Generate receipt logic here
     navigate("/receipts");
   };
 
@@ -77,7 +83,7 @@ const GenerateReceiptStep2 = () => {
         </div>
 
         {/* Client Information */}
-        <Card className="border-gray-200">
+        <Card className="border-gray-200 shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-bold text-gray-900">
               Informations du client
@@ -85,15 +91,29 @@ const GenerateReceiptStep2 = () => {
           </CardHeader>
           
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="clientName">Nom du client</Label>
-              <Input
-                id="clientName"
-                placeholder="Nom complet du client"
-                value={clientInfo.name}
-                onChange={(e) => setClientInfo({ ...clientInfo, name: e.target.value })}
-                className="border-gray-300"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="clientName">Nom du client</Label>
+                <Input
+                  id="clientName"
+                  placeholder="Nom complet du client"
+                  value={clientInfo.name}
+                  onChange={(e) => setClientInfo({ ...clientInfo, name: e.target.value })}
+                  className="border-gray-300"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="clientPhone">Téléphone</Label>
+                <Input
+                  id="clientPhone"
+                  type="tel"
+                  placeholder="+225 07 12 34 56 78"
+                  value={clientInfo.phone}
+                  onChange={(e) => setClientInfo({ ...clientInfo, phone: e.target.value })}
+                  className="border-gray-300"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -104,55 +124,43 @@ const GenerateReceiptStep2 = () => {
                 value={clientInfo.address}
                 onChange={(e) => setClientInfo({ ...clientInfo, address: e.target.value })}
                 className="border-gray-300 resize-none"
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="clientPhone">Téléphone</Label>
-              <Input
-                id="clientPhone"
-                type="tel"
-                placeholder="+123 456 789"
-                value={clientInfo.phone}
-                onChange={(e) => setClientInfo({ ...clientInfo, phone: e.target.value })}
-                className="border-gray-300"
+                rows={2}
               />
             </div>
           </CardContent>
         </Card>
 
         {/* Receipt Items */}
-        <Card className="border-gray-200">
+        <Card className="border-gray-200 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-bold text-gray-900">
-              Détails du reçu
+              Articles du reçu
             </CardTitle>
-            <Button onClick={addItem} size="sm" variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
+            <Button onClick={addItem} size="sm" variant="outline" className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
               Ajouter
             </Button>
           </CardHeader>
           
           <CardContent className="space-y-4">
             {items.map((item, index) => (
-              <div key={index} className="p-4 border border-gray-200 rounded-lg space-y-4">
-                <div className="flex items-center justify-between">
+              <div key={index} className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <div className="flex items-center justify-between mb-3">
                   <h4 className="font-medium text-gray-900">Article {index + 1}</h4>
                   {items.length > 1 && (
                     <Button
                       onClick={() => removeItem(index)}
                       size="sm"
                       variant="outline"
-                      className="text-red-600 hover:text-red-700"
+                      className="text-red-600 hover:text-red-700 h-8 w-8 p-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="md:col-span-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="md:col-span-1">
                     <Label>Désignation</Label>
                     <Input
                       placeholder="Description de l'article"
@@ -183,53 +191,78 @@ const GenerateReceiptStep2 = () => {
                       className="border-gray-300"
                     />
                   </div>
-
-                  <div>
-                    <Label>TVA (%)</Label>
-                    <Select onValueChange={(value) => updateItem(index, "tva", parseFloat(value))}>
-                      <SelectTrigger className="border-gray-300">
-                        <SelectValue placeholder="0%" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        <SelectItem value="0">0%</SelectItem>
-                        <SelectItem value="18">18%</SelectItem>
-                        <SelectItem value="19.25">19.25%</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label>Réduction (%)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={item.discount}
-                      onChange={(e) => updateItem(index, "discount", parseFloat(e.target.value) || 0)}
-                      className="border-gray-300"
-                      placeholder="0"
-                    />
-                  </div>
                 </div>
 
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-700">Sous-total :</span>
-                    <span className="font-bold text-gray-900">
-                      {(item.quantity * item.unitPrice * (1 + item.tva / 100) * (1 - item.discount / 100)).toLocaleString()} FCFA
-                    </span>
-                  </div>
+                <div className="mt-3 text-right">
+                  <span className="text-sm text-gray-600">Sous-total: </span>
+                  <span className="font-medium text-gray-900">
+                    {(item.quantity * item.unitPrice).toLocaleString()} FCFA
+                  </span>
                 </div>
               </div>
             ))}
 
-            <div className="border-t pt-4">
-              <div className="bg-primary/5 p-4 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-gray-900">Total général :</span>
-                  <span className="text-2xl font-bold text-primary">
-                    {calculateTotal().toLocaleString()} FCFA
+            {/* Receipt Totals */}
+            <div className="border-t pt-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>TVA (%)</Label>
+                  <Select onValueChange={(value) => setReceiptTva(parseFloat(value))}>
+                    <SelectTrigger className="border-gray-300">
+                      <SelectValue placeholder="0%" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="0">0%</SelectItem>
+                      <SelectItem value="18">18%</SelectItem>
+                      <SelectItem value="19.25">19.25%</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Réduction (%)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={receiptDiscount}
+                    onChange={(e) => setReceiptDiscount(parseFloat(e.target.value) || 0)}
+                    className="border-gray-300"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-primary/5 p-4 rounded-lg space-y-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">Sous-total :</span>
+                  <span className="font-medium text-gray-900">
+                    {calculateSubtotal().toLocaleString()} FCFA
                   </span>
+                </div>
+                {receiptTva > 0 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">TVA ({receiptTva}%) :</span>
+                    <span className="font-medium text-gray-900">
+                      {(calculateSubtotal() * receiptTva / 100).toLocaleString()} FCFA
+                    </span>
+                  </div>
+                )}
+                {receiptDiscount > 0 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">Réduction ({receiptDiscount}%) :</span>
+                    <span className="font-medium text-red-600">
+                      -{((calculateSubtotal() * (1 + receiptTva / 100)) * receiptDiscount / 100).toLocaleString()} FCFA
+                    </span>
+                  </div>
+                )}
+                <div className="border-t pt-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-900">Total général :</span>
+                    <span className="text-2xl font-bold text-primary">
+                      {calculateTotal().toLocaleString()} FCFA
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
