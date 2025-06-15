@@ -5,224 +5,222 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/layout/Header";
-import { Search, Filter, Plus, Eye, CheckCircle, XCircle, Clock } from "lucide-react";
+import MobileNav from "@/components/layout/MobileNav";
+import QuickNav from "@/components/layout/QuickNav";
+import { Search, Eye, Edit, UserPlus, Building } from "lucide-react";
 
 const AdminPartners = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const partners = [
     {
-      id: "1",
+      id: "PTR-001",
       name: "TechCorp Solutions",
-      email: "api@techcorp.com",
-      status: "active",
-      plan: "Enterprise",
-      monthlyRequests: 45000,
-      requestLimit: 50000,
-      joinDate: "15 Mar 2024",
-      lastActivity: "Il y a 2h"
+      contact: "Amadou Diallo",
+      email: "contact@techcorp.ci",
+      users: 1248,
+      receipts: 15420,
+      revenue: 2150000,
+      status: "Actif",
+      joinDate: "2024-01-15",
+      commission: 15
     },
     {
-      id: "2",
-      name: "E-commerce Plus",
-      email: "dev@ecommerceplus.com",
-      status: "active",
-      plan: "Professional",
-      monthlyRequests: 28000,
-      requestLimit: 30000,
-      joinDate: "3 Avr 2024",
-      lastActivity: "Il y a 1j"
+      id: "PTR-002",
+      name: "Digital Ivory",
+      contact: "Sarah Kouamé",
+      email: "info@digitalivy.com",
+      users: 892,
+      receipts: 8950,
+      revenue: 1340000,
+      status: "Actif",
+      joinDate: "2024-02-01",
+      commission: 12
     },
     {
-      id: "3",
-      name: "Mobile Apps Studio",
-      email: "contact@mobileapps.ci",
-      status: "pending",
-      plan: "Starter",
-      monthlyRequests: 0,
-      requestLimit: 10000,
-      joinDate: "12 Juin 2024",
-      lastActivity: "Jamais"
+      id: "PTR-003",
+      name: "InnovateCorp",
+      contact: "Pierre Yao",
+      email: "pierre@innovate.ci",
+      users: 445,
+      receipts: 3200,
+      revenue: 650000,
+      status: "En attente",
+      joinDate: "2024-02-15",
+      commission: 10
     },
     {
-      id: "4",
-      name: "RetailTech Solutions",
-      email: "api@retailtech.com",
-      status: "suspended",
-      plan: "Professional",
-      monthlyRequests: 15000,
-      requestLimit: 30000,
-      joinDate: "20 Jan 2024",
-      lastActivity: "Il y a 1 sem"
+      id: "PTR-004",
+      name: "WebSolutions Pro",
+      contact: "Marie Bamba",
+      email: "marie@websolutions.ci",
+      users: 156,
+      receipts: 1850,
+      revenue: 320000,
+      status: "Suspendu",
+      joinDate: "2024-01-30",
+      commission: 8
     }
   ];
 
-  const statusConfig = {
-    active: { label: "Actif", color: "bg-green-100 text-green-800", icon: CheckCircle },
-    pending: { label: "En attente", color: "bg-yellow-100 text-yellow-800", icon: Clock },
-    suspended: { label: "Suspendu", color: "bg-red-100 text-red-800", icon: XCircle }
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Actif":
+        return "bg-green-100 text-green-800";
+      case "En attente":
+        return "bg-yellow-100 text-yellow-800";
+      case "Suspendu":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
 
   const filteredPartners = partners.filter(partner =>
     partner.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    partner.contact.toLowerCase().includes(searchTerm.toLowerCase()) ||
     partner.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mobile-nav-padding">
       <Header title="Gestion des Partenaires" />
       
       <main className="p-4 md:p-6 space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <QuickNav userType="admin" />
+
+        {/* Header Actions */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Partenaires</h2>
+            <p className="text-gray-600">Gérez tous les partenaires de la plateforme</p>
+          </div>
+          <Button className="bg-primary hover:bg-primary/90">
+            <UserPlus className="w-4 h-4 mr-2" />
+            Ajouter un partenaire
+          </Button>
+        </div>
+
+        {/* Search */}
+        <Card className="border-gray-200">
+          <CardContent className="p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Rechercher un partenaire..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 border-gray-300"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Statistics */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="border-gray-200">
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold text-gray-900">156</div>
+            <CardContent className="p-4 text-center">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <Building className="w-5 h-5 text-blue-600" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">{partners.length}</p>
               <p className="text-sm text-gray-600">Total partenaires</p>
             </CardContent>
           </Card>
           <Card className="border-gray-200">
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold text-green-600">142</div>
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-bold text-green-600">
+                {partners.filter(p => p.status === "Actif").length}
+              </p>
               <p className="text-sm text-gray-600">Actifs</p>
             </CardContent>
           </Card>
           <Card className="border-gray-200">
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold text-yellow-600">8</div>
-              <p className="text-sm text-gray-600">En attente</p>
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-bold text-primary">
+                {partners.reduce((sum, p) => sum + p.users, 0).toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-600">Utilisateurs totaux</p>
             </CardContent>
           </Card>
           <Card className="border-gray-200">
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold text-red-600">6</div>
-              <p className="text-sm text-gray-600">Suspendus</p>
+            <CardContent className="p-4 text-center">
+              <p className="text-2xl font-bold text-purple-600">
+                {partners.reduce((sum, p) => sum + p.revenue, 0).toLocaleString()} FCFA
+              </p>
+              <p className="text-sm text-gray-600">Revenus générés</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Filters and Actions */}
-        <Card className="border-gray-200">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                  <Input
-                    placeholder="Rechercher par nom ou email..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Filtres
-                </Button>
-                <Button className="bg-primary hover:bg-primary/90">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nouveau partenaire
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Partners List */}
-        <Card className="border-gray-200">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-900">
-              Liste des partenaires ({filteredPartners.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {filteredPartners.map((partner) => {
-                const statusInfo = statusConfig[partner.status as keyof typeof statusConfig];
-                const usagePercentage = (partner.monthlyRequests / partner.requestLimit) * 100;
-                
-                return (
-                  <div
-                    key={partner.id}
-                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h4 className="font-medium text-gray-900">{partner.name}</h4>
-                          <Badge className={statusInfo.color}>
-                            <statusInfo.icon className="w-3 h-3 mr-1" />
-                            {statusInfo.label}
-                          </Badge>
-                          <Badge variant="outline">{partner.plan}</Badge>
-                        </div>
-                        
-                        <p className="text-sm text-gray-600 mb-3">{partner.email}</p>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-                          <div>
-                            <span className="text-gray-500">Inscription:</span>
-                            <p className="font-medium">{partner.joinDate}</p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Dernière activité:</span>
-                            <p className="font-medium">{partner.lastActivity}</p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Utilisation API:</span>
-                            <p className="font-medium">
-                              {partner.monthlyRequests.toLocaleString()} / {partner.requestLimit.toLocaleString()}
-                            </p>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                              <div 
-                                className="bg-primary h-1.5 rounded-full" 
-                                style={{ width: `${Math.min(usagePercentage, 100)}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
-                              <Eye className="w-4 h-4 mr-1" />
-                              Voir
-                            </Button>
-                            {partner.status === "pending" && (
-                              <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                                Approuver
-                              </Button>
-                            )}
-                            {partner.status === "active" && (
-                              <Button variant="destructive" size="sm">
-                                Suspendre
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {filteredPartners.map((partner) => (
+            <Card key={partner.id} className="border-gray-200">
+              <CardHeader className="pb-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg font-bold">{partner.name}</CardTitle>
+                    <p className="text-gray-600">{partner.contact}</p>
+                    <p className="text-sm text-gray-500">{partner.email}</p>
                   </div>
-                );
-              })}
-            </div>
+                  <Badge className={getStatusColor(partner.status)}>
+                    {partner.status}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-lg font-bold text-blue-600">{partner.users.toLocaleString()}</p>
+                    <p className="text-xs text-gray-600">Utilisateurs</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-green-600">{partner.receipts.toLocaleString()}</p>
+                    <p className="text-xs text-gray-600">Reçus</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-purple-600">{partner.commission}%</p>
+                    <p className="text-xs text-gray-600">Commission</p>
+                  </div>
+                </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-              <p className="text-sm text-gray-600">
-                Affichage de 1 à {filteredPartners.length} sur {partners.length} partenaires
-              </p>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" disabled>
-                  Précédent
-                </Button>
-                <Button variant="outline" size="sm">
-                  Suivant
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                <div className="pt-2 border-t border-gray-100">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-600">Revenus générés</span>
+                    <span className="font-bold text-primary">{partner.revenue.toLocaleString()} FCFA</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-600">Membre depuis</span>
+                    <span className="text-sm">{partner.joinDate}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="flex-1 border-gray-300">
+                    <Eye className="w-4 h-4 mr-2" />
+                    Voir détails
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1 border-gray-300">
+                    <Edit className="w-4 h-4 mr-2" />
+                    Modifier
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredPartners.length === 0 && (
+          <Card className="border-gray-200">
+            <CardContent className="p-8 text-center">
+              <p className="text-gray-500">Aucun partenaire trouvé</p>
+            </CardContent>
+          </Card>
+        )}
       </main>
+
+      <MobileNav />
     </div>
   );
 };

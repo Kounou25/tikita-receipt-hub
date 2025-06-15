@@ -1,60 +1,31 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, FileText, ShoppingBag, Users } from "lucide-react";
+import QuickNav from "@/components/layout/QuickNav";
+import { TrendingUp, TrendingDown, DollarSign, FileText, Calendar, BarChart3 } from "lucide-react";
 
 const UserStats = () => {
+  const [period, setPeriod] = useState("month");
+
+  const stats = {
+    totalReceipts: 245,
+    totalRevenue: 1250000,
+    avgReceiptValue: 5102,
+    topClient: "Boutique Elegance",
+    growthRate: 12.5,
+    lastMonthReceipts: 189
+  };
+
   const monthlyData = [
-    { month: 'Jan', receipts: 65, revenue: 45000 },
-    { month: 'Fév', receipts: 78, revenue: 52000 },
-    { month: 'Mar', receipts: 90, revenue: 61000 },
-    { month: 'Avr', receipts: 81, revenue: 58000 },
-    { month: 'Mai', receipts: 95, revenue: 72000 },
-    { month: 'Juin', receipts: 110, revenue: 85000 },
-  ];
-
-  const categoryData = [
-    { name: 'Électronique', value: 35, color: '#4CAF50' },
-    { name: 'Vêtements', value: 25, color: '#FF9800' },
-    { name: 'Alimentation', value: 20, color: '#2196F3' },
-    { name: 'Cosmétiques', value: 20, color: '#9C27B0' },
-  ];
-
-  const stats = [
-    {
-      title: "Revenus totaux",
-      value: "385,000 FCFA",
-      change: "+15.3%",
-      changeType: "increase",
-      icon: DollarSign,
-      color: "text-green-600"
-    },
-    {
-      title: "Reçus générés",
-      value: "519",
-      change: "+8.2%",
-      changeType: "increase",
-      icon: FileText,
-      color: "text-blue-600"
-    },
-    {
-      title: "Articles vendus",
-      value: "1,247",
-      change: "+12.5%",
-      changeType: "increase",
-      icon: ShoppingBag,
-      color: "text-purple-600"
-    },
-    {
-      title: "Clients uniques",
-      value: "89",
-      change: "-2.1%",
-      changeType: "decrease",
-      icon: Users,
-      color: "text-orange-600"
-    }
+    { month: "Jan", receipts: 65, revenue: 320000 },
+    { month: "Fév", receipts: 78, revenue: 390000 },
+    { month: "Mar", receipts: 92, revenue: 460000 },
+    { month: "Avr", receipts: 85, revenue: 425000 },
+    { month: "Mai", receipts: 98, revenue: 490000 },
+    { month: "Juin", receipts: 112, revenue: 560000 }
   ];
 
   return (
@@ -62,148 +33,163 @@ const UserStats = () => {
       <Header title="Statistiques" />
       
       <main className="p-4 md:p-6 space-y-6">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat) => (
-            <Card key={stat.title} className="border-gray-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                    <div className="flex items-center gap-1">
-                      {stat.changeType === "increase" ? (
-                        <TrendingUp className="w-4 h-4 text-green-500" />
-                      ) : (
-                        <TrendingDown className="w-4 h-4 text-red-500" />
-                      )}
-                      <span className={`text-sm font-medium ${
-                        stat.changeType === "increase" ? "text-green-500" : "text-red-500"
-                      }`}>
-                        {stat.change}
-                      </span>
+        <QuickNav userType="user" />
+
+        {/* Period Selector */}
+        <div className="flex justify-center space-x-2">
+          <Button
+            variant={period === "week" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPeriod("week")}
+          >
+            7 jours
+          </Button>
+          <Button
+            variant={period === "month" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPeriod("month")}
+          >
+            30 jours
+          </Button>
+          <Button
+            variant={period === "year" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setPeriod("year")}
+          >
+            1 an
+          </Button>
+        </div>
+
+        {/* Key Metrics */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Reçus totaux</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalReceipts}</p>
+                </div>
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                </div>
+              </div>
+              <div className="flex items-center mt-2">
+                <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+                <span className="text-sm text-green-600">+{stats.growthRate}%</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Chiffre d'affaires</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalRevenue.toLocaleString()} FCFA</p>
+                </div>
+                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <DollarSign className="w-5 h-5 text-green-600" />
+                </div>
+              </div>
+              <div className="flex items-center mt-2">
+                <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+                <span className="text-sm text-green-600">+8.2%</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Panier moyen</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.avgReceiptValue.toLocaleString()} FCFA</p>
+                </div>
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-purple-600" />
+                </div>
+              </div>
+              <div className="flex items-center mt-2">
+                <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
+                <span className="text-sm text-red-600">-2.1%</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Meilleur client</p>
+                  <p className="text-lg font-bold text-gray-900">{stats.topClient}</p>
+                </div>
+                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-orange-600" />
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mt-2">15 reçus ce mois</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Évolution mensuelle</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {monthlyData.map((data, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600">{data.month}</span>
+                    <div className="flex items-center space-x-4">
+                      <span className="text-sm font-medium">{data.receipts} reçus</span>
+                      <span className="text-sm font-bold text-primary">{data.revenue.toLocaleString()} FCFA</span>
                     </div>
                   </div>
-                  <div className={`p-3 rounded-full bg-gray-50 ${stat.color}`}>
-                    <stat.icon className="w-6 h-6" />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Répartition par catégorie</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Vêtements</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-20 h-2 bg-gray-200 rounded-full">
+                      <div className="w-16 h-2 bg-blue-500 rounded-full"></div>
+                    </div>
+                    <span className="text-sm font-medium">45%</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Revenue Chart */}
-        <Card className="border-gray-200">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-900">
-              Évolution des revenus (6 derniers mois)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip 
-                    formatter={(value, name) => [
-                      name === 'revenue' ? `${value} FCFA` : value,
-                      name === 'revenue' ? 'Revenus' : 'Reçus'
-                    ]}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="#4CAF50" 
-                    strokeWidth={3}
-                    dot={{ fill: '#4CAF50', strokeWidth: 2, r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Receipts Chart */}
-          <Card className="border-gray-200">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-gray-900">
-                Reçus générés par mois
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={monthlyData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="receipts" fill="#4CAF50" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Category Distribution */}
-          <Card className="border-gray-200">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-gray-900">
-                Répartition par catégorie
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={80}
-                      dataKey="value"
-                      label={({ name, value }) => `${name}: ${value}%`}
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Accessoires</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-20 h-2 bg-gray-200 rounded-full">
+                      <div className="w-12 h-2 bg-green-500 rounded-full"></div>
+                    </div>
+                    <span className="text-sm font-medium">30%</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Chaussures</span>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-20 h-2 bg-gray-200 rounded-full">
+                      <div className="w-10 h-2 bg-purple-500 rounded-full"></div>
+                    </div>
+                    <span className="text-sm font-medium">25%</span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Performance Summary */}
-        <Card className="border-gray-200">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-900">
-              Résumé des performances
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">72%</div>
-                <p className="text-gray-600">Taux de conversion</p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">4,321 FCFA</div>
-                <p className="text-gray-600">Panier moyen</p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">24h</div>
-                <p className="text-gray-600">Délai moyen de paiement</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </main>
 
       <MobileNav />
