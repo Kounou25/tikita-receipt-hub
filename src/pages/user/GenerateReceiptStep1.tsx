@@ -1,150 +1,246 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
-import { ArrowRight, Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowRight, User, Package, CreditCard, FileText } from "lucide-react";
 
 const GenerateReceiptStep1 = () => {
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    clientName: "",
+    clientPhone: "",
+    clientEmail: "",
+    productName: "",
+    quantity: "",
+    unitPrice: "",
+    paymentMethod: "",
+    notes: ""
+  });
 
-  const templates = [
-    {
-      id: "modern",
-      name: "Moderne",
-      description: "Design épuré et professionnel",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
-      popular: true
-    },
-    {
-      id: "classic",
-      name: "Classique",
-      description: "Style traditionnel et élégant",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
-    },
-    {
-      id: "minimal",
-      name: "Minimaliste",
-      description: "Simple et efficace",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
-    },
-    {
-      id: "colorful",
-      name: "Coloré",
-      description: "Design vibrant et attractif",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
-    },
-    {
-      id: "business",
-      name: "Business",
-      description: "Professionnel pour entreprises",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
-    },
-    {
-      id: "invoice",
-      name: "Facture",
-      description: "Format facture détaillé",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
-    }
-  ];
-
-  const handleContinue = () => {
-    if (selectedTemplate) {
-      localStorage.setItem("selectedTemplate", selectedTemplate);
-      navigate("/generate/step2");
-    }
+  const handleNext = () => {
+    // Validation logic here
+    navigate("/generate/step2");
   };
 
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
-      <Header title="Générer un reçu" />
+      <Header title="Nouveau Reçu - Étape 1" />
       
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="user" />
 
-        {/* Progress indicator */}
-        <div className="flex items-center justify-center space-x-4 mb-8">
+        {/* Progress Indicator */}
+        <div className="flex items-center justify-center space-x-4 mb-6">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-medium">
+            <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
               1
             </div>
-            <span className="ml-2 text-sm font-medium text-primary">Modèle</span>
+            <span className="ml-2 text-sm font-medium text-primary">Informations</span>
           </div>
-          <div className="w-12 h-0.5 bg-gray-300"></div>
+          <div className="w-8 h-px bg-gray-300"></div>
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 font-medium">
+            <div className="w-8 h-8 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center text-sm font-medium">
               2
             </div>
-            <span className="ml-2 text-sm text-gray-500">Détails</span>
+            <span className="ml-2 text-sm font-medium text-gray-500">Aperçu</span>
           </div>
         </div>
 
-        <Card className="border-gray-200 shadow-sm">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              Choisissez un modèle de reçu
-            </CardTitle>
-            <p className="text-gray-600 mt-2">
-              Sélectionnez le design qui correspond le mieux à votre marque
-            </p>
-          </CardHeader>
-          
-          <CardContent className="px-6 pb-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {templates.map((template) => (
-                <div
-                  key={template.id}
-                  className={`relative border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${
-                    selectedTemplate === template.id
-                      ? "border-primary bg-primary/5 shadow-md"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                  onClick={() => setSelectedTemplate(template.id)}
-                >
-                  {template.popular && (
-                    <div className="absolute -top-2 -right-2 bg-secondary text-white text-xs px-2 py-1 rounded-full font-medium z-10">
-                      Populaire
-                    </div>
-                  )}
-                  
-                  {selectedTemplate === template.id && (
-                    <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10">
-                      <Check className="w-3 h-3 text-white" />
-                    </div>
-                  )}
-
-                  <div className="p-3">
-                    <div className="aspect-[3/4] bg-gray-100 rounded-lg mb-2 overflow-hidden">
-                      <img
-                        src={template.thumbnail}
-                        alt={template.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="font-medium text-gray-900 text-sm mb-1">{template.name}</h3>
-                    <p className="text-xs text-gray-600 leading-relaxed">{template.description}</p>
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Informations Client */}
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <User className="w-5 h-5 text-primary" />
+                Informations du client
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="clientName" className="text-sm font-medium">
+                    Nom du client *
+                  </Label>
+                  <Input
+                    id="clientName"
+                    placeholder="Nom complet du client"
+                    value={formData.clientName}
+                    onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                    className="border-gray-300 h-12"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="clientPhone" className="text-sm font-medium">
+                      Téléphone
+                    </Label>
+                    <Input
+                      id="clientPhone"
+                      placeholder="+227 XX XX XX XX"
+                      value={formData.clientPhone}
+                      onChange={(e) => setFormData({ ...formData, clientPhone: e.target.value })}
+                      className="border-gray-300 h-12"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="clientEmail" className="text-sm font-medium">
+                      Email (optionnel)
+                    </Label>
+                    <Input
+                      id="clientEmail"
+                      type="email"
+                      placeholder="client@email.com"
+                      value={formData.clientEmail}
+                      onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
+                      className="border-gray-300 h-12"
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            <div className="mt-8 flex justify-center">
-              <Button 
-                onClick={handleContinue}
-                disabled={!selectedTemplate}
-                className="bg-primary hover:bg-primary/90 px-8 py-2 rounded-lg font-medium"
-                size="lg"
-              >
-                Continuer
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Informations Produit */}
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Package className="w-5 h-5 text-primary" />
+                Détails du produit/service
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="productName" className="text-sm font-medium">
+                  Nom du produit/service *
+                </Label>
+                <Input
+                  id="productName"
+                  placeholder="Nom du produit ou service vendu"
+                  value={formData.productName}
+                  onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
+                  className="border-gray-300 h-12"
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="quantity" className="text-sm font-medium">
+                    Quantité *
+                  </Label>
+                  <Input
+                    id="quantity"
+                    type="number"
+                    placeholder="1"
+                    min="1"
+                    value={formData.quantity}
+                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                    className="border-gray-300 h-12"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="unitPrice" className="text-sm font-medium">
+                    Prix unitaire (FCFA) *
+                  </Label>
+                  <Input
+                    id="unitPrice"
+                    type="number"
+                    placeholder="1000"
+                    min="0"
+                    step="100"
+                    value={formData.unitPrice}
+                    onChange={(e) => setFormData({ ...formData, unitPrice: e.target.value })}
+                    className="border-gray-300 h-12"
+                  />
+                </div>
+              </div>
+
+              {/* Calcul automatique du total */}
+              {formData.quantity && formData.unitPrice && (
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-green-800">Total :</span>
+                    <span className="text-xl font-bold text-green-600">
+                      {(parseInt(formData.quantity) * parseInt(formData.unitPrice)).toLocaleString()} FCFA
+                    </span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Informations Paiement */}
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <CreditCard className="w-5 h-5 text-primary" />
+                Méthode de paiement
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Mode de paiement *</Label>
+                <Select value={formData.paymentMethod} onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })}>
+                  <SelectTrigger className="border-gray-300 h-12">
+                    <SelectValue placeholder="Sélectionnez un mode de paiement" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">Espèces</SelectItem>
+                    <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                    <SelectItem value="bank_transfer">Virement bancaire</SelectItem>
+                    <SelectItem value="check">Chèque</SelectItem>
+                    <SelectItem value="card">Carte bancaire</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Notes additionnelles */}
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <FileText className="w-5 h-5 text-primary" />
+                Notes (optionnel)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <Label htmlFor="notes" className="text-sm font-medium">
+                  Informations complémentaires
+                </Label>
+                <Textarea
+                  id="notes"
+                  placeholder="Garantie, conditions particulières, etc."
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="border-gray-300 min-h-[100px] resize-none"
+                  rows={4}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Bouton Suivant */}
+          <div className="flex justify-end pb-20 md:pb-6">
+            <Button 
+              onClick={handleNext}
+              className="bg-primary hover:bg-primary/90 px-8 py-3 h-auto text-base"
+              disabled={!formData.clientName || !formData.productName || !formData.quantity || !formData.unitPrice || !formData.paymentMethod}
+            >
+              Continuer
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </div>
+        </div>
       </main>
 
       <MobileNav />
