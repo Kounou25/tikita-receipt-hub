@@ -59,45 +59,54 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
   const navItems = getNavItems();
 
   return (
-    <Card className="border-gray-200 mb-6">
-      <CardContent className="p-4">
-        <div className="flex flex-wrap gap-2">
-          {navItems.map((item) => (
-            <Link key={item.path} to={item.path}>
-              <Button
-                variant={location.pathname === item.path ? "default" : "outline"}
-                size="sm"
-                className={cn(
-                  "flex items-center gap-2",
-                  location.pathname === item.path
-                    ? "bg-primary text-white"
-                    : "text-gray-600 hover:text-primary"
-                )}
-              >
-                <item.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{item.label}</span>
-              </Button>
-            </Link>
-          ))}
-          
-          {/* Liens additionnels */}
-          <div className="flex gap-2 ml-auto">
-            <Link to="/subscription">
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary">
-                <CreditCard className="w-4 h-4" />
-                <span className="hidden sm:inline ml-2">Abonnement</span>
-              </Button>
-            </Link>
-            <Link to="/support">
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary">
-                <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline ml-2">Support</span>
-              </Button>
-            </Link>
+    <>
+      {/* Desktop Navigation */}
+      <Card className="border-gray-200 mb-6 hidden md:block">
+        <CardContent className="p-4">
+          <div className="flex flex-wrap gap-2">
+            {navItems.map((item) => (
+              <Link key={item.path} to={item.path}>
+                <Button
+                  variant={location.pathname === item.path ? "default" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "flex items-center gap-2",
+                    location.pathname === item.path
+                      ? "bg-primary text-white"
+                      : "text-gray-600 hover:text-primary"
+                  )}
+                >
+                  <item.icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </Button>
+              </Link>
+            ))}
+            
+            {/* Liens additionnels */}
+            <div className="flex gap-2 ml-auto">
+              <Link to="/subscription">
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary">
+                  <CreditCard className="w-4 h-4" />
+                  <span className="ml-2">Abonnement</span>
+                </Button>
+              </Link>
+              <Link to="/support">
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary">
+                  <Settings className="w-4 h-4" />
+                  <span className="ml-2">Support</span>
+                </Button>
+              </Link>
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Mobile Navigation - Affiche uniquement la barre en bas */}
+      <div className="md:hidden">
+        {/* Espacement pour éviter que le contenu soit masqué par la barre de navigation fixe */}
+        <div className="h-4"></div>
+      </div>
+    </>
   );
 };
 

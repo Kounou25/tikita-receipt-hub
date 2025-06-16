@@ -5,17 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
-import { Search, Eye, Edit, UserPlus, Users, Filter } from "lucide-react";
+import { Search, Eye, Edit, UserPlus, Users, UserX, UserCheck, Power, PowerOff } from "lucide-react";
 
 const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPlan, setFilterPlan] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+  const { toast } = useToast();
 
-  const users = [
+  const [users, setUsers] = useState([
     {
       id: "USR-001",
       name: "Marie Kouassi",
@@ -76,7 +78,42 @@ const AdminUsers = () => {
       lastLogin: "Il y a 3j",
       revenue: 990000
     }
-  ];
+  ]);
+
+  const handleActivateUser = (userId: string) => {
+    setUsers(users.map(user => 
+      user.id === userId ? { ...user, status: "Actif" } : user
+    ));
+    const user = users.find(u => u.id === userId);
+    toast({
+      title: "Utilisateur activé",
+      description: `${user?.name} a été activé avec succès.`,
+    });
+  };
+
+  const handleDeactivateUser = (userId: string) => {
+    setUsers(users.map(user => 
+      user.id === userId ? { ...user, status: "Inactif" } : user
+    ));
+    const user = users.find(u => u.id === userId);
+    toast({
+      title: "Utilisateur désactivé",
+      description: `${user?.name} a été désactivé.`,
+      variant: "destructive",
+    });
+  };
+
+  const handleSuspendUser = (userId: string) => {
+    setUsers(users.map(user => 
+      user.id === userId ? { ...user, status: "Suspendu" } : user
+    ));
+    const user = users.find(u => u.id === userId);
+    toast({
+      title: "Utilisateur suspendu",
+      description: `${user?.name} a été suspendu.`,
+      variant: "destructive",
+    });
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -264,12 +301,48 @@ const AdminUsers = () => {
                       </td>
                       <td className="py-3 px-2">
                         <div className="flex gap-1">
-                          <Button variant="outline" size="sm" className="border-gray-300">
+                          <Button variant="outline" size="sm" className="border-gray-300" title="Voir">
                             <Eye className="w-3 h-3" />
                           </Button>
-                          <Button variant="outline" size="sm" className="border-gray-300">
+                          <Button variant="outline" size="sm" className="border-gray-300" title="Modifier">
                             <Edit className="w-3 h-3" />
                           </Button>
+                          
+                          {/* Boutons d'actions selon le statut */}
+                          {user.status === "Actif" && (
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="border-orange-300 text-orange-600 hover:bg-orange-50"
+                                onClick={() => handleDeactivateUser(user.id)}
+                                title="Désactiver"
+                              >
+                                <PowerOff className="w-3 h-3" />
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="border-red-300 text-red-600 hover:bg-red-50"
+                                onClick={() => handleSuspendUser(user.id)}
+                                title="Suspendre"
+                              >
+                                <UserX className="w-3 h-3" />
+                              </Button>
+                            </>
+                          )}
+                          
+                          {(user.status === "Inactif" || user.status === "Suspendu") && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="border-green-300 text-green-600 hover:bg-green-50"
+                              onClick={() => handleActivateUser(user.id)}
+                              title="Activer"
+                            >
+                              <UserCheck className="w-3 h-3" />
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -287,7 +360,7 @@ const AdminUsers = () => {
         </Card>
       </main>
 
-      <MobileNav />
+      <MobileNav userType="admin" />
     </div>
   );
 };
