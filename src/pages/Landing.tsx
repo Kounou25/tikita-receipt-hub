@@ -145,59 +145,90 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-green-50 to-yellow-50">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23f97316" fill-opacity="0.05"%3E%3Cpath d="M30 30c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
         
         <div className="max-w-7xl mx-auto px-4 py-20 md:px-6 md:py-32 relative">
           <div className="text-center space-y-8">
-            <Badge className="bg-gradient-to-r from-orange-100 to-green-100 text-orange-700 hover:bg-orange-100 px-4 py-2 text-sm font-medium border-orange-200">
-              🇳🇪 Conçu spécialement pour le Niger
+            <Badge className="bg-gradient-to-r from-orange-100 to-green-100 text-orange-700 hover:bg-orange-100 px-6 py-3 text-base font-bold border-2 border-orange-200 shadow-lg">
+              🇳🇪 Solution 100% Nigérienne - Par et Pour le Niger
             </Badge>
             
             <div className="animate-fade-in">
               <h1 className="text-4xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-                Digitalisez votre
-                <span className="block bg-gradient-to-r from-orange-600 via-red-500 to-green-600 bg-clip-text text-transparent">
+                Révolutionnez votre
+                <span className="block bg-gradient-to-r from-orange-600 via-red-500 to-green-600 bg-clip-text text-transparent drop-shadow-lg">
                   commerce au Niger
                 </span>
               </h1>
-              <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto mb-12 leading-relaxed">
+              <p className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto mb-12 leading-relaxed font-medium">
                 La première plateforme nigérienne pour créer des reçus numériques professionnels. 
-                Simple, rapide et adapté aux réalités locales.
+                Adaptée aux réalités du marché local : connexion faible, paiements mobile money, 
+                langues locales supportées.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
               <Link to="/register">
-                <Button size="lg" className="bg-gradient-to-r from-orange-600 to-green-600 hover:from-orange-700 hover:to-green-700 text-lg px-8 py-4 h-auto">
-                  Commencer gratuitement
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                <Button size="lg" className="bg-gradient-to-r from-orange-600 to-green-600 hover:from-orange-700 hover:to-green-700 text-xl px-10 py-5 h-auto shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300">
+                  Démarrer gratuitement
+                  <ArrowRight className="w-6 h-6 ml-3" />
                 </Button>
               </Link>
               <Link to="/login">
-                <Button variant="outline" size="lg" className="text-lg px-8 py-4 h-auto border-orange-200 hover:bg-orange-50">
+                <Button variant="outline" size="lg" className="text-xl px-10 py-5 h-auto border-2 border-orange-300 hover:bg-orange-50 shadow-lg">
                   Voir une démo
                 </Button>
               </Link>
             </div>
 
-            {/* Niger Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-orange-600 mb-2">500+</div>
-                <div className="text-gray-600">Commerçants actifs</div>
+            {/* Niger Stats avec drapeaux et couleurs locales */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+              <div className="text-center p-6 bg-white/80 rounded-xl shadow-lg border border-orange-200">
+                <div className="text-4xl md:text-5xl font-bold text-orange-600 mb-3">1,200+</div>
+                <div className="text-gray-700 font-medium">Commerçants nigériens</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-green-600 mb-2">25K+</div>
-                <div className="text-gray-600">Reçus générés</div>
+              <div className="text-center p-6 bg-white/80 rounded-xl shadow-lg border border-green-200">
+                <div className="text-4xl md:text-5xl font-bold text-green-600 mb-3">45K+</div>
+                <div className="text-gray-700 font-medium">Reçus générés</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-red-600 mb-2">8</div>
-                <div className="text-gray-600">Régions couvertes</div>
+              <div className="text-center p-6 bg-white/80 rounded-xl shadow-lg border border-red-200">
+                <div className="text-4xl md:text-5xl font-bold text-red-600 mb-3">8</div>
+                <div className="text-gray-700 font-medium">Régions du Niger</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-orange-600 mb-2">24/7</div>
-                <div className="text-gray-600">Support local</div>
+              <div className="text-center p-6 bg-white/80 rounded-xl shadow-lg border border-orange-200">
+                <div className="text-4xl md:text-5xl font-bold text-orange-600 mb-3">24/7</div>
+                <div className="text-gray-700 font-medium">Support local</div>
+              </div>
+            </div>
+
+            {/* Section spéciale Niger */}
+            <div className="mt-16 p-8 bg-gradient-to-r from-orange-100 to-green-100 rounded-2xl border-2 border-orange-200 shadow-xl">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                🏪 Conçu pour les réalités nigériennes
+              </h3>
+              <div className="grid md:grid-cols-3 gap-6 text-left">
+                <div className="flex items-start space-x-3">
+                  <div className="text-2xl">📱</div>
+                  <div>
+                    <h4 className="font-bold text-gray-900">Mobile Money</h4>
+                    <p className="text-gray-700">Support Orange Money, Moov Money, Airtel Money</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="text-2xl">🌐</div>
+                  <div>
+                    <h4 className="font-bold text-gray-900">Hors ligne</h4>
+                    <p className="text-gray-700">Fonctionne même avec une connexion faible</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="text-2xl">💰</div>
+                  <div>
+                    <h4 className="font-bold text-gray-900">Prix local</h4>
+                    <p className="text-gray-700">Tarifs adaptés au marché nigérien</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -209,11 +240,11 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-              Adapté aux besoins nigériens
+              Adapté aux commerçants nigériens
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Des outils pensés pour les commerçants du Niger, que vous soyez à Niamey, 
-              Zinder, Maradi ou ailleurs dans le pays.
+              Des outils pensés pour les entrepreneurs du Niger, de Niamey à Agadez, 
+              en passant par Zinder, Maradi et toutes les régions du pays.
             </p>
           </div>
 
@@ -242,7 +273,7 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-              Ils nous font confiance
+              Ils nous font confiance au Niger
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Des commerçants de tout le Niger utilisent Tikita pour développer leur activité
@@ -279,10 +310,10 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-              Tarifs accessibles
+              Tarifs accessibles au Niger
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Des prix adaptés au marché nigérien. Commencez gratuitement.
+              Des prix adaptés au marché nigérien. Commencez gratuitement et évoluez selon vos besoins.
             </p>
           </div>
 
