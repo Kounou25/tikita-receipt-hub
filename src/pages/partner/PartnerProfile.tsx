@@ -5,55 +5,45 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
-import { Edit, Save, Eye, EyeOff, Copy, RefreshCw, Camera, Building2 } from "lucide-react";
+import { Edit, Save, Eye, EyeOff, Copy, RefreshCw } from "lucide-react";
 
 const PartnerProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [profile, setProfile] = useState({
-    companyName: "TechCorp Solutions Niger",
-    contactName: "Ibrahim Mamadou",
-    email: "contact@techcorp.ne",
-    phone: "+227 96 23 45 67",
-    address: "Plateau, Niamey, Niger",
-    website: "https://techcorp.ne",
-    description: "Partenaire technologique spécialisé dans l'intégration de solutions de facturation pour les entreprises nigériennes.",
-    partnerSince: "Janvier 2024",
-    logo: "/lovable-uploads/98b915da-4744-4a07-84d2-b2d5065e9c15.png"
+    companyName: "TechCorp Solutions",
+    contactName: "Amadou Diallo",
+    email: "contact@techcorp.ci",
+    phone: "+225 01 02 03 04 05",
+    address: "Plateau, Abidjan, Côte d'Ivoire",
+    website: "https://techcorp.ci",
+    description: "Partenaire technologique spécialisé dans l'intégration de solutions de facturation pour les entreprises ivoiriennes.",
+    partnerSince: "Janvier 2024"
   });
 
   const apiCredentials = {
     apiKey: "tk_live_AbCdEfGhIjKlMnOpQrStUvWxYz123456",
     secretKey: "sk_live_ZyXwVuTsRqPoNmLkJiHgFeDcBa987654",
-    webhookUrl: "https://api.techcorp.ne/webhooks/tikita"
+    webhookUrl: "https://api.techcorp.ci/webhooks/tikita"
   };
 
   const handleSave = () => {
     setIsEditing(false);
+    // Save logic here
     console.log("Profile saved:", profile);
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+    // Show toast notification
   };
 
   const regenerateApiKey = () => {
+    // Logic to regenerate API key
     console.log("Regenerating API key...");
-  };
-
-  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfile({ ...profile, logo: e.target?.result as string });
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   return (
@@ -63,63 +53,26 @@ const PartnerProfile = () => {
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="partner" />
 
-        {/* En-tête avec logo et informations principales */}
-        <Card className="border-gray-200">
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-              <div className="relative">
-                <Avatar className="w-24 h-24 md:w-32 md:h-32">
-                  <AvatarImage src={profile.logo} alt={profile.companyName} />
-                  <AvatarFallback className="text-2xl">
-                    <Building2 className="w-12 h-12" />
-                  </AvatarFallback>
-                </Avatar>
-                {isEditing && (
-                  <label className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full cursor-pointer hover:bg-primary/90 transition-colors">
-                    <Camera className="w-4 h-4" />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoUpload}
-                      className="hidden"
-                    />
-                  </label>
-                )}
-              </div>
-              <div className="flex-1 text-center md:text-left">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">{profile.companyName}</h2>
-                <p className="text-gray-600 mb-1">Contact : {profile.contactName}</p>
-                <p className="text-sm text-gray-500 mb-4">Partenaire depuis {profile.partnerSince}</p>
-                <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                  <span>{profile.email}</span>
-                  <span>{profile.phone}</span>
-                  <span>{profile.website}</span>
-                </div>
-              </div>
-              <Button
-                onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                className="bg-primary hover:bg-primary/90 w-full md:w-auto"
-              >
-                {isEditing ? (
-                  <>
-                    <Save className="w-4 h-4 mr-2" />
-                    Sauvegarder
-                  </>
-                ) : (
-                  <>
-                    <Edit className="w-4 h-4 mr-2" />
-                    Modifier
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Company Information */}
         <Card className="border-gray-200">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-xl font-bold">Informations de l'entreprise</CardTitle>
+            <Button 
+              onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {isEditing ? (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Sauvegarder
+                </>
+              ) : (
+                <>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Modifier
+                </>
+              )}
+            </Button>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -202,6 +155,12 @@ const PartnerProfile = () => {
                 rows={4}
               />
             </div>
+
+            <div className="pt-4 border-t">
+              <p className="text-sm text-gray-600">
+                <strong>Partenaire depuis :</strong> {profile.partnerSince}
+              </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -220,7 +179,7 @@ const PartnerProfile = () => {
                 <Input
                   value={apiCredentials.apiKey}
                   readOnly
-                  className="border-gray-300 bg-gray-50 font-mono text-sm"
+                  className="border-gray-300 bg-gray-50"
                 />
                 <Button
                   variant="outline"
@@ -239,7 +198,7 @@ const PartnerProfile = () => {
                   type={showApiKey ? "text" : "password"}
                   value={apiCredentials.secretKey}
                   readOnly
-                  className="border-gray-300 bg-gray-50 font-mono text-sm"
+                  className="border-gray-300 bg-gray-50"
                 />
                 <Button
                   variant="outline"
@@ -264,7 +223,7 @@ const PartnerProfile = () => {
                 <Input
                   value={apiCredentials.webhookUrl}
                   readOnly
-                  className="border-gray-300 bg-gray-50 font-mono text-sm"
+                  className="border-gray-300 bg-gray-50"
                 />
                 <Button
                   variant="outline"
@@ -300,19 +259,19 @@ const PartnerProfile = () => {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">648</p>
+                <p className="text-2xl font-bold text-blue-600">1,248</p>
                 <p className="text-sm text-gray-600">Utilisateurs référés</p>
               </div>
               <div className="text-center p-4 bg-green-50 rounded-lg">
-                <p className="text-2xl font-bold text-green-600">8,420</p>
+                <p className="text-2xl font-bold text-green-600">15,420</p>
                 <p className="text-sm text-gray-600">Reçus générés</p>
               </div>
               <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <p className="text-2xl font-bold text-purple-600">92%</p>
+                <p className="text-2xl font-bold text-purple-600">89%</p>
                 <p className="text-sm text-gray-600">Taux de satisfaction</p>
               </div>
               <div className="text-center p-4 bg-orange-50 rounded-lg">
-                <p className="text-2xl font-bold text-orange-600">1.8M</p>
+                <p className="text-2xl font-bold text-orange-600">2.1M</p>
                 <p className="text-sm text-gray-600">Revenus générés (FCFA)</p>
               </div>
             </div>
