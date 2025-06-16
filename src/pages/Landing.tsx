@@ -145,8 +145,10 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-green-50 to-yellow-50">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23f97316" fill-opacity="0.05"%3E%3Cpath d="M30 30c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-100 via-green-50 to-yellow-50">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23f97316" fill-opacity="0.05"%3E%3Cpath d="M30 30c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
+        </div>
         
         <div className="max-w-7xl mx-auto px-4 py-20 md:px-6 md:py-32 relative">
           <div className="text-center space-y-8">
@@ -182,7 +184,7 @@ const Landing = () => {
               </Link>
             </div>
 
-            {/* Niger Stats avec drapeaux et couleurs locales */}
+            {/* Niger Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
               <div className="text-center p-6 bg-white/80 rounded-xl shadow-lg border border-orange-200">
                 <div className="text-4xl md:text-5xl font-bold text-orange-600 mb-3">1,200+</div>
