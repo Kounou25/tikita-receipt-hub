@@ -94,13 +94,10 @@ const Landing = () => {
         <nav className="flex items-center justify-between max-w-7xl mx-auto px-4 py-4 md:px-6">
           <div className="flex items-center space-x-3">
             <img 
-              src="/lovable-uploads/98b915da-4744-4a07-84d2-b2d5065e9c15.png" 
-              alt="Tikita Logo" 
-              className="w-10 h-10 rounded-lg"
+              src="/lovable-uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
+              alt="Tikiita Logo" 
+              className="h-10"
             />
-            <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
-              Tikita
-            </span>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
@@ -319,7 +316,7 @@ const Landing = () => {
             Prêt à révolutionner vos reçus ?
           </h2>
           <p className="text-xl text-green-100 mb-12">
-            Rejoignez des milliers de vendeurs qui font confiance à Tikita 
+            Rejoignez des milliers de vendeurs qui font confiance à Tikiita 
             pour leurs reçus numériques.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -345,11 +342,10 @@ const Landing = () => {
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
                 <img 
-                  src="/lovable-uploads/98b915da-4744-4a07-84d2-b2d5065e9c15.png" 
-                  alt="Tikita Logo" 
-                  className="w-10 h-10 rounded-lg"
+                  src="/lovable-uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
+                  alt="Tikiita Logo" 
+                  className="h-10"
                 />
-                <span className="text-2xl font-bold">Tikita</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-md">
                 La plateforme de référence pour la génération de reçus numériques 
@@ -378,7 +374,7 @@ const Landing = () => {
           
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 mb-4 md:mb-0">
-              &copy; 2024 Tikita. Tous droits réservés.
+              &copy; 2024 Tikiita. Tous droits réservés.
             </p>
             <div className="flex space-x-6 text-gray-400">
               <a href="#" className="hover:text-white transition-colors">Facebook</a>

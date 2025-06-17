@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const RegisterStep1 = () => {
@@ -41,11 +41,12 @@ const RegisterStep1 = () => {
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <div className="flex items-center justify-center space-x-2 mb-8">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <FileText className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-3xl font-bold text-gray-900">Tikita</span>
+          <div className="flex items-center justify-center mb-8">
+            <img 
+              src="/lovable-uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
+              alt="Tikiita Logo" 
+              className="h-12"
+            />
           </div>
         </div>
 
