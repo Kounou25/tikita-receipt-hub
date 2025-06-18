@@ -107,7 +107,7 @@ const Landing = () => {
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
               <img 
-                src="/lovable-uploads/98b915da-4744-4a07-84d2-b2d5065e9c15.png" 
+                src="/lovable-uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
                 alt="Tikiita Logo" 
                 className="h-6 w-6"
               />
@@ -365,7 +365,7 @@ const Landing = () => {
 
       {/* CTA Section avec gradient animé */}
       <section className="py-20 md:py-32 bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
         <div className="relative max-w-4xl mx-auto text-center px-4 md:px-6">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
             Prêt à révolutionner votre business ?
@@ -399,7 +399,7 @@ const Landing = () => {
               <div className="flex items-center space-x-3 mb-6">
                 <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
                   <img 
-                    src="/lovable-uploads/98b915da-4744-4a07-84d2-b2d5065e9c15.png" 
+                    src="/lovable-uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
                     alt="Tikiita Logo" 
                     className="h-6 w-6"
                   />
