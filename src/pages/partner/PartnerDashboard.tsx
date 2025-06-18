@@ -4,7 +4,11 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
-import { FileText, Users, DollarSign, TrendingUp, Eye, Download } from "lucide-react";
+import LineChart from "@/components/charts/LineChart";
+import BarChart from "@/components/charts/BarChart";
+import PieChart from "@/components/charts/PieChart";
+import { FileText, Users, DollarSign, TrendingUp, Eye, Download, Bell } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const PartnerDashboard = () => {
   const stats = {
@@ -14,6 +18,32 @@ const PartnerDashboard = () => {
     revenue: 2150000,
     growth: 15.3
   };
+
+  // Charts data
+  const revenueData = [
+    { id: "commissions", data: [
+      { x: "Jan", y: 125000 },
+      { x: "Fév", y: 145000 },
+      { x: "Mar", y: 135000 },
+      { x: "Avr", y: 167000 },
+      { x: "Mai", y: 189000 },
+      { x: "Juin", y: 215000 }
+    ]}
+  ];
+
+  const userActivityData = [
+    { month: "Jan", nouveaux: 45, actifs: 234 },
+    { month: "Fév", nouveaux: 52, actifs: 267 },
+    { month: "Mar", nouveaux: 48, actifs: 245 },
+    { month: "Avr", nouveaux: 67, actifs: 289 },
+    { month: "Mai", nouveaux: 71, actifs: 312 },
+    { month: "Juin", nouveaux: 59, actifs: 298 }
+  ];
+
+  const receiptDistributionData = [
+    { id: "recus", label: "Reçus", value: 68, color: "#10B981" },
+    { id: "factures", label: "Factures", value: 32, color: "#3B82F6" }
+  ];
 
   const recentActivity = [
     { id: 1, user: "Marie Kouassi", action: "Nouveau compte créé", time: "Il y a 2 min" },
@@ -38,12 +68,20 @@ const PartnerDashboard = () => {
                   Bienvenue, TechCorp Solutions
                 </h2>
                 <p className="text-gray-600 mb-4">
-                  Voici un aperçu de l'activité de vos utilisateurs sur Tikita
+                  Voici un aperçu de l'activité de vos utilisateurs sur Tikiita
                 </p>
-                <Button className="bg-primary hover:bg-primary/90">
-                  <Eye className="w-4 h-4 mr-2" />
-                  Voir le rapport détaillé
-                </Button>
+                <div className="flex gap-3">
+                  <Button className="bg-primary hover:bg-primary/90">
+                    <Eye className="w-4 h-4 mr-2" />
+                    Voir le rapport détaillé
+                  </Button>
+                  <Link to="/partner/notifications">
+                    <Button variant="outline">
+                      <Bell className="w-4 h-4 mr-2" />
+                      Notifications
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -115,9 +153,45 @@ const PartnerDashboard = () => {
           </Card>
         </div>
 
-        {/* Recent Activity */}
+        {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle>Évolution des commissions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <LineChart data={revenueData} height={300} />
+            </CardContent>
+          </Card>
+
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle>Activité utilisateurs</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BarChart 
+                data={userActivityData} 
+                keys={["nouveaux", "actifs"]} 
+                indexBy="month" 
+                height={300} 
+              />
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Receipt Distribution Chart */}
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle>Types de documents</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PieChart data={receiptDistributionData} height={250} />
+            </CardContent>
+          </Card>
+
+          {/* Recent Activity */}
+          <Card className="border-gray-200 lg:col-span-2">
             <CardHeader>
               <CardTitle className="text-lg font-semibold">Activité récente</CardTitle>
             </CardHeader>
@@ -135,27 +209,28 @@ const PartnerDashboard = () => {
               </div>
             </CardContent>
           </Card>
-
-          <Card className="border-gray-200">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Actions rapides</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button className="w-full justify-start" variant="outline">
-                <FileText className="w-4 h-4 mr-2" />
-                Générer un rapport
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Download className="w-4 h-4 mr-2" />
-                Exporter les données
-              </Button>
-              <Button className="w-full justify-start" variant="outline">
-                <Users className="w-4 h-4 mr-2" />
-                Gérer les utilisateurs
-              </Button>
-            </CardContent>
-          </Card>
         </div>
+
+        {/* Quick Actions */}
+        <Card className="border-gray-200">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Actions rapides</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button className="w-full justify-start" variant="outline">
+              <FileText className="w-4 h-4 mr-2" />
+              Générer un rapport
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <Download className="w-4 h-4 mr-2" />
+              Exporter les données
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <Users className="w-4 h-4 mr-2" />
+              Gérer les utilisateurs
+            </Button>
+          </CardContent>
+        </Card>
       </main>
 
       <MobileNav />

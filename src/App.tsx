@@ -17,17 +17,20 @@ import UserProfile from "./pages/user/UserProfile";
 import GenerateReceiptStep1 from "./pages/user/GenerateReceiptStep1";
 import GenerateReceiptStep2 from "./pages/user/GenerateReceiptStep2";
 import UserStats from "./pages/user/UserStats";
+import Notifications from "./pages/user/Notifications";
 
 // Partner Pages
 import PartnerDashboard from "./pages/partner/PartnerDashboard";
 import PartnerProfile from "./pages/partner/PartnerProfile";
 import PartnerReceipts from "./pages/partner/PartnerReceipts";
+import PartnerNotifications from "./pages/partner/PartnerNotifications";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminPartners from "./pages/admin/AdminPartners";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminNotifications from "./pages/admin/AdminNotifications";
 
 // Other Pages
 import Landing from "./pages/Landing";
@@ -59,17 +62,20 @@ const App = () => (
           <Route path="/generate" element={<GenerateReceiptStep1 />} />
           <Route path="/generate/step2" element={<GenerateReceiptStep2 />} />
           <Route path="/stats" element={<UserStats />} />
+          <Route path="/notifications" element={<Notifications />} />
           
           {/* Partner Routes */}
           <Route path="/partner/dashboard" element={<PartnerDashboard />} />
           <Route path="/partner/profile" element={<PartnerProfile />} />
           <Route path="/partner/receipts" element={<PartnerReceipts />} />
+          <Route path="/partner/notifications" element={<PartnerNotifications />} />
           
           {/* Admin Routes */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/partners" element={<AdminPartners />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/notifications" element={<AdminNotifications />} />
           
           {/* Other Routes */}
           <Route path="/subscription" element={<Subscription />} />

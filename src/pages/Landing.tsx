@@ -1,17 +1,34 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, CheckCircle, FileText, Smartphone, Users, Star, Shield, TrendingUp, Globe, BarChart } from "lucide-react";
+import { ArrowRight, CheckCircle, FileText, Smartphone, Users, Star, Shield, Zap, TrendingUp, Sparkles, Globe, BarChart, Receipt, CreditCard, Clock, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import PartnersShowcase from "@/components/partners/PartnersShowcase";
 
 const Landing = () => {
+  const heroFeatures = [
+    {
+      icon: Receipt,
+      title: "Reçus instantanés",
+      description: "Générez vos reçus en quelques clics avec nos modèles professionnels"
+    },
+    {
+      icon: CreditCard,
+      title: "Factures complètes", 
+      description: "Créez des factures détaillées conformes aux standards nigériens"
+    },
+    {
+      icon: Smartphone,
+      title: "100% Mobile",
+      description: "Optimisé pour smartphone, travaillez partout au Niger"
+    }
+  ];
+
   const features = [
     {
       icon: FileText,
-      title: "Génération de reçus",
-      description: "Créez des reçus professionnels et des factures en quelques clics avec nos modèles adaptatifs.",
+      title: "Génération intelligente",
+      description: "Créez des reçus et factures professionnels adaptés au marché nigérien.",
       color: "from-emerald-500 to-teal-600"
     },
     {
@@ -23,7 +40,7 @@ const Landing = () => {
     {
       icon: Users,
       title: "CRM intégré",
-      description: "Gestion avancée des clients avec historique et analytics prédictifs.",
+      description: "Gestion avancée des clients avec historique et analytics détaillés.",
       color: "from-purple-500 to-pink-600"
     },
     {
@@ -40,8 +57,8 @@ const Landing = () => {
     },
     {
       icon: BarChart,
-      title: "Analytics détaillés",
-      description: "Insights business pour comprendre et améliorer vos performances.",
+      title: "Analytics avancés",
+      description: "Insights business détaillés pour optimiser vos ventes.",
       color: "from-cyan-500 to-blue-600"
     }
   ];
@@ -85,7 +102,7 @@ const Landing = () => {
       price: "3,500",
       period: "/mois",
       description: "Pour entrepreneurs actifs",
-      features: ["Reçus illimités", "Templates premium", "Support prioritaire", "Analytics avancés", "Multi-devises", "API accès"],
+      features: ["Reçus illimités", "Templates premium", "Support prioritaire", "Analytics avancés", "Multi-devises", "Export PDF"],
       popular: true,
       gradient: "from-primary-50 to-primary-100"
     },
@@ -100,63 +117,20 @@ const Landing = () => {
     }
   ];
 
-  const partners = [
-    {
-      name: "Tech Solutions Niger",
-      logo: "https://placehold.co/200x100/4CAF50/FFFFFF?text=Tech+Niger",
-      industry: "Technologie"
-    },
-    {
-      name: "Banque Atlantique",
-      logo: "https://placehold.co/200x100/2196F3/FFFFFF?text=Banque+ATL",
-      industry: "Services Financiers"
-    },
-    {
-      name: "Orange Niger",
-      logo: "https://placehold.co/200x100/FF9800/FFFFFF?text=Orange",
-      industry: "Télécommunications"
-    },
-    {
-      name: "Nigelec",
-      logo: "https://placehold.co/200x100/F44336/FFFFFF?text=Nigelec",
-      industry: "Énergie"
-    },
-    {
-      name: "Airtel",
-      logo: "https://placehold.co/200x100/E91E63/FFFFFF?text=Airtel",
-      industry: "Télécommunications"
-    },
-    {
-      name: "Ecobank",
-      logo: "https://placehold.co/200x100/9C27B0/FFFFFF?text=Ecobank",
-      industry: "Services Financiers"
-    },
-    {
-      name: "SONIBANK",
-      logo: "https://placehold.co/200x100/673AB7/FFFFFF?text=SONIBANK",
-      industry: "Services Financiers"
-    },
-    {
-      name: "Niger Telecom",
-      logo: "https://placehold.co/200x100/3F51B5/FFFFFF?text=Niger+Telecom",
-      industry: "Télécommunications"
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/30">
       {/* Header avec glassmorphism */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg shadow-black/5">
         <nav className="flex items-center justify-between max-w-7xl mx-auto px-4 py-4 md:px-6">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
               <img 
-                src="/lovable-uploads/568a915c-4c9a-4adf-a2cc-731d5e1287ff.png" 
+                src="/lovable-uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
                 alt="Tikiita Logo" 
-                className="h-10 w-auto"
+                className="h-6 w-6"
               />
             </div>
-            <span className="text-xl font-bold text-gray-900">
+            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
               Tikiita
             </span>
           </div>
@@ -180,7 +154,7 @@ const Landing = () => {
               </Button>
             </Link>
             <Link to="/register">
-              <Button className="bg-primary hover:bg-primary-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <Button className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 Inscription
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -194,7 +168,7 @@ const Landing = () => {
               </Button>
             </Link>
             <Link to="/register">
-              <Button size="sm" className="bg-primary hover:bg-primary-600">
+              <Button size="sm" className="bg-gradient-to-r from-primary-600 to-primary-700">
                 Inscription
               </Button>
             </Link>
@@ -202,58 +176,76 @@ const Landing = () => {
         </nav>
       </header>
 
-      {/* Hero Section avec animations */}
+      {/* Hero Section avec focus sur génération de reçus */}
       <section className="relative overflow-hidden pt-20">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 via-transparent to-primary-50/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 via-transparent to-secondary-50/30"></div>
         <div className="absolute top-20 left-10 w-20 h-20 bg-primary-200/30 rounded-full blur-xl animate-float"></div>
-        <div className="absolute top-40 right-20 w-32 h-32 bg-primary-200/20 rounded-full blur-2xl animate-float" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-secondary-200/20 rounded-full blur-2xl animate-float" style={{animationDelay: '1s'}}></div>
         
         <div className="relative max-w-7xl mx-auto px-4 py-20 md:px-6 md:py-32">
           <div className="text-center space-y-8">
             <div className="animate-fade-in">
-              <Badge className="bg-gradient-to-r from-primary-100 to-primary-300 text-primary-700 hover:from-primary-200 hover:to-primary-400 px-6 py-2 text-sm font-medium border-0 shadow-lg">
-                Solution de Facturation Professionnelle
+              <Badge className="bg-gradient-to-r from-primary-100 to-secondary-100 text-primary-700 hover:from-primary-200 hover:to-secondary-200 px-6 py-2 text-sm font-medium border-0 shadow-lg">
+                <Sparkles className="w-4 h-4 mr-2" />
+                🇳🇪 Logiciel 100% nigérien - Nouvelle version
               </Badge>
             </div>
             
             <div className="animate-fade-in space-y-6">
               <h1 className="text-4xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-                La solution moderne de
-                <span className="block bg-gradient-to-r from-primary-600 via-primary-700 to-primary-900 bg-clip-text text-transparent animate-pulse-gentle">
-                  gestion de factures
+                Générez vos
+                <span className="block bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-600 bg-clip-text text-transparent animate-glow">
+                  reçus & factures
                 </span>
-                <span className="block text-gray-800">pour les entreprises africaines</span>
+                <span className="block text-gray-800">en 30 secondes</span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-                La première plateforme nigérienne de reçus et factures numériques, 
-                <span className="font-semibold text-primary-700"> conçue pour l'écosystème économique local.</span>
+                La première plateforme nigérienne de génération de reçus et factures professionnels. 
+                <span className="font-semibold text-primary-700">Simple, rapide et conforme</span> aux standards locaux.
               </p>
+            </div>
+
+            {/* Hero Features Cards */}
+            <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-12">
+              {heroFeatures.map((feature, index) => (
+                <Card key={index} className="border-primary-200 bg-white/90 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-6 text-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                      <feature.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="font-bold text-gray-900 mb-2">{feature.title}</h3>
+                    <p className="text-sm text-gray-600">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-up">
               <Link to="/register">
-                <Button size="lg" className="bg-primary hover:bg-primary-600 text-lg px-8 py-4 h-auto shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-                  Démarrer gratuitement
+                <Button size="lg" className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-lg px-8 py-4 h-auto shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                  <Receipt className="w-5 h-5 mr-2" />
+                  Créer mon premier reçu
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
               <Link to="/login">
                 <Button variant="outline" size="lg" className="text-lg px-8 py-4 h-auto border-primary-200 hover:bg-primary-50 hover:border-primary-300 transition-all duration-300">
-                  Découvrir la démo
+                  <Download className="w-5 h-5 mr-2" />
+                  Voir la démo
                 </Button>
               </Link>
             </div>
 
-            {/* Stats avec animations */}
+            {/* Stats avec focus Niger */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in">
               {[
-                { value: "2,500+", label: "Entreprises" },
-                { value: "150K+", label: "Documents générés" },
+                { value: "2,500+", label: "Entrepreneurs Niger" },
+                { value: "150K+", label: "Reçus générés" },
                 { value: "99.9%", label: "Uptime" },
-                { value: "24/7", label: "Support local" }
+                { value: "🇳🇪", label: "Made in Niger" }
               ].map((stat, index) => (
                 <div key={index} className="text-center group">
-                  <div className="text-3xl md:text-4xl font-bold text-primary-600 mb-2 group-hover:scale-110 transition-transform duration-300">
+                  <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300">
                     {stat.value}
                   </div>
                   <div className="text-gray-600 font-medium">{stat.label}</div>
@@ -264,7 +256,65 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Features Section modernisée */}
+      {/* Quick Receipt Generator Demo */}
+      <section className="py-20 bg-gradient-to-br from-primary-500 to-primary-700 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-pattern opacity-10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 md:px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">
+              Votre premier reçu en 3 étapes
+            </h2>
+            <p className="text-xl text-primary-100 max-w-3xl mx-auto">
+              Découvrez la simplicité de Tikiita avec notre processus optimisé
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: "1",
+                title: "Choisissez votre modèle",
+                description: "Sélectionnez parmi nos templates professionnels adaptés au Niger",
+                icon: FileText
+              },
+              {
+                step: "2", 
+                title: "Saisissez les informations",
+                description: "Interface mobile optimisée pour une saisie rapide",
+                icon: Smartphone
+              },
+              {
+                step: "3",
+                title: "Générez et partagez",
+                description: "Reçu professionnel prêt en PDF, SMS ou WhatsApp",
+                icon: Download
+              }
+            ].map((step, index) => (
+              <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 text-white">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span className="text-2xl font-bold">{step.step}</span>
+                  </div>
+                  <step.icon className="w-8 h-8 mx-auto mb-4 text-primary-100" />
+                  <h3 className="text-xl font-bold mb-4">{step.title}</h3>
+                  <p className="text-primary-100">{step.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link to="/register">
+              <Button size="lg" className="bg-white text-primary-700 hover:bg-primary-50 text-lg px-8 py-4 h-auto shadow-xl">
+                <Clock className="w-5 h-5 mr-2" />
+                Commencer maintenant - C'est gratuit
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
       <section id="features" className="py-20 md:py-32 bg-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary-50/20 to-transparent"></div>
         <div className="relative max-w-7xl mx-auto px-4 md:px-6">
@@ -302,8 +352,11 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Testimonials Section avec avatars */}
-      <section id="testimonials" className="py-20 md:py-32 bg-gradient-to-br from-primary-50 to-primary-100 relative">
+      {/* Partners Section */}
+      <PartnersShowcase />
+
+      {/* Testimonials Section */}
+      <section id="testimonials" className="py-20 md:py-32 bg-gradient-to-br from-primary-50 to-secondary-50 relative">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary-100/30 to-transparent"></div>
         <div className="relative max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-20">
@@ -315,7 +368,7 @@ const Landing = () => {
               Ils transforment leur gestion financière
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Plus de 2,500 entrepreneurs nigériens nous font confiance
+              Plus de 2,500 entrepreneurs nigériens nous font déjà confiance
             </p>
           </div>
 
@@ -347,16 +400,8 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Partenaires */}
-      <PartnersShowcase 
-        title="Entreprises qui nous font confiance"
-        description="Rejoignez ces entreprises qui transforment leur gestion financière avec Tikiita"
-        partners={partners}
-        className="bg-white"
-      />
-
-      {/* Pricing Section modernisée */}
-      <section id="pricing" className="py-20 md:py-32 bg-gray-50 relative overflow-hidden">
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 md:py-32 bg-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary-50/20 to-transparent"></div>
         <div className="relative max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-20">
@@ -412,93 +457,87 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* CTA Section avec gradient animé */}
-      <section className="py-20 md:py-32 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 relative overflow-hidden">
-        <div className="absolute inset-0 bg-pattern opacity-20"></div>
-        <div className="relative max-w-4xl mx-auto text-center px-4 md:px-6">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-            Prêt à révolutionner votre business ?
-          </h2>
-          <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto">
-            Rejoignez la révolution numérique au Niger. Plus de 2,500 entrepreneurs 
-            nous font déjà confiance pour leurs reçus et factures.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/register">
-              <Button size="lg" variant="secondary" className="bg-white text-primary-700 hover:bg-gray-50 text-lg px-8 py-4 h-auto shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-                Créer mon compte gratuitement
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Link to="/login">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8 py-4 h-auto transition-all duration-300">
-                Voir une démo
-              </Button>
-            </Link>
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-900 to-primary-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-pattern opacity-10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 md:px-6 text-center">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">
+              Rejoignez la révolution des reçus numériques au Niger
+            </h2>
+            <p className="text-xl text-gray-300 mb-8">
+              Plus de 2,500 entrepreneurs nigériens nous font déjà confiance
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/register">
+                <Button size="lg" className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-lg px-8 py-4 h-auto shadow-xl">
+                  <Receipt className="w-5 h-5 mr-2" />
+                  Créer mon compte gratuit
+                </Button>
+              </Link>
+              <Link to="/support">
+                <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10 text-lg px-8 py-4 h-auto">
+                  Contactez-nous
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Footer modernisé */}
-      <footer className="bg-gray-900 text-white py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"></div>
-        <div className="relative max-w-7xl mx-auto px-4 md:px-6">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div className="md:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
-                <img 
-                  src="/lovable-uploads/568a915c-4c9a-4adf-a2cc-731d5e1287ff.png"
-                  alt="Tikiita Logo" 
-                  className="h-10 w-auto"
-                />
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
+                  <img 
+                    src="/lovable-uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
+                    alt="Tikiita Logo" 
+                    className="h-6 w-6"
+                  />
+                </div>
                 <span className="text-xl font-bold">Tikiita</span>
               </div>
-              <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
-                La première plateforme nigérienne de reçus et factures numériques. 
-                Révolutionnez votre business avec la technologie de demain.
+              <p className="text-gray-400 mb-4">
+                La solution nigérienne pour vos reçus et factures professionnels.
               </p>
-              <div className="flex space-x-4">
-                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <span className="text-sm font-bold">f</span>
-                </div>
-                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <span className="text-sm font-bold">t</span>
-                </div>
-                <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center hover:bg-white/20 transition-colors cursor-pointer">
-                  <span className="text-sm font-bold">in</span>
-                </div>
+              <div className="text-sm text-gray-500">
+                🇳🇪 Fièrement nigérien
               </div>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4 text-primary-400">Produit</h4>
+              <h3 className="font-semibold mb-4">Produit</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#features" className="hover:text-white transition-colors hover:text-primary-300">Fonctionnalités</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors hover:text-primary-300">Tarifs</a></li>
-                <li><Link to="/support" className="hover:text-white transition-colors hover:text-primary-300">Support</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors hover:text-primary-300">API</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">Fonctionnalités</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">Tarifs</a></li>
+                <li><Link to="/support" className="hover:text-white transition-colors">Support</Link></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold mb-4 text-primary-400">Légal</h4>
+              <h3 className="font-semibold mb-4">Entreprise</h3>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors hover:text-primary-300">CGU</a></li>
-                <li><a href="#" className="hover:text-white transition-colors hover:text-primary-300">Confidentialité</a></li>
-                <li><a href="#" className="hover:text-white transition-colors hover:text-primary-300">CGV</a></li>
-                <li><a href="#" className="hover:text-white transition-colors hover:text-primary-300">Mentions légales</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">À propos</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Carrières</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-4">Contact</h3>
+              <ul className="space-y-2 text-gray-400">
+                <li>📍 Niamey, Niger</li>
+                <li>📞 +227 XX XX XX XX</li>
+                <li>✉️ contact@tikiita.ne</li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 mb-4 md:mb-0">
-              &copy; 2024 Tikiita. Tous droits réservés. Fait avec ❤️ au Niger.
-            </p>
-            <div className="flex items-center space-x-2 text-gray-400">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <span className="text-sm">Tous systèmes opérationnels</span>
-            </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 Tikiita. Tous droits réservés. Made with ❤️ in Niger 🇳🇪</p>
           </div>
         </div>
       </footer>

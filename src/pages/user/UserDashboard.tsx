@@ -4,290 +4,235 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
-import { Plus, FileText, BarChart, TrendingUp, Users, Zap, Eye, Download, Receipt } from "lucide-react";
-import { Link } from "react-router-dom";
-import UserProfileCard from "@/components/user/UserProfileCard";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import LineChart from "@/components/charts/LineChart";
+import PieChart from "@/components/charts/PieChart";
+import { Receipt, FileText, Users, TrendingUp, Plus, Eye, Download, Bell } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const UserDashboard = () => {
+  // Sample data for charts
+  const revenueData = [
+    { id: "revenus", data: [
+      { x: "Jan", y: 45000 },
+      { x: "Fév", y: 52000 },
+      { x: "Mar", y: 48000 },
+      { x: "Avr", y: 67000 },
+      { x: "Mai", y: 71000 },
+      { x: "Juin", y: 59000 }
+    ]}
+  ];
+
+  const receiptTypeData = [
+    { id: "recus", label: "Reçus", value: 65, color: "#10B981" },
+    { id: "factures", label: "Factures", value: 35, color: "#3B82F6" }
+  ];
+
   const stats = [
-    { 
-      title: "Reçus générés", 
-      value: "127", 
-      change: "+12%",
-      icon: FileText, 
-      color: "text-primary-600", 
-      bg: "bg-gradient-to-br from-primary-50 to-primary-100",
-      gradient: "from-primary-500 to-primary-600"
-    },
-    { 
-      title: "Articles vendus", 
-      value: "1,456", 
-      change: "+23%",
-      icon: BarChart, 
-      color: "text-secondary-600", 
-      bg: "bg-gradient-to-br from-secondary-50 to-secondary-100",
-      gradient: "from-secondary-500 to-secondary-600"
-    },
-    { 
-      title: "Recettes totales", 
-      value: "2,450,000", 
-      unit: "FCFA",
-      change: "+18%",
-      icon: TrendingUp, 
-      color: "text-accent-600", 
-      bg: "bg-gradient-to-br from-accent-50 to-accent-100",
-      gradient: "from-accent-500 to-accent-600"
-    },
-    { 
-      title: "Clients actifs", 
-      value: "89", 
-      change: "+7%",
-      icon: Users, 
-      color: "text-emerald-600", 
-      bg: "bg-gradient-to-br from-emerald-50 to-emerald-100",
-      gradient: "from-emerald-500 to-emerald-600"
-    },
+    { title: "Reçus générés", value: "342", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+12%" },
+    { title: "Factures créées", value: "128", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+8%" },
+    { title: "Clients actifs", value: "89", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+25%" },
+    { title: "Revenus totaux", value: "4,250,000 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+18%" },
   ];
 
   const recentReceipts = [
-    { id: "TKT-20250626-001", client: "Amina Abdoul", amount: "45,000", date: "2024-01-15", status: "Payé", statusColor: "bg-green-100 text-green-800", type: "reçu" },
-    { id: "TKT-20250626-002", client: "Ibrahim Moussa", amount: "78,500", date: "2024-01-14", status: "Payé", statusColor: "bg-green-100 text-green-800", type: "facture" },
-    { id: "TKT-20250625-003", client: "Fatouma Hassan", amount: "125,000", date: "2024-01-13", status: "En attente", statusColor: "bg-yellow-100 text-yellow-800", type: "facture" },
-    { id: "TKT-20250625-004", client: "Moussa Ali", amount: "32,000", date: "2024-01-12", status: "Payé", statusColor: "bg-green-100 text-green-800", type: "reçu" },
-  ];
-
-  // Données pour le graphique
-  const chartData = [
-    {
-      id: "Reçus",
-      color: "hsl(142, 69%, 30%)",
-      data: [
-        { x: "Jan", y: 30 },
-        { x: "Fév", y: 40 },
-        { x: "Mar", y: 35 },
-        { x: "Avr", y: 50 },
-        { x: "Mai", y: 45 },
-        { x: "Juin", y: 62 },
-      ],
-    },
-    {
-      id: "Factures",
-      color: "hsl(210, 79%, 46%)",
-      data: [
-        { x: "Jan", y: 20 },
-        { x: "Fév", y: 25 },
-        { x: "Mar", y: 22 },
-        { x: "Avr", y: 30 },
-        { x: "Mai", y: 28 },
-        { x: "Juin", y: 35 },
-      ],
-    },
+    { id: "TKT-20250118-001", client: "Marie Kouassi", amount: "25,000 FCFA", type: "Reçu", status: "Payé", date: "18 Jan 2025" },
+    { id: "TKT-20250118-002", client: "Ibrahim Moussa", amount: "45,000 FCFA", type: "Facture", status: "En attente", date: "18 Jan 2025" },
+    { id: "TKT-20250117-003", client: "Fatou Diallo", amount: "12,500 FCFA", type: "Reçu", status: "Payé", date: "17 Jan 2025" },
+    { id: "TKT-20250117-004", client: "Kofi Asante", amount: "67,000 FCFA", type: "Facture", status: "Payé", date: "17 Jan 2025" },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/30 mobile-nav-padding">
-      <Header title="Tableau de bord" />
+    <div className="min-h-screen bg-gray-50 mobile-nav-padding">
+      <Header title="Dashboard" />
       
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="user" />
 
-        {/* Profil utilisateur et informations d'abonnement */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <UserProfileCard 
-            name="John Doe" 
-            email="john.doe@example.com" 
-            avatar="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=150&h=150&fit=crop&crop=faces" 
-            userNumber="TKT-USER-00125"
-            subscriptionStatus="active"
-            subscriptionType="Plan Premium"
-            subscriptionEndDate="15 juillet 2024"
-          />
-          
-          <Card className="col-span-1 lg:col-span-2 border-0 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-primary-50 to-primary-100">
-              <CardTitle className="text-lg font-semibold text-primary-800">Aperçu de l'activité</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="h-64">
-                <LineChart data={chartData} height={250} />
+        {/* Welcome Section */}
+        <Card className="border-primary bg-gradient-to-r from-primary/5 to-secondary/5">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  Bonjour ! 👋
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  Voici un aperçu de votre activité commerciale sur Tikiita.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link to="/generate">
+                    <Button className="bg-primary hover:bg-primary/90">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Nouveau reçu
+                    </Button>
+                  </Link>
+                  <Link to="/receipts">
+                    <Button variant="outline">
+                      <Eye className="w-4 h-4 mr-2" />
+                      Voir l'historique
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              <div className="mt-4 text-center">
-                <p className="text-sm text-gray-500">Évolution des documents générés au cours des 6 derniers mois</p>
+              <div className="mt-4 md:mt-0">
+                <Link to="/notifications">
+                  <Button variant="outline" size="sm">
+                    <Bell className="w-4 h-4 mr-2" />
+                    Notifications
+                  </Button>
+                </Link>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Stats Grid avec animations */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, index) => (
-            <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 overflow-hidden group">
-              <CardContent className="p-6 relative">
-                <div className={`absolute inset-0 ${stat.bg} opacity-50 group-hover:opacity-70 transition-opacity`}></div>
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <stat.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                        {stat.change}
-                      </div>
-                    </div>
+            <Card key={index} className="border-gray-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center`}>
+                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
-                    <div className="flex items-baseline gap-1">
-                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                      {stat.unit && <span className="text-sm text-gray-600 font-medium">{stat.unit}</span>}
-                    </div>
-                  </div>
+                  <span className="text-sm font-medium text-green-600">{stat.growth}</span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {/* Création de document - Deux options */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-primary-500 to-primary-600 text-white">
-            <CardContent className="p-8 flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                <Receipt className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Générer un Reçu</h3>
-              <p className="mb-6 opacity-90">Créez rapidement un reçu de paiement pour vos clients</p>
-              <Link to="/generate?type=receipt">
-                <Button className="bg-white text-primary-700 hover:bg-gray-100">
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle>Évolution des revenus</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <LineChart data={revenueData} height={300} />
+            </CardContent>
+          </Card>
+
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle>Répartition des documents</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PieChart data={receiptTypeData} height={300} />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Activity */}
+        <Card className="border-gray-200">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Activité récente</CardTitle>
+            <Link to="/receipts">
+              <Button variant="outline" size="sm">
+                Voir tout
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentReceipts.map((receipt, index) => (
+                <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      receipt.type === "Reçu" ? "bg-blue-100" : "bg-green-100"
+                    }`}>
+                      {receipt.type === "Reçu" ? 
+                        <Receipt className={`w-5 h-5 ${receipt.type === "Reçu" ? "text-blue-600" : "text-green-600"}`} /> :
+                        <FileText className="w-5 h-5 text-green-600" />
+                      }
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{receipt.id}</p>
+                      <p className="text-sm text-gray-600">{receipt.client}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-gray-900">{receipt.amount}</p>
+                    <p className={`text-sm ${
+                      receipt.status === "Payé" ? "text-green-600" : "text-orange-600"
+                    }`}>
+                      {receipt.status}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle className="text-lg">Actions rapides</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Link to="/generate">
+                <Button variant="outline" className="w-full justify-start">
                   <Plus className="w-4 h-4 mr-2" />
-                  Nouveau reçu
+                  Nouveau document
+                </Button>
+              </Link>
+              <Link to="/stats">
+                <Button variant="outline" className="w-full justify-start">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Voir les statistiques
+                </Button>
+              </Link>
+              <Button variant="outline" className="w-full justify-start">
+                <Download className="w-4 h-4 mr-2" />
+                Exporter les données
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle className="text-lg">Raccourcis</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Link to="/receipts">
+                <Button variant="outline" className="w-full justify-start">
+                  <Receipt className="w-4 h-4 mr-2" />
+                  Mes reçus
+                </Button>
+              </Link>
+              <Link to="/profile">
+                <Button variant="outline" className="w-full justify-start">
+                  <Users className="w-4 h-4 mr-2" />
+                  Mon profil
                 </Button>
               </Link>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 bg-gradient-to-br from-secondary-500 to-secondary-600 text-white">
-            <CardContent className="p-8 flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                <FileText className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold mb-2">Générer une Facture</h3>
-              <p className="mb-6 opacity-90">Créez une facture professionnelle avec tous les détails nécessaires</p>
-              <Link to="/generate?type=invoice">
-                <Button className="bg-white text-secondary-700 hover:bg-gray-100">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Nouvelle facture
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle className="text-lg">Support</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button variant="outline" className="w-full justify-start">
+                <FileText className="w-4 h-4 mr-2" />
+                Documentation
+              </Button>
+              <Link to="/support">
+                <Button variant="outline" className="w-full justify-start">
+                  <Users className="w-4 h-4 mr-2" />
+                  Contacter le support
                 </Button>
               </Link>
             </CardContent>
           </Card>
         </div>
-
-        {/* Recent Receipts avec design moderne */}
-        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-          <CardHeader className="bg-gradient-to-r from-gray-50 to-primary-50 border-b border-gray-100">
-            <div className="flex flex-row items-center justify-between">
-              <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-white" />
-                </div>
-                Documents récents
-              </CardTitle>
-              <Link to="/receipts">
-                <Button variant="outline" className="border-primary-200 hover:bg-primary-50 hover:border-primary-300 transition-all duration-300">
-                  <Eye className="w-4 h-4 mr-2" />
-                  Voir tout
-                </Button>
-              </Link>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Document
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Client
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Montant
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Statut
-                    </th>
-                    <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-100">
-                  {recentReceipts.map((receipt, index) => (
-                    <tr key={receipt.id} className="hover:bg-gradient-to-r hover:from-primary-50/50 hover:to-transparent transition-all duration-200 group">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center">
-                            <span className="text-xs font-bold text-primary-700">#{receipt.id.slice(-3)}</span>
-                          </div>
-                          <span className="text-sm font-semibold text-gray-900">{receipt.id}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge variant="outline" className={receipt.type === "reçu" ? "border-primary-300 text-primary-800 bg-primary-50" : "border-secondary-300 text-secondary-800 bg-secondary-50"}>
-                          {receipt.type === "reçu" ? "Reçu" : "Facture"}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 mr-3">
-                            <Avatar className="h-6 w-6">
-                              <AvatarFallback className="text-xs">
-                                {receipt.client.split(' ').map(n => n[0]).join('').toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                          </div>
-                          <div className="text-sm font-medium text-gray-900">{receipt.client}</div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-bold text-gray-900">{receipt.amount} <span className="text-xs text-gray-500">FCFA</span></div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-600">{receipt.date}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${receipt.statusColor}`}>
-                          {receipt.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                            <Eye className="w-3 h-3" />
-                          </Button>
-                          <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                            <Download className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
       </main>
 
       <MobileNav />
