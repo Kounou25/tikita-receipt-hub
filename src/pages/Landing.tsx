@@ -2,15 +2,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, CheckCircle, FileText, Smartphone, Users, Star, Shield, Zap, TrendingUp, Sparkles, Globe, BarChart } from "lucide-react";
+import { ArrowRight, CheckCircle, FileText, Smartphone, Users, Star, Shield, TrendingUp, Globe, BarChart } from "lucide-react";
 import { Link } from "react-router-dom";
+import PartnersShowcase from "@/components/partners/PartnersShowcase";
 
 const Landing = () => {
   const features = [
     {
       icon: FileText,
-      title: "Génération intelligente",
-      description: "Créez des reçus professionnels avec IA intégrée et modèles adaptatifs.",
+      title: "Génération de reçus",
+      description: "Créez des reçus professionnels et des factures en quelques clics avec nos modèles adaptatifs.",
       color: "from-emerald-500 to-teal-600"
     },
     {
@@ -39,8 +40,8 @@ const Landing = () => {
     },
     {
       icon: BarChart,
-      title: "Analytics IA",
-      description: "Insights business alimentés par intelligence artificielle.",
+      title: "Analytics détaillés",
+      description: "Insights business pour comprendre et améliorer vos performances.",
       color: "from-cyan-500 to-blue-600"
     }
   ];
@@ -99,20 +100,63 @@ const Landing = () => {
     }
   ];
 
+  const partners = [
+    {
+      name: "Tech Solutions Niger",
+      logo: "https://placehold.co/200x100/4CAF50/FFFFFF?text=Tech+Niger",
+      industry: "Technologie"
+    },
+    {
+      name: "Banque Atlantique",
+      logo: "https://placehold.co/200x100/2196F3/FFFFFF?text=Banque+ATL",
+      industry: "Services Financiers"
+    },
+    {
+      name: "Orange Niger",
+      logo: "https://placehold.co/200x100/FF9800/FFFFFF?text=Orange",
+      industry: "Télécommunications"
+    },
+    {
+      name: "Nigelec",
+      logo: "https://placehold.co/200x100/F44336/FFFFFF?text=Nigelec",
+      industry: "Énergie"
+    },
+    {
+      name: "Airtel",
+      logo: "https://placehold.co/200x100/E91E63/FFFFFF?text=Airtel",
+      industry: "Télécommunications"
+    },
+    {
+      name: "Ecobank",
+      logo: "https://placehold.co/200x100/9C27B0/FFFFFF?text=Ecobank",
+      industry: "Services Financiers"
+    },
+    {
+      name: "SONIBANK",
+      logo: "https://placehold.co/200x100/673AB7/FFFFFF?text=SONIBANK",
+      industry: "Services Financiers"
+    },
+    {
+      name: "Niger Telecom",
+      logo: "https://placehold.co/200x100/3F51B5/FFFFFF?text=Niger+Telecom",
+      industry: "Télécommunications"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/30">
       {/* Header avec glassmorphism */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg shadow-black/5">
         <nav className="flex items-center justify-between max-w-7xl mx-auto px-4 py-4 md:px-6">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center">
               <img 
-                src="/lovable-uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
+                src="/lovable-uploads/568a915c-4c9a-4adf-a2cc-731d5e1287ff.png" 
                 alt="Tikiita Logo" 
-                className="h-6 w-6"
+                className="h-10 w-auto"
               />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
+            <span className="text-xl font-bold text-gray-900">
               Tikiita
             </span>
           </div>
@@ -136,7 +180,7 @@ const Landing = () => {
               </Button>
             </Link>
             <Link to="/register">
-              <Button className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+              <Button className="bg-primary hover:bg-primary-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                 Inscription
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
@@ -150,7 +194,7 @@ const Landing = () => {
               </Button>
             </Link>
             <Link to="/register">
-              <Button size="sm" className="bg-gradient-to-r from-primary-600 to-primary-700">
+              <Button size="sm" className="bg-primary hover:bg-primary-600">
                 Inscription
               </Button>
             </Link>
@@ -160,37 +204,35 @@ const Landing = () => {
 
       {/* Hero Section avec animations */}
       <section className="relative overflow-hidden pt-20">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 via-transparent to-secondary-50/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 via-transparent to-primary-50/30"></div>
         <div className="absolute top-20 left-10 w-20 h-20 bg-primary-200/30 rounded-full blur-xl animate-float"></div>
-        <div className="absolute top-40 right-20 w-32 h-32 bg-secondary-200/20 rounded-full blur-2xl animate-float" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-40 right-20 w-32 h-32 bg-primary-200/20 rounded-full blur-2xl animate-float" style={{animationDelay: '1s'}}></div>
         
         <div className="relative max-w-7xl mx-auto px-4 py-20 md:px-6 md:py-32">
           <div className="text-center space-y-8">
             <div className="animate-fade-in">
-              <Badge className="bg-gradient-to-r from-primary-100 to-secondary-100 text-primary-700 hover:from-primary-200 hover:to-secondary-200 px-6 py-2 text-sm font-medium border-0 shadow-lg">
-                <Sparkles className="w-4 h-4 mr-2" />
-                Nouveau : IA intégrée pour reçus intelligents
+              <Badge className="bg-gradient-to-r from-primary-100 to-primary-300 text-primary-700 hover:from-primary-200 hover:to-primary-400 px-6 py-2 text-sm font-medium border-0 shadow-lg">
+                Solution de Facturation Professionnelle
               </Badge>
             </div>
             
             <div className="animate-fade-in space-y-6">
               <h1 className="text-4xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-                L'avenir des
-                <span className="block bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-600 bg-clip-text text-transparent animate-glow">
-                  reçus numériques
+                La solution moderne de
+                <span className="block bg-gradient-to-r from-primary-600 via-primary-700 to-primary-900 bg-clip-text text-transparent animate-pulse-gentle">
+                  gestion de factures
                 </span>
-                <span className="block text-gray-800">au Niger</span>
+                <span className="block text-gray-800">pour les entreprises africaines</span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-                La première plateforme nigérienne de reçus intelligents. 
-                <span className="font-semibold text-primary-700"> Alimentée par IA</span>, 
-                conçue pour l'écosystème économique local.
+                La première plateforme nigérienne de reçus et factures numériques, 
+                <span className="font-semibold text-primary-700"> conçue pour l'écosystème économique local.</span>
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-up">
               <Link to="/register">
-                <Button size="lg" className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-lg px-8 py-4 h-auto shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                <Button size="lg" className="bg-primary hover:bg-primary-600 text-lg px-8 py-4 h-auto shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                   Démarrer gratuitement
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
@@ -205,13 +247,13 @@ const Landing = () => {
             {/* Stats avec animations */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto animate-fade-in">
               {[
-                { value: "2,500+", label: "Entrepreneurs" },
-                { value: "150K+", label: "Reçus générés" },
+                { value: "2,500+", label: "Entreprises" },
+                { value: "150K+", label: "Documents générés" },
                 { value: "99.9%", label: "Uptime" },
                 { value: "24/7", label: "Support local" }
               ].map((stat, index) => (
                 <div key={index} className="text-center group">
-                  <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300">
+                  <div className="text-3xl md:text-4xl font-bold text-primary-600 mb-2 group-hover:scale-110 transition-transform duration-300">
                     {stat.value}
                   </div>
                   <div className="text-gray-600 font-medium">{stat.label}</div>
@@ -228,7 +270,6 @@ const Landing = () => {
         <div className="relative max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-20">
             <Badge className="bg-primary-100 text-primary-700 mb-6">
-              <Zap className="w-4 h-4 mr-2" />
               Fonctionnalités avancées
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -262,7 +303,7 @@ const Landing = () => {
       </section>
 
       {/* Testimonials Section avec avatars */}
-      <section id="testimonials" className="py-20 md:py-32 bg-gradient-to-br from-primary-50 to-secondary-50 relative">
+      <section id="testimonials" className="py-20 md:py-32 bg-gradient-to-br from-primary-50 to-primary-100 relative">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary-100/30 to-transparent"></div>
         <div className="relative max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-20">
@@ -271,7 +312,7 @@ const Landing = () => {
               Témoignages clients
             </Badge>
             <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-              Ils révolutionnent leur business
+              Ils transforment leur gestion financière
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Plus de 2,500 entrepreneurs nigériens nous font confiance
@@ -306,12 +347,20 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Partenaires */}
+      <PartnersShowcase 
+        title="Entreprises qui nous font confiance"
+        description="Rejoignez ces entreprises qui transforment leur gestion financière avec Tikiita"
+        partners={partners}
+        className="bg-white"
+      />
+
       {/* Pricing Section modernisée */}
-      <section id="pricing" className="py-20 md:py-32 bg-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-secondary-50/20 to-transparent"></div>
+      <section id="pricing" className="py-20 md:py-32 bg-gray-50 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary-50/20 to-transparent"></div>
         <div className="relative max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-20">
-            <Badge className="bg-secondary-100 text-secondary-700 mb-6">
+            <Badge className="bg-primary-100 text-primary-700 mb-6">
               <TrendingUp className="w-4 h-4 mr-2" />
               Tarification transparente
             </Badge>
@@ -327,7 +376,7 @@ const Landing = () => {
             {pricing.map((plan, index) => (
               <Card key={index} className={`relative overflow-hidden border-0 ${plan.popular ? 'scale-105 shadow-2xl' : 'shadow-lg'} hover:shadow-xl transition-all duration-300`}>
                 {plan.popular && (
-                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-primary-600 to-secondary-600 p-3">
+                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-primary-600 to-primary-700 p-3">
                     <p className="text-white text-center font-semibold text-sm">
                       ⭐ Le plus populaire
                     </p>
@@ -338,7 +387,7 @@ const Landing = () => {
                   <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                   <p className="text-gray-600 mb-6">{plan.description}</p>
                   <div className="mb-6">
-                    <span className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                    <span className="text-4xl font-bold text-primary-600">
                       {plan.price}
                     </span>
                     {plan.period && <span className="text-gray-600"> FCFA{plan.period}</span>}
@@ -352,7 +401,7 @@ const Landing = () => {
                     ))}
                   </ul>
                   <Link to="/register">
-                    <Button className={`w-full ${plan.popular ? 'bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 shadow-lg' : 'bg-gray-900 hover:bg-gray-800'} transition-all duration-300 transform hover:scale-105`}>
+                    <Button className={`w-full ${plan.popular ? 'bg-primary hover:bg-primary-600 shadow-lg' : 'bg-gray-900 hover:bg-gray-800'} transition-all duration-300 transform hover:scale-105`}>
                       Commencer maintenant
                     </Button>
                   </Link>
@@ -364,7 +413,7 @@ const Landing = () => {
       </section>
 
       {/* CTA Section avec gradient animé */}
-      <section className="py-20 md:py-32 bg-gradient-to-br from-primary-600 via-primary-700 to-secondary-600 relative overflow-hidden">
+      <section className="py-20 md:py-32 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 relative overflow-hidden">
         <div className="absolute inset-0 bg-pattern opacity-20"></div>
         <div className="relative max-w-4xl mx-auto text-center px-4 md:px-6">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
@@ -372,7 +421,7 @@ const Landing = () => {
           </h2>
           <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto">
             Rejoignez la révolution numérique au Niger. Plus de 2,500 entrepreneurs 
-            nous font déjà confiance pour leurs reçus intelligents.
+            nous font déjà confiance pour leurs reçus et factures.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/register">
@@ -397,17 +446,15 @@ const Landing = () => {
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
-                  <img 
-                    src="/lovable-uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
-                    alt="Tikiita Logo" 
-                    className="h-6 w-6"
-                  />
-                </div>
+                <img 
+                  src="/lovable-uploads/568a915c-4c9a-4adf-a2cc-731d5e1287ff.png"
+                  alt="Tikiita Logo" 
+                  className="h-10 w-auto"
+                />
                 <span className="text-xl font-bold">Tikiita</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-md leading-relaxed">
-                La première plateforme nigérienne de reçus intelligents. 
+                La première plateforme nigérienne de reçus et factures numériques. 
                 Révolutionnez votre business avec la technologie de demain.
               </p>
               <div className="flex space-x-4">

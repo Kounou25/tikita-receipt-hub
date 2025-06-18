@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
-import { TrendingUp, TrendingDown, DollarSign, FileText, Calendar, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, FileText, Users, BarChart3, Calendar, Filter } from "lucide-react";
+import LineChart from "@/components/charts/LineChart";
+import PieChart from "@/components/charts/PieChart";
+import BarChart from "@/components/charts/BarChart";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const UserStats = () => {
   const [period, setPeriod] = useState("month");
@@ -19,13 +23,86 @@ const UserStats = () => {
     lastMonthReceipts: 189
   };
 
-  const monthlyData = [
-    { month: "Jan", receipts: 65, revenue: 320000 },
-    { month: "Fév", receipts: 78, revenue: 390000 },
-    { month: "Mar", receipts: 92, revenue: 460000 },
-    { month: "Avr", receipts: 85, revenue: 425000 },
-    { month: "Mai", receipts: 98, revenue: 490000 },
-    { month: "Juin", receipts: 112, revenue: 560000 }
+  // Données pour les graphiques
+  const revenueData = [
+    {
+      id: "revenu",
+      color: "#4CAF50",
+      data: [
+        { x: "Jan", y: 320000 },
+        { x: "Fév", y: 390000 },
+        { x: "Mar", y: 460000 },
+        { x: "Avr", y: 425000 },
+        { x: "Mai", y: 490000 },
+        { x: "Juin", y: 560000 }
+      ],
+    }
+  ];
+
+  const documentsData = [
+    {
+      id: "Reçus",
+      color: "#4CAF50",
+      data: [
+        { x: "Jan", y: 65 },
+        { x: "Fév", y: 78 },
+        { x: "Mar", y: 92 },
+        { x: "Avr", y: 85 },
+        { x: "Mai", y: 98 },
+        { x: "Juin", y: 112 }
+      ],
+    },
+    {
+      id: "Factures",
+      color: "#2196F3",
+      data: [
+        { x: "Jan", y: 45 },
+        { x: "Fév", y: 52 },
+        { x: "Mar", y: 63 },
+        { x: "Avr", y: 59 },
+        { x: "Mai", y: 67 },
+        { x: "Juin", y: 75 }
+      ],
+    }
+  ];
+
+  const categoryData = [
+    { id: "Vêtements", label: "Vêtements", value: 45, color: "#4CAF50" },
+    { id: "Accessoires", label: "Accessoires", value: 30, color: "#2196F3" },
+    { id: "Chaussures", label: "Chaussures", value: 25, color: "#9C27B0" }
+  ];
+
+  const clientsBarData = [
+    { 
+      client: "Client A",
+      "Reçus": 12,
+      "Factures": 8,
+      "Total": 20
+    },
+    { 
+      client: "Client B", 
+      "Reçus": 18,
+      "Factures": 6,
+      "Total": 24
+    },
+    { 
+      client: "Client C",
+      "Reçus": 8,
+      "Factures": 14,
+      "Total": 22
+    },
+    { 
+      client: "Client D",
+      "Reçus": 15, 
+      "Factures": 10,
+      "Total": 25
+    },
+    { 
+      client: "Client E", 
+      "Reçus": 9,
+      "Factures": 11, 
+      "Total": 20
+    }
   ];
 
   return (
@@ -36,159 +113,222 @@ const UserStats = () => {
         <QuickNav userType="user" />
 
         {/* Period Selector */}
-        <div className="flex justify-center space-x-2">
-          <Button
-            variant={period === "week" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setPeriod("week")}
-          >
-            7 jours
-          </Button>
-          <Button
-            variant={period === "month" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setPeriod("month")}
-          >
-            30 jours
-          </Button>
-          <Button
-            variant={period === "year" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setPeriod("year")}
-          >
-            1 an
-          </Button>
-        </div>
+        <Card className="shadow-md border-0">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Filter className="w-4 h-4 mr-2 text-gray-500" />
+                <span className="text-sm font-medium">Période:</span>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant={period === "week" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setPeriod("week")}
+                  className={period === "week" ? "bg-primary hover:bg-primary-600" : ""}
+                >
+                  7 jours
+                </Button>
+                <Button
+                  variant={period === "month" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setPeriod("month")}
+                  className={period === "month" ? "bg-primary hover:bg-primary-600" : ""}
+                >
+                  30 jours
+                </Button>
+                <Button
+                  variant={period === "year" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setPeriod("year")}
+                  className={period === "year" ? "bg-primary hover:bg-primary-600" : ""}
+                >
+                  1 an
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="border-gray-200">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="border-0 shadow-md hover:shadow-lg transition-all">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Reçus totaux</p>
+                  <p className="text-sm text-gray-600">Documents générés</p>
                   <p className="text-2xl font-bold text-gray-900">{stats.totalReceipts}</p>
                 </div>
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-blue-600" />
+                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-primary-600" />
                 </div>
               </div>
               <div className="flex items-center mt-2">
                 <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
                 <span className="text-sm text-green-600">+{stats.growthRate}%</span>
+                <span className="text-xs text-gray-500 ml-1">vs période préc.</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200">
+          <Card className="border-0 shadow-md hover:shadow-lg transition-all">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Chiffre d'affaires</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalRevenue.toLocaleString()} FCFA</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalRevenue.toLocaleString()} <span className="text-base">FCFA</span></p>
                 </div>
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <DollarSign className="w-5 h-5 text-green-600" />
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-green-600" />
                 </div>
               </div>
               <div className="flex items-center mt-2">
                 <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
                 <span className="text-sm text-green-600">+8.2%</span>
+                <span className="text-xs text-gray-500 ml-1">vs période préc.</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200">
+          <Card className="border-0 shadow-md hover:shadow-lg transition-all">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Panier moyen</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.avgReceiptValue.toLocaleString()} FCFA</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.avgReceiptValue.toLocaleString()} <span className="text-base">FCFA</span></p>
                 </div>
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-5 h-5 text-purple-600" />
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                  <BarChart3 className="w-6 h-6 text-purple-600" />
                 </div>
               </div>
               <div className="flex items-center mt-2">
                 <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
                 <span className="text-sm text-red-600">-2.1%</span>
+                <span className="text-xs text-gray-500 ml-1">vs période préc.</span>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200">
+          <Card className="border-0 shadow-md hover:shadow-lg transition-all">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Meilleur client</p>
-                  <p className="text-lg font-bold text-gray-900">{stats.topClient}</p>
+                  <p className="text-sm text-gray-600">Clients actifs</p>
+                  <p className="text-2xl font-bold text-gray-900">64</p>
                 </div>
-                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-orange-600" />
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Users className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
-              <p className="text-sm text-gray-600 mt-2">15 reçus ce mois</p>
+              <div className="flex items-center mt-2">
+                <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+                <span className="text-sm text-green-600">+15%</span>
+                <span className="text-xs text-gray-500 ml-1">vs période préc.</span>
+              </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="border-gray-200">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Évolution mensuelle</CardTitle>
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-gray-50 to-primary-50 border-b border-gray-100">
+              <CardTitle className="text-lg font-semibold">Évolution des revenus</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {monthlyData.map((data, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">{data.month}</span>
-                    <div className="flex items-center space-x-4">
-                      <span className="text-sm font-medium">{data.receipts} reçus</span>
-                      <span className="text-sm font-bold text-primary">{data.revenue.toLocaleString()} FCFA</span>
-                    </div>
-                  </div>
-                ))}
+            <CardContent className="p-6">
+              <div className="h-72">
+                <LineChart data={revenueData} height={280} />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold">Répartition par catégorie</CardTitle>
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-gray-50 to-primary-50 border-b border-gray-100">
+              <CardTitle className="text-lg font-semibold">Documents générés</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Vêtements</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 h-2 bg-gray-200 rounded-full">
-                      <div className="w-16 h-2 bg-blue-500 rounded-full"></div>
-                    </div>
-                    <span className="text-sm font-medium">45%</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Accessoires</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 h-2 bg-gray-200 rounded-full">
-                      <div className="w-12 h-2 bg-green-500 rounded-full"></div>
-                    </div>
-                    <span className="text-sm font-medium">30%</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Chaussures</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-20 h-2 bg-gray-200 rounded-full">
-                      <div className="w-10 h-2 bg-purple-500 rounded-full"></div>
-                    </div>
-                    <span className="text-sm font-medium">25%</span>
-                  </div>
-                </div>
+            <CardContent className="p-6">
+              <div className="h-72">
+                <LineChart data={documentsData} height={280} />
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Additional Analytics */}
+        <Tabs defaultValue="categories" className="w-full">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Analyse détaillée</h2>
+            <TabsList>
+              <TabsTrigger value="categories">Catégories</TabsTrigger>
+              <TabsTrigger value="clients">Top Clients</TabsTrigger>
+              <TabsTrigger value="timeline">Chronologie</TabsTrigger>
+            </TabsList>
+          </div>
+          
+          <TabsContent value="categories" className="mt-0">
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-6">
+                <div className="h-96">
+                  <PieChart data={categoryData} height={380} />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="clients" className="mt-0">
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-6">
+                <div className="h-96">
+                  <BarChart 
+                    data={clientsBarData} 
+                    keys={["Reçus", "Factures"]}
+                    indexBy="client"
+                    height={380}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="timeline" className="mt-0">
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  {Array.from({ length: 5 }).map((_, index) => {
+                    const date = new Date();
+                    date.setDate(date.getDate() - index);
+                    
+                    return (
+                      <div key={index} className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
+                        <div className="flex items-center">
+                          <div className="w-12 h-12 bg-primary-50 flex items-center justify-center rounded-full mr-4">
+                            <Calendar className="w-6 h-6 text-primary-500" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{date.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            <p className="text-sm text-gray-500">{2 + index} documents générés</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-primary-600">{(35000 + index * 2500).toLocaleString()} FCFA</p>
+                          <p className="text-sm text-gray-500">de revenus</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Export Actions */}
+        <div className="flex justify-end">
+          <div className="space-x-4">
+            <Button variant="outline">Exporter en PDF</Button>
+            <Button variant="outline">Exporter en Excel</Button>
+            <Button>Rapport détaillé</Button>
+          </div>
         </div>
       </main>
 
