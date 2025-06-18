@@ -1,5 +1,5 @@
 
-import { ResponsiveLine } from "@nivo/line";
+import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface DataPoint {
   x: string | number;
@@ -16,73 +16,41 @@ interface LineChartProps {
 }
 
 const LineChart = ({ data, height = 300 }: LineChartProps) => {
+  // Transform nivo data format to recharts format
+  const transformedData = data[0]?.data.map(point => ({
+    name: point.x,
+    ...data.reduce((acc, series) => {
+      const dataPoint = series.data.find(d => d.x === point.x);
+      if (dataPoint) {
+        acc[series.id] = dataPoint.y;
+      }
+      return acc;
+    }, {} as Record<string, number>)
+  })) || [];
+
+  const colors = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336'];
+
   return (
-    <div style={{ height: height }}>
-      <ResponsiveLine
-        data={data}
-        margin={{ top: 20, right: 20, bottom: 50, left: 50 }}
-        xScale={{ type: 'point' }}
-        yScale={{
-          type: 'linear',
-          min: 'auto',
-          max: 'auto',
-          stacked: false,
-          reverse: false
-        }}
-        yFormat=" >-.2f"
-        axisTop={null}
-        axisRight={null}
-        axisBottom={{
-          tickSize: 5,
-          tickPadding: 5,
-          tickRotation: 0,
-          legend: 'Mois',
-          legendOffset: 36,
-          legendPosition: 'middle'
-        }}
-        axisLeft={{
-          tickSize: 5,
-          tickPadding: 5,
-          tickRotation: 0,
-          legend: 'Valeur',
-          legendOffset: -40,
-          legendPosition: 'middle'
-        }}
-        enableGridX={false}
-        colors={{ scheme: 'category10' }}
-        pointSize={10}
-        pointColor={{ theme: 'background' }}
-        pointBorderWidth={2}
-        pointBorderColor={{ from: 'serieColor' }}
-        pointLabelYOffset={-12}
-        useMesh={true}
-        legends={[
-          {
-            anchor: 'bottom',
-            direction: 'row',
-            justify: false,
-            translateX: 0,
-            translateY: 50,
-            itemsSpacing: 0,
-            itemDirection: 'left-to-right',
-            itemWidth: 80,
-            itemHeight: 20,
-            itemOpacity: 0.75,
-            symbolSize: 12,
-            symbolShape: 'circle',
-            symbolBorderColor: 'rgba(0, 0, 0, .5)',
-            effects: [
-              {
-                on: 'hover',
-                style: {
-                  itemBackground: 'rgba(0, 0, 0, .03)',
-                  itemOpacity: 1
-                }
-              }
-            ]
-          }
-        ]}
-      />
+    <div style={{ width: '100%', height: height }}>
+      <ResponsiveContainer>
+        <RechartsLineChart data={transformedData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          {data.map((series, index) => (
+            <Line
+              key={series.id}
+              type="monotone"
+              dataKey={series.id}
+              stroke={series.color || colors[index % colors.length]}
+              strokeWidth={2}
+              dot={{ r: 4 }}
+            />
+          ))}
+        </RechartsLineChart>
+      </ResponsiveContainer>
     </div>
   );
 };
