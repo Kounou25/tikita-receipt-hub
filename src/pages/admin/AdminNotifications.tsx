@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -211,7 +210,7 @@ const AdminNotifications = () => {
                         <h3 className={`font-medium ${notification.read ? 'text-gray-900' : 'text-gray-900 font-semibold'}`}>
                           {notification.title}
                         </h3>
-                        <Badge size="sm" className={getPriorityColor(notification.priority)}>
+                        <Badge className={getPriorityColor(notification.priority)}>
                           {getPriorityLabel(notification.priority)}
                         </Badge>
                         {!notification.read && (

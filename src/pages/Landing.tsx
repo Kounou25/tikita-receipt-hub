@@ -117,6 +117,49 @@ const Landing = () => {
     }
   ];
 
+  const partners = [
+    {
+      name: "Orange Niger",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Orange_logo.svg/200px-Orange_logo.svg.png",
+      industry: "Télécommunications"
+    },
+    {
+      name: "Bank of Africa Niger",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/BOA_logo.svg/200px-BOA_logo.svg.png",
+      industry: "Banque"
+    },
+    {
+      name: "Airtel Niger",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Airtel_logo.svg/200px-Airtel_logo.svg.png",
+      industry: "Télécommunications"
+    },
+    {
+      name: "SONIBANK",
+      logo: "https://via.placeholder.com/120x60/374151/FFFFFF?text=SONIBANK",
+      industry: "Banque"
+    },
+    {
+      name: "ECOBANK Niger",
+      logo: "https://via.placeholder.com/120x60/059669/FFFFFF?text=ECOBANK",
+      industry: "Banque"
+    },
+    {
+      name: "UBA Niger",
+      logo: "https://via.placeholder.com/120x60/dc2626/FFFFFF?text=UBA",
+      industry: "Banque"
+    },
+    {
+      name: "BIA Niger",
+      logo: "https://via.placeholder.com/120x60/7c3aed/FFFFFF?text=BIA",
+      industry: "Banque"
+    },
+    {
+      name: "Société Nigérienne d'Électricité",
+      logo: "https://via.placeholder.com/120x60/f59e0b/FFFFFF?text=NIGELEC",
+      industry: "Énergie"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50/30">
       {/* Header avec glassmorphism */}
@@ -353,7 +396,12 @@ const Landing = () => {
       </section>
 
       {/* Partners Section */}
-      <PartnersShowcase />
+      <PartnersShowcase 
+        title="Ils nous font confiance au Niger"
+        description="Plus de 150 entreprises nigériennes utilisent déjà Tikiita pour leurs reçus et factures"
+        partners={partners}
+        className="bg-gray-50"
+      />
 
       {/* Testimonials Section */}
       <section id="testimonials" className="py-20 md:py-32 bg-gradient-to-br from-primary-50 to-secondary-50 relative">
