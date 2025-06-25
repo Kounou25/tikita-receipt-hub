@@ -45,10 +45,9 @@ const UserProfileCard = ({
 
   return (
     <Card className="overflow-hidden border-0 shadow-lg">
-      <div className="h-24 bg-gradient-to-r from-primary-500 to-primary-700"></div>
-      <CardContent className="pt-0 -mt-12">
+      <CardContent className="pt-6">
         <div className="flex flex-col items-center">
-          <div className="ring-4 ring-white rounded-full">
+          <div className="mb-4">
             <Avatar className="h-24 w-24">
               <AvatarImage src={avatar} alt={name} />
               <AvatarFallback className="bg-primary-100 text-primary-800 text-xl font-semibold">

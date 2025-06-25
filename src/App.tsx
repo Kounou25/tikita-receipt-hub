@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,7 +17,7 @@ import ReceiptDetails from "./pages/user/ReceiptDetails";
 import UserProfile from "./pages/user/UserProfile";
 import GenerateReceiptStep1 from "./pages/user/GenerateReceiptStep1";
 import GenerateReceiptStep2 from "./pages/user/GenerateReceiptStep2";
-import UserStats from "./pages/user/UserStats";
+import UserClients from "./pages/user/UserClients";
 import Notifications from "./pages/user/Notifications";
 
 // Partner Pages
@@ -61,7 +62,7 @@ const App = () => (
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/generate" element={<GenerateReceiptStep1 />} />
           <Route path="/generate/step2" element={<GenerateReceiptStep2 />} />
-          <Route path="/stats" element={<UserStats />} />
+          <Route path="/clients" element={<UserClients />} />
           <Route path="/notifications" element={<Notifications />} />
           
           {/* Partner Routes */}

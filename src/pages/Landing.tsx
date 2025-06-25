@@ -13,9 +13,9 @@ const Landing = () => {
       description: "Générez vos reçus en quelques clics avec nos modèles professionnels"
     },
     {
-      icon: CreditCard,
-      title: "Factures complètes", 
-      description: "Créez des factures détaillées conformes aux standards nigériens"
+      icon: FileText,
+      title: "Reçus détaillés", 
+      description: "Créez des reçus complets conformes aux standards nigériens"
     },
     {
       icon: Smartphone,
@@ -28,7 +28,7 @@ const Landing = () => {
     {
       icon: FileText,
       title: "Génération intelligente",
-      description: "Créez des reçus et factures professionnels adaptés au marché nigérien.",
+      description: "Créez des reçus professionnels adaptés au marché nigérien.",
       color: "from-emerald-500 to-teal-600"
     },
     {
@@ -238,12 +238,12 @@ const Landing = () => {
               <h1 className="text-4xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
                 Générez vos
                 <span className="block bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-600 bg-clip-text text-transparent animate-glow">
-                  reçus & factures
+                  reçus professionnels
                 </span>
                 <span className="block text-gray-800">en 30 secondes</span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-                La première plateforme nigérienne de génération de reçus et factures professionnels. 
+                La première plateforme nigérienne de génération de reçus professionnels. 
                 <span className="font-semibold text-primary-700">Simple, rapide et conforme</span> aux standards locaux.
               </p>
             </div>
@@ -317,7 +317,7 @@ const Landing = () => {
               {
                 step: "1",
                 title: "Choisissez votre modèle",
-                description: "Sélectionnez parmi nos templates professionnels adaptés au Niger",
+                description: "Sélectionnez parmi nos templates de reçus adaptés au Niger",
                 icon: FileText
               },
               {
@@ -398,7 +398,7 @@ const Landing = () => {
       {/* Partners Section */}
       <PartnersShowcase 
         title="Ils nous font confiance au Niger"
-        description="Plus de 150 entreprises nigériennes utilisent déjà Tikiita pour leurs reçus et factures"
+        description="Plus de 150 entreprises nigériennes utilisent déjà Tikiita pour leurs reçus professionnels"
         partners={partners}
         className="bg-gray-50"
       />
@@ -549,7 +549,7 @@ const Landing = () => {
                 <span className="text-xl font-bold">Tikiita</span>
               </div>
               <p className="text-gray-400 mb-4">
-                La solution nigérienne pour vos reçus et factures professionnels.
+                La solution nigérienne pour vos reçus professionnels.
               </p>
               <div className="text-sm text-gray-500">
                 🇳🇪 Fièrement nigérien

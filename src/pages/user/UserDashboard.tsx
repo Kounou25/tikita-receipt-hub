@@ -5,40 +5,40 @@ import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import LineChart from "@/components/charts/LineChart";
-import PieChart from "@/components/charts/PieChart";
-import { Receipt, FileText, Users, TrendingUp, Plus, Eye, Download, Bell } from "lucide-react";
+import { Receipt, FileText, Users, TrendingUp, Plus, Eye, Download, Bell, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const UserDashboard = () => {
   // Sample data for charts
   const revenueData = [
-    { id: "revenus", data: [
-      { x: "Jan", y: 45000 },
-      { x: "Fév", y: 52000 },
-      { x: "Mar", y: 48000 },
-      { x: "Avr", y: 67000 },
-      { x: "Mai", y: 71000 },
-      { x: "Juin", y: 59000 }
-    ]}
-  ];
-
-  const receiptTypeData = [
-    { id: "recus", label: "Reçus", value: 65, color: "#10B981" },
-    { id: "factures", label: "Factures", value: 35, color: "#3B82F6" }
+    { name: "Jan", value: 45000 },
+    { name: "Fév", value: 52000 },
+    { name: "Mar", value: 48000 },
+    { name: "Avr", value: 67000 },
+    { name: "Mai", value: 71000 },
+    { name: "Juin", value: 59000 }
   ];
 
   const stats = [
     { title: "Reçus générés", value: "342", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+12%" },
-    { title: "Factures créées", value: "128", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+8%" },
+    { title: "Documents créés", value: "128", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+8%" },
     { title: "Clients actifs", value: "89", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+25%" },
     { title: "Revenus totaux", value: "4,250,000 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+18%" },
   ];
 
   const recentReceipts = [
     { id: "TKT-20250118-001", client: "Marie Kouassi", amount: "25,000 FCFA", type: "Reçu", status: "Payé", date: "18 Jan 2025" },
-    { id: "TKT-20250118-002", client: "Ibrahim Moussa", amount: "45,000 FCFA", type: "Facture", status: "En attente", date: "18 Jan 2025" },
+    { id: "TKT-20250118-002", client: "Ibrahim Moussa", amount: "45,000 FCFA", type: "Reçu", status: "En attente", date: "18 Jan 2025" },
     { id: "TKT-20250117-003", client: "Fatou Diallo", amount: "12,500 FCFA", type: "Reçu", status: "Payé", date: "17 Jan 2025" },
-    { id: "TKT-20250117-004", client: "Kofi Asante", amount: "67,000 FCFA", type: "Facture", status: "Payé", date: "17 Jan 2025" },
+    { id: "TKT-20250117-004", client: "Kofi Asante", amount: "67,000 FCFA", type: "Reçu", status: "Payé", date: "17 Jan 2025" },
+  ];
+
+  const topClients = [
+    { name: "Boutique Elegance", purchases: 12, amount: "320,000 FCFA", growth: "+25%" },
+    { name: "Restaurant Sahel", purchases: 8, amount: "280,000 FCFA", growth: "+18%" },
+    { name: "Magasin Central", purchases: 6, amount: "195,000 FCFA", growth: "+12%" },
+    { name: "Pharmacie Moderne", purchases: 5, amount: "150,000 FCFA", growth: "+8%" },
+    { name: "Atelier Mécanique", purchases: 4, amount: "125,000 FCFA", growth: "+5%" },
   ];
 
   return (
@@ -118,11 +118,32 @@ const UserDashboard = () => {
           </Card>
 
           <Card className="border-gray-200">
-            <CardHeader>
-              <CardTitle>Répartition des documents</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="w-5 h-5 text-yellow-600" />
+                Top 5 Clients du Mois
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <PieChart data={receiptTypeData} height={300} />
+              <div className="space-y-4">
+                {topClients.map((client, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{client.name}</p>
+                        <p className="text-sm text-gray-600">{client.purchases} achats</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-gray-900">{client.amount}</p>
+                      <p className="text-sm text-green-600">{client.growth}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -142,13 +163,8 @@ const UserDashboard = () => {
               {recentReceipts.map((receipt, index) => (
                 <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                   <div className="flex items-center space-x-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      receipt.type === "Reçu" ? "bg-blue-100" : "bg-green-100"
-                    }`}>
-                      {receipt.type === "Reçu" ? 
-                        <Receipt className={`w-5 h-5 ${receipt.type === "Reçu" ? "text-blue-600" : "text-green-600"}`} /> :
-                        <FileText className="w-5 h-5 text-green-600" />
-                      }
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <Receipt className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">{receipt.id}</p>
@@ -182,10 +198,10 @@ const UserDashboard = () => {
                   Nouveau document
                 </Button>
               </Link>
-              <Link to="/stats">
+              <Link to="/clients">
                 <Button variant="outline" className="w-full justify-start">
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  Voir les statistiques
+                  <Users className="w-4 h-4 mr-2" />
+                  Gérer les clients
                 </Button>
               </Link>
               <Button variant="outline" className="w-full justify-start">
