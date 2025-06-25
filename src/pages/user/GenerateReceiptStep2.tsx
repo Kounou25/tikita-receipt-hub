@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
@@ -30,6 +30,13 @@ const GenerateReceiptStep2 = () => {
     notes: ""
   });
 
+  // Sample client list for dropdown
+  const clients = [
+    { id: 1, name: "Client 1", email: "client1@example.com", phone: "+225 01 23 45 67", address: "123 Rue Principale" },
+    { id: 2, name: "Client 2", email: "client2@example.com", phone: "+225 89 01 23 45", address: "456 Avenue Centrale" },
+    { id: 3, name: "Client 3", email: "client3@example.com", phone: "+225 67 89 01 23", address: "789 Boulevard Nord" }
+  ];
+
   const addItem = () => {
     const newItem = {
       id: Date.now(),
@@ -52,6 +59,27 @@ const GenerateReceiptStep2 = () => {
     ));
   };
 
+  const handleClientSelect = (clientId: string) => {
+    const selectedClient = clients.find(client => client.id.toString() === clientId);
+    if (selectedClient) {
+      setClientInfo({
+        name: selectedClient.name,
+        email: selectedClient.email,
+        phone: selectedClient.phone,
+        address: selectedClient.address
+      });
+    }
+  };
+
+  const handleAddClient = () => {
+    setClientInfo({
+      name: "",
+      email: "",
+      phone: "",
+      address: ""
+    });
+  };
+
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const discountAmount = (subtotal * receiptInfo.discount) / 100;
   const taxableAmount = subtotal - discountAmount;
@@ -59,7 +87,6 @@ const GenerateReceiptStep2 = () => {
   const total = taxableAmount + tvaAmount;
 
   const handleGenerateReceipt = () => {
-    // Logic to generate the receipt
     console.log("Generating receipt with:", { clientInfo, items, receiptInfo, total });
     navigate("/receipts");
   };
@@ -96,6 +123,27 @@ const GenerateReceiptStep2 = () => {
                 <CardTitle className="text-xl font-bold">Informations client</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="space-y-2 flex-1">
+                    <Label htmlFor="clientSelect">Sélectionner un client</Label>
+                    <Select onValueChange={handleClientSelect}>
+                      <SelectTrigger id="clientSelect" className="border-gray-300">
+                        <SelectValue placeholder="Choisir un client" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clients.map(client => (
+                          <SelectItem key={client.id} value={client.id.toString()}>
+                            {client.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={handleAddClient} size="sm" className="bg-primary hover:bg-primary/90 mt-6">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Ajouter
+                  </Button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="clientName">Nom complet *</Label>
