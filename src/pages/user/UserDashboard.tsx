@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
@@ -9,14 +8,20 @@ import { Receipt, FileText, Users, TrendingUp, Plus, Eye, Download, Bell, Crown 
 import { Link } from "react-router-dom";
 
 const UserDashboard = () => {
-  // Sample data for charts
+  // Sample data for charts - transformed to match LineChart interface
   const revenueData = [
-    { name: "Jan", value: 45000 },
-    { name: "Fév", value: 52000 },
-    { name: "Mar", value: 48000 },
-    { name: "Avr", value: 67000 },
-    { name: "Mai", value: 71000 },
-    { name: "Juin", value: 59000 }
+    {
+      id: "revenus",
+      color: "#4CAF50",
+      data: [
+        { x: "Jan", y: 45000 },
+        { x: "Fév", y: 52000 },
+        { x: "Mar", y: 48000 },
+        { x: "Avr", y: 67000 },
+        { x: "Mai", y: 71000 },
+        { x: "Juin", y: 59000 }
+      ]
+    }
   ];
 
   const stats = [
