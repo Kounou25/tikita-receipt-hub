@@ -5,10 +5,9 @@ import {
   Home, 
   FileText, 
   User, 
-  BarChart3, 
+  Users, 
   Plus, 
   Settings,
-  Users,
   UserCheck,
   Key,
   CreditCard
@@ -27,7 +26,7 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
     { icon: Home, label: "Dashboard", path: "/dashboard" },
     { icon: Plus, label: "Nouveau reçu", path: "/generate" },
     { icon: FileText, label: "Mes reçus", path: "/receipts" },
-    { icon: BarChart3, label: "Statistiques", path: "/stats" },
+    { icon: Users, label: "Mes clients", path: "/clients" },
     { icon: User, label: "Profil", path: "/profile" },
   ];
 

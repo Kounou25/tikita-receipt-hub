@@ -1,5 +1,5 @@
 
-import { Home, FileText, User, BarChart3, Settings, Users, UserCheck, Plus, Key } from "lucide-react";
+import { Home, FileText, User, Users, Settings, UserCheck, Plus, Key } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,7 @@ const MobileNav = ({ userType = "user" }: MobileNavProps) => {
     { icon: Home, label: "Accueil", path: "/dashboard" },
     { icon: Plus, label: "Nouveau", path: "/generate" },
     { icon: FileText, label: "Reçus", path: "/receipts" },
-    { icon: BarChart3, label: "Stats", path: "/stats" },
+    { icon: Users, label: "Clients", path: "/clients" },
     { icon: User, label: "Profil", path: "/profile" },
   ];
 
