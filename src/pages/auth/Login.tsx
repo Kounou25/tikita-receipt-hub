@@ -46,6 +46,8 @@ const Login = () => {
       if (user && token) {
         localStorage.setItem("user_id", user.user_id);
         localStorage.setItem("token", token);
+        localStorage.setItem("user_role", user.role);
+        localStorage.setItem("user_name", user.full_name || user.email);
 
         if (user.role === "user") {
           navigate("/dashboard");
@@ -64,6 +66,16 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Overlay de chargement pleine page */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-12 h-12 text-primary-600 animate-spin" />
+            <p className="text-white text-lg font-medium">Chargement...</p>
+          </div>
+        </div>
+      )}
+
       <div className="absolute top-20 left-10 w-20 h-20 bg-primary-200/30 rounded-full blur-xl animate-float"></div>
       <div className="absolute bottom-20 right-10 w-32 h-32 bg-secondary-200/20 rounded-full blur-2xl animate-float" style={{ animationDelay: "2s" }}></div>
 
@@ -135,7 +147,7 @@ const Login = () => {
                   <Checkbox
                     id="remember"
                     checked={formData.rememberMe}
-                    onCheckedChange={(checked) => setFormData({ ...formData, rememberMe: checked as boolean })}
+                    onChecked loCheckedChange={(checked) => setFormData({ ...formData, rememberMe: checked as boolean })}
                     disabled={isLoading}
                   />
                   <Label htmlFor="remember" className="text-sm text-gray-600 font-medium">Se souvenir de moi</Label>
