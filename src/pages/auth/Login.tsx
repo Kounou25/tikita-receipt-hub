@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Sparkles, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -13,53 +12,84 @@ const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    rememberMe: false
+    rememberMe: false,
   });
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/dashboard");
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/login/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Échec de la connexion. Vérifiez vos identifiants.");
+      }
+
+      const { user, token } = await response.json();
+      console.log("Réponse de connexion:", { user, token });
+
+      if (user && token) {
+        localStorage.setItem("user_id", user.user_id);
+        localStorage.setItem("token", token);
+
+        if (user.role === "user") {
+          navigate("/dashboard");
+        } else {
+          setError("Rôle non autorisé pour cette redirection.");
+        }
+      } else {
+        setError("Réponse inattendue du serveur.");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur s'est produite. Veuillez réessayer.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background animations */}
       <div className="absolute top-20 left-10 w-20 h-20 bg-primary-200/30 rounded-full blur-xl animate-float"></div>
-      <div className="absolute bottom-20 right-10 w-32 h-32 bg-secondary-200/20 rounded-full blur-2xl animate-float" style={{animationDelay: '2s'}}></div>
-      
+      <div className="absolute bottom-20 right-10 w-32 h-32 bg-secondary-200/20 rounded-full blur-2xl animate-float" style={{ animationDelay: "2s" }}></div>
+
       <div className="w-full max-w-md space-y-8 relative z-10">
-        {/* Logo */}
         <div className="text-center">
           <div className="flex items-center justify-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center shadow-xl">
-              <img 
-                src="/lovable-uploads/98b915da-4744-4a07-84d2-b2d5065e9c15.png" 
-                alt="Tikiita Logo" 
-                className="h-8 w-8"
-              />
+              <img src="/lovable-uploads/98b915da-4744-4a07-84d2-b2d5065e9c15.png" alt="Tikiita Logo" className="h-8 w-8" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
-            Tikiita
-          </h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">Tikiita</h1>
           <p className="text-gray-600 mt-2">La révolution des reçus numériques</p>
         </div>
 
-        {/* Login Form */}
         <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-xl">
           <CardHeader className="text-center pb-6">
             <CardTitle className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-2">
               <Sparkles className="w-6 h-6 text-primary-600" />
               Connexion
             </CardTitle>
-            <p className="text-gray-600">
-              Accédez à votre espace de génération intelligente
-            </p>
+            <p className="text-gray-600">Accédez à votre espace de génération intelligente</p>
           </CardHeader>
-          
+
           <CardContent className="pt-0">
             <form onSubmit={handleSubmit} className="space-y-6">
+              {error && <p className="text-red-500 text-sm text-center">{error}</p>}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-gray-700 font-medium">Email ou téléphone</Label>
                 <Input
@@ -69,6 +99,7 @@ const Login = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
+                  disabled={isLoading}
                   className="border-gray-200 focus:border-primary-500 focus:ring-primary-500 bg-white/50 backdrop-blur-sm h-12"
                 />
               </div>
@@ -83,6 +114,7 @@ const Login = () => {
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
+                    disabled={isLoading}
                     className="border-gray-200 focus:border-primary-500 focus:ring-primary-500 bg-white/50 backdrop-blur-sm h-12 pr-12"
                   />
                   <Button
@@ -91,12 +123,9 @@ const Login = () => {
                     size="icon"
                     className="absolute right-0 top-0 h-12 px-3 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4 text-gray-400" />
-                    ) : (
-                      <Eye className="w-4 h-4 text-gray-400" />
-                    )}
+                    {showPassword ? <EyeOff className="w-4 h-4 text-gray-400" /> : <Eye className="w-4 h-4 text-gray-400" />}
                   </Button>
                 </div>
               </div>
@@ -106,38 +135,36 @@ const Login = () => {
                   <Checkbox
                     id="remember"
                     checked={formData.rememberMe}
-                    onCheckedChange={(checked) => 
-                      setFormData({ ...formData, rememberMe: checked as boolean })
-                    }
+                    onCheckedChange={(checked) => setFormData({ ...formData, rememberMe: checked as boolean })}
+                    disabled={isLoading}
                   />
-                  <Label htmlFor="remember" className="text-sm text-gray-600 font-medium">
-                    Se souvenir de moi
-                  </Label>
+                  <Label htmlFor="remember" className="text-sm text-gray-600 font-medium">Se souvenir de moi</Label>
                 </div>
-                
-                <Link 
-                  to="/forgot-password" 
-                  className="text-sm text-primary-600 hover:text-primary-700 transition-colors font-medium"
-                >
+                <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700 transition-colors font-medium">
                   Mot de passe oublié ?
                 </Link>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 h-12 text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+                disabled={isLoading}
               >
-                Se connecter
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Connexion...
+                  </span>
+                ) : (
+                  "Se connecter"
+                )}
               </Button>
             </form>
 
             <div className="mt-8 text-center">
               <p className="text-gray-600">
                 Nouveau sur Tikiita ?{" "}
-                <Link 
-                  to="/register" 
-                  className="text-primary-600 hover:text-primary-700 font-semibold transition-colors"
-                >
+                <Link to="/register" className="text-primary-600 hover:text-primary-700 font-semibold transition-colors">
                   Créer un compte gratuit
                 </Link>
               </p>
@@ -145,7 +172,6 @@ const Login = () => {
           </CardContent>
         </Card>
 
-        {/* Demo accounts */}
         <Card className="border-0 bg-gradient-to-br from-gray-50 to-gray-100 shadow-lg">
           <CardContent className="pt-6">
             <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">

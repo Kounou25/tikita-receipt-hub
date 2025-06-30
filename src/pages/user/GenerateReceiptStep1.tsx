@@ -17,7 +17,7 @@ const GenerateReceiptStep1 = () => {
       id: "modern",
       name: "Moderne",
       description: "Design épuré et professionnel",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80",
+      thumbnail: "/receipts_models/modern.png",
       popular: true
     },
     {
