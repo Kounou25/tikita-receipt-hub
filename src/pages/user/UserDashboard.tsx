@@ -23,7 +23,7 @@ const UserDashboard = () => {
       ]
     }
   ];
-
+  const username = localStorage.getItem("user_name") || "Utilisateur";
   const stats = [
     { title: "Reçus générés", value: "342", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+12%" },
     { title: "Documents créés", value: "128", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+8%" },
@@ -59,7 +59,7 @@ const UserDashboard = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Bonjour ! 👋
+                  Bonjour ! {username} 👋
                 </h2>
                 <p className="text-gray-600 mb-4">
                   Voici un aperçu de votre activité commerciale sur Tikiita.
