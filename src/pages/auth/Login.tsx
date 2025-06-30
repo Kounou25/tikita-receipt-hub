@@ -40,14 +40,15 @@ const Login = () => {
         throw new Error(errorData.message || "Échec de la connexion. Vérifiez vos identifiants.");
       }
 
-      const { user, token } = await response.json();
-      console.log("Réponse de connexion:", { user, token });
+      const { user, token,company_id } = await response.json();
+      console.log("Réponse de connexion:", { user,company_id, token });
 
       if (user && token) {
         localStorage.setItem("user_id", user.user_id);
         localStorage.setItem("token", token);
         localStorage.setItem("user_role", user.role);
         localStorage.setItem("user_name", user.full_name || user.email);
+        localStorage.setItem("company_id", company_id);
 
         if (user.role === "user") {
           navigate("/dashboard");
