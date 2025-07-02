@@ -1,5 +1,7 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Loader2, AlertCircle } from "lucide-react";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
@@ -8,43 +10,174 @@ import { Receipt, FileText, Users, TrendingUp, Plus, Eye, Download, Bell, Crown 
 import { Link } from "react-router-dom";
 
 const UserDashboard = () => {
-  // Sample data for charts - transformed to match LineChart interface
-  const revenueData = [
-    {
-      id: "revenus",
-      color: "#4CAF50",
-      data: [
-        { x: "Jan", y: 45000 },
-        { x: "Fév", y: 52000 },
-        { x: "Mar", y: 48000 },
-        { x: "Avr", y: 67000 },
-        { x: "Mai", y: 71000 },
-        { x: "Juin", y: 59000 }
-      ]
-    }
-  ];
+  // State for dynamic data
+  const [stats, setStats] = useState([]);
+  const [revenueData, setRevenueData] = useState([]);
+  const [topClients, setTopClients] = useState([]);
+  const [recentReceipts, setRecentReceipts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const username = localStorage.getItem("user_name") || "Utilisateur";
-  const stats = [
-    { title: "Reçus générés", value: "342", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+12%" },
-    { title: "Documents créés", value: "128", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+8%" },
-    { title: "Clients actifs", value: "89", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+25%" },
-    { title: "Revenus totaux", value: "4,250,000 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+18%" },
-  ];
+  const companyId = localStorage.getItem("company_id") || null;
+  const token = localStorage.getItem("token") || null;
 
-  const recentReceipts = [
-    { id: "TKT-20250118-001", client: "Marie Kouassi", amount: "25,000 FCFA", type: "Reçu", status: "Payé", date: "18 Jan 2025" },
-    { id: "TKT-20250118-002", client: "Ibrahim Moussa", amount: "45,000 FCFA", type: "Reçu", status: "En attente", date: "18 Jan 2025" },
-    { id: "TKT-20250117-003", client: "Fatou Diallo", amount: "12,500 FCFA", type: "Reçu", status: "Payé", date: "17 Jan 2025" },
-    { id: "TKT-20250117-004", client: "Kofi Asante", amount: "67,000 FCFA", type: "Reçu", status: "Payé", date: "17 Jan 2025" },
-  ];
+  // Fetch all data
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!companyId) {
+        setError("ID de l'entreprise non défini. Veuillez vous reconnecter.");
+        setIsLoading(false);
+        return;
+      }
 
-  const topClients = [
-    { name: "Boutique Elegance", purchases: 12, amount: "320,000 FCFA", growth: "+25%" },
-    { name: "Restaurant Sahel", purchases: 8, amount: "280,000 FCFA", growth: "+18%" },
-    { name: "Magasin Central", purchases: 6, amount: "195,000 FCFA", growth: "+12%" },
-    { name: "Pharmacie Moderne", purchases: 5, amount: "150,000 FCFA", growth: "+8%" },
-    { name: "Atelier Mécanique", purchases: 4, amount: "125,000 FCFA", growth: "+5%" },
-  ];
+      try {
+        setIsLoading(true);
+        setError(null);
+        console.log("Fetching data with companyId:", companyId);
+
+        // Fetch stats
+        const statsResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/${companyId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { "Authorization": `Bearer ${token}` }),
+          },
+        });
+        if (!statsResponse.ok) {
+          throw new Error(`Failed to fetch stats: ${statsResponse.status} ${statsResponse.statusText}`);
+        }
+        const statsData = await statsResponse.json();
+        if (!Array.isArray(statsData) || statsData.length === 0) {
+          throw new Error("Invalid stats response: empty or not an array");
+        }
+        const apiStats = statsData[0];
+        const transformedStats = [
+          { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+          { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+          { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+          { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+        ];
+        setStats(transformedStats);
+
+        // Fetch revenue per month
+        const revenueResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/revenuePerMonth/${companyId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { "Authorization": `Bearer ${token}` }),
+          },
+        });
+        if (!revenueResponse.ok) {
+          throw new Error(`Failed to fetch revenue: ${revenueResponse.status} ${revenueResponse.statusText}`);
+        }
+        const revenueData = await revenueResponse.json();
+        if (!Array.isArray(revenueData)) {
+          throw new Error("Invalid revenue response: not an array");
+        }
+        const transformedRevenue = [{
+          id: "revenus",
+          color: "#4CAF50",
+          data: revenueData.map(item => ({
+            x: item.mois,
+            y: item.chiffre_affaire
+          }))
+        }];
+        setRevenueData(transformedRevenue);
+
+        // Fetch top 5 clients
+        const clientsResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/topFiveClients/${companyId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { "Authorization": `Bearer ${token}` }),
+          },
+        });
+        if (!clientsResponse.ok) {
+          throw new Error(`Failed to fetch top clients: ${clientsResponse.status} ${clientsResponse.statusText}`);
+        }
+        const clientsData = await clientsResponse.json();
+        if (!Array.isArray(clientsData)) {
+          throw new Error("Invalid clients response: not an array");
+        }
+        const transformedClients = clientsData.map(client => ({
+          name: client.client_name,
+          purchases: client.total_items,
+          amount: `${client.total_purchases.toLocaleString('fr-FR')} FCFA`,
+          growth: "+0%"
+        }));
+        setTopClients(transformedClients);
+
+        // Fetch recent receipts
+        const receiptsResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/receipt/list/${companyId}/5`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { "Authorization": `Bearer ${token}` }),
+          },
+        });
+        if (!receiptsResponse.ok) {
+          throw new Error(`Failed to fetch recent receipts: ${receiptsResponse.status} ${receiptsResponse.statusText}`);
+        }
+        const receiptsData = await receiptsResponse.json();
+        if (!Array.isArray(receiptsData)) {
+          throw new Error("Invalid receipts response: not an array");
+        }
+        const transformedReceipts = receiptsData.map(receipt => ({
+          id: receipt.receipt_number,
+          client: receipt.client_name,
+          amount: `${receipt.total_amount.toLocaleString('fr-FR')} FCFA`,
+          type: "Reçu",
+          status: receipt.payment_status === "paid" ? "Payé" : "En attente",
+          date: new Date(receipt.receipt_date).toLocaleDateString('fr-FR', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          })
+        }));
+        setRecentReceipts(transformedReceipts);
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(error.message || "Une erreur est survenue lors du chargement des données.");
+        // Fallback data
+        setStats([
+          { title: "Reçus générés", value: "342", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+12%" },
+          { title: "Documents créés", value: "128", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+8%" },
+          { title: "Clients actifs", value: "89", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+25%" },
+          { title: "Revenus totaux", value: "4,250,000 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+18%" },
+        ]);
+        setRevenueData([{
+          id: "revenus",
+          color: "#4CAF50",
+          data: [
+            { x: "Jan", y: 45000 },
+            { x: "Fév", y: 52000 },
+            { x: "Mar", y: 48000 },
+            { x: "Avr", y: 67000 },
+            { x: "Mai", y: 71000 },
+            { x: "Juin", y: 59000 }
+          ]
+        }]);
+        setTopClients([
+          { name: "Boutique Elegance", purchases: 12, amount: "320,000 FCFA", growth: "+25%" },
+          { name: "Restaurant Sahel", purchases: 8, amount: "280,000 FCFA", growth: "+18%" },
+          { name: "Magasin Central", purchases: 6, amount: "195,000 FCFA", growth: "+12%" },
+          { name: "Pharmacie Moderne", purchases: 5, amount: "150,000 FCFA", growth: "+8%" },
+          { name: "Atelier Mécanique", purchases: 4, amount: "125,000 FCFA", growth: "+5%" },
+        ]);
+        setRecentReceipts([
+          { id: "TKT-20250118-001", client: "Marie Kouassi", amount: "25,000 FCFA", type: "Reçu", status: "Payé", date: "18 Jan 2025" },
+          { id: "TKT-20250118-002", client: "Ibrahim Moussa", amount: "45,000 FCFA", type: "Reçu", status: "En attente", date: "18 Jan 2025" },
+          { id: "TKT-20250117-003", client: "Fatou Diallo", amount: "12,500 FCFA", type: "Reçu", status: "Payé", date: "17 Jan 2025" },
+          { id: "TKT-20250117-004", client: "Kofi Asante", amount: "67,000 FCFA", type: "Reçu", status: "Payé", date: "17 Jan 2025" },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [companyId]);
 
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
@@ -52,6 +185,23 @@ const UserDashboard = () => {
       
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="user" />
+
+        {/* Loading Overlay */}
+        {isLoading && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-4 flex items-center gap-2 text-red-600">
+              <AlertCircle className="w-5 h-5" />
+              <p>{error}</p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Welcome Section */}
         <Card className="border-primary bg-gradient-to-r from-primary/5 to-secondary/5">
@@ -178,9 +328,7 @@ const UserDashboard = () => {
                   </div>
                   <div className="text-right">
                     <p className="font-medium text-gray-900">{receipt.amount}</p>
-                    <p className={`text-sm ${
-                      receipt.status === "Payé" ? "text-green-600" : "text-orange-600"
-                    }`}>
+                    <p className={`text-sm ${receipt.status === "Payé" ? "text-green-600" : "text-orange-600"}`}>
                       {receipt.status}
                     </p>
                   </div>
