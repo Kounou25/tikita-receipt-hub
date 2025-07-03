@@ -1,64 +1,196 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Loader2, AlertCircle, ArrowLeft, Download, Eye, Share2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
-import { ArrowLeft, Download, Eye, Share2, Mail } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
 const ReceiptDetails = () => {
   const { id } = useParams();
+  const companyId = localStorage.getItem("company_id") || null;
+  const token = localStorage.getItem("token") || null;
+  const [receipt, setReceipt] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [downloadProgress, setDownloadProgress] = useState(null);
 
-  // Mock data - en réalité cela viendrait d'une API
-  const receipt = {
-    id: "R001234",
-    client: {
-      name: "Jean Dupont",
-      address: "123 Rue de la Paix, Abidjan, Côte d'Ivoire",
-      phone: "+225 07 12 34 56 78"
-    },
-    company: {
-      name: "Ma Boutique SARL",
-      address: "456 Boulevard Principal, Cocody, Abidjan",
-      phone: "+225 27 22 12 34 56",
-      email: "contact@maboutique.ci",
-      nif: "NIF123456789",
-      rccm: "RCCM123456"
-    },
-    date: "15 Juin 2024 14:30",
-    status: "Payé",
-    items: [
-      {
-        designation: "Smartphone Samsung Galaxy A54",
-        quantity: 1,
-        unitPrice: 180000,
-        total: 180000
-      },
-      {
-        designation: "Écouteurs Bluetooth",
-        quantity: 2,
-        unitPrice: 15000,
-        total: 30000
-      },
-      {
-        designation: "Coque de protection",
-        quantity: 1,
-        unitPrice: 5000,
-        total: 5000
+  const handleDownloadPDF = async () => {
+    try {
+      setError(null);
+      setDownloadProgress(0);
+
+      const progressInterval = setInterval(() => {
+        setDownloadProgress(prev => {
+          if (prev === null) return prev;
+          return Math.min(prev + 10, 90);
+        });
+      }, 200);
+
+      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/receipt/generate/${id}`, {
+        method: "GET",
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      clearInterval(progressInterval);
+      setDownloadProgress(100);
+
+      if (!response.ok) {
+        throw new Error(`Failed to download PDF: ${response.status} ${response.statusText}`);
       }
-    ],
-    subtotal: 215000,
-    tva: 18,
-    tvaAmount: 38700,
-    discount: 5,
-    discountAmount: 12685,
-    total: 241015,
-    paymentMethod: "Mobile Money"
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `receipt_${receipt.receipt_number}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      setTimeout(() => setDownloadProgress(null), 500);
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+      setError(error.message || "Une erreur est survenue lors du téléchargement du PDF.");
+      setDownloadProgress(null);
+      setTimeout(() => setError(null), 5000);
+    }
   };
 
-  const getStatusColor = (status: string) => {
+  useEffect(() => {
+    const fetchReceiptDetails = async () => {
+      if (!companyId || !id) {
+        setError("ID de l'entreprise ou du reçu non défini. Veuillez vous reconnecter.");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/receipt/details/${companyId}/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch receipt details: ${response.status} ${response.statusText}`);
+        }
+
+        const [receiptData] = await response.json();
+        if (!receiptData) {
+          throw new Error("Invalid receipt data: empty response");
+        }
+
+        const transformedReceipt = {
+          id: receiptData.receipt_number,
+          client: {
+            name: receiptData.client_name,
+            address: receiptData.client_address,
+            phone: receiptData.client_phone,
+            email: receiptData.client_email,
+          },
+          company: {
+            name: receiptData.company_name,
+            address: receiptData.company_address,
+            phone: receiptData.company_phone,
+            email: receiptData.company_email, // Default email as not provided
+            nif: receiptData.company_nif, // Default as not provided
+            rccm: receiptData.company_rccm // Default as not provided
+          },
+          date: receiptData.receipt_date
+            ? new Date(receiptData.receipt_date).toLocaleString('fr-FR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+            : 'Date inconnue',
+          status: receiptData.payment_status === "paid" ? "Payé" : "En attente",
+          items: receiptData.items.map(item => ({
+            designation: item.description,
+            quantity: item.quantity,
+            unitPrice: item.unit_price,
+            total: item.total
+          })),
+          subtotal: receiptData.total_ht,
+          tva: receiptData.tva_rate,
+          tvaAmount: receiptData.tva_amount,
+          discount: 0, // Not provided by API
+          discountAmount: 0, // Not provided by API
+          total: receiptData.total_ttc,
+          paymentMethod: receiptData.payment_method,
+          receipt_number: receiptData.receipt_number // For PDF download
+        };
+
+        setReceipt(transformedReceipt);
+      } catch (error) {
+        console.error("Error fetching receipt details:", error);
+        setError(error.message || "Une erreur est survenue lors du chargement des détails du reçu.");
+        setReceipt({
+          id: "R001234",
+          client: {
+            name: "Jean Dupont",
+            address: "123 Rue de la Paix, Abidjan, Côte d'Ivoire",
+            phone: "+225 07 12 34 56 78"
+          },
+          company: {
+            name: "Ma Boutique SARL",
+            address: "456 Boulevard Principal, Cocody, Abidjan",
+            phone: "+225 27 22 12 34 56",
+            email: "contact@maboutique.ci",
+            nif: "NIF123456789",
+            rccm: "RCCM123456"
+          },
+          date: "15 Juin 2024 14:30",
+          status: "Payé",
+          items: [
+            {
+              designation: "Smartphone Samsung Galaxy A54",
+              quantity: 1,
+              unitPrice: 180000,
+              total: 180000
+            },
+            {
+              designation: "Écouteurs Bluetooth",
+              quantity: 2,
+              unitPrice: 15000,
+              total: 30000
+            },
+            {
+              designation: "Coque de protection",
+              quantity: 1,
+              unitPrice: 5000,
+              total: 5000
+            }
+          ],
+          subtotal: 215000,
+          tva: 18,
+          tvaAmount: 38700,
+          discount: 5,
+          discountAmount: 12685,
+          total: 241015,
+          paymentMethod: "Mobile Money",
+          receipt_number: "R001234"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReceiptDetails();
+  }, [companyId, id]);
+
+  const getStatusColor = (status) => {
     switch (status) {
       case "Payé":
         return "bg-green-100 text-green-800";
@@ -71,11 +203,60 @@ const ReceiptDetails = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!receipt) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-4 flex items-center gap-2 text-red-600">
+            <AlertCircle className="w-5 h-5" />
+            <p>Aucun reçu trouvé.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
       <Header title="Détails du reçu" />
       
       <main className="p-4 md:p-6 space-y-6">
+        {/* Error Message */}
+        {error && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-4 flex items-center gap-2 text-red-600">
+              <AlertCircle className="w-5 h-5" />
+              <p>{error}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* PDF Download Progress Overlay */}
+        {downloadProgress !== null && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center gap-4">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-200 ease-out"
+                  style={{ width: `${downloadProgress}%` }}
+                />
+              </div>
+              <p className="text-sm font-medium text-gray-700">
+                Téléchargement en cours... {downloadProgress}%
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Header with actions */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div>
@@ -93,8 +274,17 @@ const ReceiptDetails = () => {
               <Eye className="w-4 h-4 mr-2" />
               Aperçu
             </Button>
-            <Button variant="outline" size="sm">
-              <Download className="w-4 h-4 mr-2" />
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleDownloadPDF}
+              disabled={downloadProgress !== null}
+            >
+              {downloadProgress !== null ? (
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+              ) : (
+                <Download className="w-4 h-4 mr-2" />
+              )}
               PDF
             </Button>
             <Button variant="outline" size="sm">
@@ -122,6 +312,10 @@ const ReceiptDetails = () => {
                 <p className="font-medium text-gray-900">{receipt.client.phone}</p>
               </div>
               <div>
+                <p className="text-sm text-gray-600">Email</p>
+                <p className="font-medium text-gray-900">{receipt.client.email || "Non fourni"}</p>
+              </div>
+              <div>
                 <p className="text-sm text-gray-600">Adresse</p>
                 <p className="font-medium text-gray-900">{receipt.client.address}</p>
               </div>
@@ -139,6 +333,10 @@ const ReceiptDetails = () => {
               <div>
                 <p className="text-sm text-gray-600">Nom</p>
                 <p className="font-medium text-gray-900">{receipt.company.name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Téléphone</p>
+                <p className="font-medium text-gray-900">{receipt.company.phone}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Email</p>
