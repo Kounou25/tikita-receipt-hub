@@ -7,17 +7,22 @@ import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+
+const Skeleton = ({ className }) => (
+  <div className={cn("animate-pulse bg-gray-200 rounded-md", className)} />
+);
 
 const ReceiptHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [receipts, setReceipts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({}); // Track progress for multiple receipts
+  const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({});
   const companyId = localStorage.getItem("company_id") || null;
   const token = localStorage.getItem("token") || null;
 
-  const handleDownloadPDF = async (id: string, receiptNumber: string) => {
+  const handleDownloadPDF = async (id, receiptNumber) => {
     try {
       setError(null);
       setDownloadProgress(prev => ({ ...prev, [id]: 0 }));
@@ -56,7 +61,7 @@ const ReceiptHistory = () => {
 
       setTimeout(() => {
         setDownloadProgress(prev => {
-          const { [id]: _, ...rest } = prev;
+          const { [id as string]: _, ...rest } = prev;
           return rest;
         });
       }, 500);
@@ -67,12 +72,12 @@ const ReceiptHistory = () => {
         const { [id]: _, ...rest } = prev;
         return rest;
       });
-      setTimeout(() => setError(null), 5000); // Clear error after 5 seconds
+      setTimeout(() => setError(null), 5000);
     }
   };
 
   useEffect(() => {
-    const fetchReceipts = async (): Promise<void> => {
+    const fetchReceipts = async () => {
       if (!companyId) {
         setError("ID de l'entreprise non défini. Veuillez vous reconnecter.");
         setIsLoading(false);
@@ -229,174 +234,271 @@ const ReceiptHistory = () => {
         )}
 
         {/* Filtres et recherche */}
-        <Card className="border-gray-200">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Rechercher par client ou numéro de reçu..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-gray-300"
-                />
+        {isLoading ? (
+          <Card className="border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Skeleton className="h-10 w-full flex-1" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-8 w-24" />
+                  <Skeleton className="h-8 w-24" />
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Filter className="w-4 h-4 mr-2" />
-                  Filtrer
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Période
-                </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-gray-200">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    placeholder="Rechercher par client ou numéro de reçu..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 border-gray-300"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Filter className="w-4 h-4 mr-2" />
+                    Filtrer
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Période
+                  </Button>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Liste des reçus */}
-        <Card className="border-gray-200">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Mes reçus ({filteredReceipts.length})</span>
-              <span className="text-sm font-normal text-gray-500">
-                Total: {receipts.reduce((sum, receipt) => sum + receipt.raw_amount, 0).toLocaleString('fr-FR')} FCFA
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            {/* Version mobile */}
-            <div className="md:hidden">
-              {filteredReceipts.map((receipt) => (
-                <div key={receipt.id} className="border-b border-gray-200 p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="font-medium text-gray-900">{receipt.receipt_number}</h3>
-                      <p className="text-sm text-gray-600">{receipt.client}</p>
-                    </div>
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      receipt.status === "Payé" 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}>
-                      {receipt.status}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-medium text-gray-900">{receipt.amount}</p>
-                      <p className="text-sm text-gray-500">{receipt.date} • {receipt.items} articles</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Link to={`/receipts/${receipt.id}`}>
-                        <Button variant="outline" size="sm">
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      </Link>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => handleDownloadPDF(receipt.id, receipt.receipt_number)}
-                        disabled={downloadProgress[receipt.id] !== undefined}
-                      >
-                        {downloadProgress[receipt.id] ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Download className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Version desktop */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Reçu
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Client
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Montant
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Articles
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Statut
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredReceipts.map((receipt) => (
-                    <tr key={receipt.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{receipt.receipt_number}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{receipt.client}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{receipt.amount}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{receipt.date}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{receipt.items}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          receipt.status === "Payé" 
-                            ? "bg-green-100 text-green-800" 
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}>
-                          {receipt.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex gap-2">
-                          <Link to={`/receipts/${receipt.id}`}>
-                            <Button variant="outline" size="sm">
-                              <Eye className="w-4 h-4 mr-1" />
-                              Voir
-                            </Button>
-                          </Link>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handleDownloadPDF(receipt.id, receipt.receipt_number)}
-                            disabled={downloadProgress[receipt.id] !== undefined}
-                          >
-                            {downloadProgress[receipt.id] ? (
-                              <Loader2 className="w-4 h-4 animate-spin mr-1" />
-                            ) : (
-                              <Download className="w-4 h-4 mr-1" />
-                            )}
-                            PDF
-                          </Button>
+        {isLoading ? (
+          <Card className="border-gray-200">
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+            </CardHeader>
+            <CardContent className="p-0">
+              {/* Version mobile */}
+              <div className="md:hidden">
+                {Array(5)
+                  .fill(null)
+                  .map((_, index) => (
+                    <div key={index} className="border-b border-gray-200 p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="space-y-2">
+                          <Skeleton className="h-5 w-32" />
+                          <Skeleton className="h-4 w-24" />
                         </div>
-                      </td>
-                    </tr>
+                        <Skeleton className="h-5 w-16 rounded-full" />
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div className="space-y-2">
+                          <Skeleton className="h-5 w-24" />
+                          <Skeleton className="h-4 w-32" />
+                        </div>
+                        <div className="flex gap-2">
+                          <Skeleton className="h-8 w-8" />
+                          <Skeleton className="h-8 w-8" />
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+
+              {/* Version desktop */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      {["Reçu", "Client", "Montant", "Date", "Articles", "Statut", "Actions"].map((header, index) => (
+                        <th key={index} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {Array(5)
+                      .fill(null)
+                      .map((_, index) => (
+                        <tr key={index}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Skeleton className="h-4 w-24" />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Skeleton className="h-4 w-32" />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Skeleton className="h-4 w-24" />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Skeleton className="h-4 w-20" />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Skeleton className="h-4 w-16" />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Skeleton className="h-5 w-16 rounded-full" />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex gap-2">
+                              <Skeleton className="h-8 w-16" />
+                              <Skeleton className="h-8 w-16" />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-gray-200">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Mes reçus ({filteredReceipts.length})</span>
+                <span className="text-sm font-normal text-gray-500">
+                  Total: {receipts.reduce((sum, receipt) => sum + receipt.raw_amount, 0).toLocaleString('fr-FR')} FCFA
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {/* Version mobile */}
+              <div className="md:hidden">
+                {filteredReceipts.map((receipt) => (
+                  <div key={receipt.id} className="border-b border-gray-200 p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-medium text-gray-900">{receipt.receipt_number}</h3>
+                        <p className="text-sm text-gray-600">{receipt.client}</p>
+                      </div>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        receipt.status === "Payé" 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}>
+                        {receipt.status}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-medium text-gray-900">{receipt.amount}</p>
+                        <p className="text-sm text-gray-500">{receipt.date} • {receipt.items} articles</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Link to={`/receipts/${receipt.id}`}>
+                          <Button variant="outline" size="sm">
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </Link>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleDownloadPDF(receipt.id, receipt.receipt_number)}
+                          disabled={downloadProgress[receipt.id] !== undefined}
+                        >
+                          {downloadProgress[receipt.id] ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Download className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Version desktop */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Reçu
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Client
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Montant
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Articles
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Statut
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredReceipts.map((receipt) => (
+                      <tr key={receipt.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{receipt.receipt_number}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{receipt.client}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{receipt.amount}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">{receipt.date}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">{receipt.items}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            receipt.status === "Payé" 
+                              ? "bg-green-100 text-green-800" 
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}>
+                            {receipt.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex gap-2">
+                            <Link to={`/receipts/${receipt.id}`}>
+                              <Button variant="outline" size="sm">
+                                <Eye className="w-4 h-4 mr-1" />
+                                Voir
+                              </Button>
+                            </Link>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleDownloadPDF(receipt.id, receipt.receipt_number)}
+                              disabled={downloadProgress[receipt.id] !== undefined}
+                            >
+                              {downloadProgress[receipt.id] ? (
+                                <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                              ) : (
+                                <Download className="w-4 h-4 mr-1" />
+                              )}
+                              PDF
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </main>
 
       <MobileNav />
