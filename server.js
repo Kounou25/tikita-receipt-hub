@@ -1,21 +1,22 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import http from "http";
+import handler from "serve-handler";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
+const distPath = path.resolve(__dirname, "dist");
 
-const distPath = path.join(__dirname, 'dist');
-
-app.use(express.static(distPath));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'));
+const server = http.createServer((req, res) => {
+  return handler(req, res, {
+    public: distPath,
+    rewrites: [
+      { source: "**", destination: "/index.html" },
+    ],
+  });
 });
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+server.listen(8080, () => {
+  console.log("✅ Serveur HTTP lancé sur http://localhost:8080");
 });
