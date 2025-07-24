@@ -133,11 +133,11 @@ const RegisterStep1 = () => {
         {/* Logo */}
         <div className="text-center">
           <div className="flex items-center justify-center mb-8">
-            <img 
+            {/* <img 
               src="/lovable-Uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
               alt="Tikiita Logo" 
               className="h-12"
-            />
+            /> */}
           </div>
         </div>
 
