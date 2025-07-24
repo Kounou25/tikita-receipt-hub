@@ -1,91 +1,106 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
-import { Bell, Check, Trash2, Settings, AlertCircle, FileText, CreditCard, Users, TrendingUp } from "lucide-react";
+import { Bell, AlertCircle, FileText, CreditCard, Users, TrendingUp, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// Composant Skeleton pour l'animation de chargement
+const Skeleton = ({ className }: { className?: string }) => (
+  <div className={cn("animate-pulse bg-gray-200 rounded-md", className)} />
+);
+
+// Fonction pour formater la date en durée relative
+const formatRelativeTime = (createdAt: string) => {
+  const now = new Date();
+  const date = new Date(createdAt);
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return `Il y a ${diffInSeconds} seconde${diffInSeconds !== 1 ? 's' : ''}`;
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `Il y a ${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''}`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `Il y a ${diffInHours} heure${diffInHours !== 1 ? 's' : ''}`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 7) return `Il y a ${diffInDays} jour${diffInDays !== 1 ? 's' : ''}`;
+  return `Il y a ${Math.floor(diffInDays / 7)} semaine${Math.floor(diffInDays / 7) !== 1 ? 's' : ''}`;
+};
+
+// Mapping des types de notification vers les icônes et couleurs
+const notificationStyles: Record<string, { icon: React.ElementType; color: string }> = {
+  abonnement: { icon: AlertCircle, color: "text-red-600 bg-red-100" },
+  bienvenue: { icon: Users, color: "text-purple-600 bg-purple-100" },
+  receipt: { icon: FileText, color: "text-blue-600 bg-blue-100" },
+  payment: { icon: CreditCard, color: "text-green-600 bg-green-100" },
+  stats: { icon: TrendingUp, color: "text-orange-600 bg-orange-100" },
+  client: { icon: Users, color: "text-purple-600 bg-purple-100" },
+};
 
 const Notifications = () => {
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: "receipt",
-      title: "Nouveau reçu généré",
-      message: "Votre reçu TKT-20250118-001 a été créé avec succès",
-      time: "Il y a 5 minutes",
-      read: false,
-      icon: FileText,
-      color: "text-blue-600 bg-blue-100"
-    },
-    {
-      id: 2,
-      type: "payment",
-      title: "Paiement reçu",
-      message: "Nouveau paiement de 25,000 FCFA - Facture TKT-20250118-002",
-      time: "Il y a 1 heure",
-      read: false,
-      icon: CreditCard,
-      color: "text-green-600 bg-green-100"
-    },
-    {
-      id: 3,
-      type: "client",
-      title: "Nouveau client",
-      message: "Marie Kouassi a été ajoutée à votre liste de clients",
-      time: "Il y a 2 heures",
-      read: true,
-      icon: Users,
-      color: "text-purple-600 bg-purple-100"
-    },
-    {
-      id: 4,
-      type: "stats",
-      title: "Rapport mensuel",
-      message: "Vos statistiques de janvier sont disponibles",
-      time: "Il y a 1 jour",
-      read: true,
-      icon: TrendingUp,
-      color: "text-orange-600 bg-orange-100"
-    },
-    {
-      id: 5,
-      type: "alert",
-      title: "Limite d'abonnement",
-      message: "Vous avez utilisé 80% de vos reçus gratuits ce mois",
-      time: "Il y a 2 jours",
-      read: false,
-      icon: AlertCircle,
-      color: "text-red-600 bg-red-100"
+  const [notifications, setNotifications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Récupérer company_id depuis localStorage et charger les notifications
+  useEffect(() => {
+    const companyId = localStorage.getItem("company_id");
+    if (!companyId) {
+      setError("Identifiant de l'entreprise manquant.");
+      setIsLoading(false);
+      return;
     }
-  ]);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/notifications/${companyId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            // Ajoutez un token d'authentification si nécessaire
+            // "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
 
-  const markAsRead = (id: number) => {
-    setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    ));
-  };
+        if (!response.ok) {
+          throw new Error("Échec de la récupération des notifications.");
+        }
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
-  };
+        const data = await response.json();
+        // Formatter les données pour correspondre au format attendu par le composant
+        const formattedNotifications = data.map((notif: any) => ({
+          id: notif.notification_id,
+          type: notif.type,
+          title: notif.title,
+          message: notif.message,
+          time: formatRelativeTime(notif.created_at),
+          read: notif.is_read,
+          icon: notificationStyles[notif.type]?.icon || AlertCircle,
+          color: notificationStyles[notif.type]?.color || "text-gray-600 bg-gray-100",
+        }));
+        setNotifications(formattedNotifications);
+      } catch (err) {
+        setError(err.message || "Une erreur est survenue lors du chargement des notifications.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const deleteNotification = (id: number) => {
-    setNotifications(notifications.filter(n => n.id !== id));
-  };
+    fetchNotifications();
+  }, []);
+
+  const unreadCount = notifications.filter((n: any) => !n.read).length;
 
   const getNotificationsByDate = () => {
-    const today = notifications.filter(n => 
+    const today = notifications.filter((n: any) => 
       n.time.includes("minute") || n.time.includes("heure")
     );
-    const yesterday = notifications.filter(n => 
+    const yesterday = notifications.filter((n: any) => 
       n.time.includes("1 jour")
     );
-    const older = notifications.filter(n => 
+    const older = notifications.filter((n: any) => 
       n.time.includes("2 jours") || n.time.includes("semaine")
     );
 
@@ -93,6 +108,63 @@ const Notifications = () => {
   };
 
   const { today, yesterday, older } = getNotificationsByDate();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 mobile-nav-padding">
+        <Header title="Notifications" />
+        <main className="p-4 md:p-6 space-y-6">
+          <QuickNav userType="user" />
+          {/* Header Skeleton */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Skeleton className="w-6 h-6 rounded-full" />
+              <Skeleton className="w-32 h-8" />
+              <Skeleton className="w-8 h-6 rounded-full" />
+            </div>
+            <Skeleton className="w-24 h-10" />
+          </div>
+          {/* Notifications Skeleton */}
+          <div className="space-y-6">
+            <div>
+              <Skeleton className="w-24 h-6 mb-4" />
+              <div className="space-y-3">
+                {[...Array(3)].map((_, index) => (
+                  <Card key={index} className="border-l-4 border-gray-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-3">
+                        <Skeleton className="w-10 h-10 rounded-full" />
+                        <div className="flex-1 space-y-2">
+                          <Skeleton className="w-48 h-5" />
+                          <Skeleton className="w-64 h-4" />
+                          <Skeleton className="w-24 h-3" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+        <MobileNav />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="text-center py-12 max-w-md">
+          <CardContent>
+            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Erreur</h3>
+            <p className="text-gray-600">{error}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
@@ -119,16 +191,6 @@ const Notifications = () => {
           </div>
           
           <div className="flex gap-2">
-            {unreadCount > 0 && (
-              <Button 
-                variant="outline" 
-                onClick={markAllAsRead}
-                className="text-sm"
-              >
-                <Check className="w-4 h-4 mr-2" />
-                Tout marquer comme lu
-              </Button>
-            )}
             <Button variant="outline" size="sm">
               <Settings className="w-4 h-4 mr-2" />
               Paramètres
@@ -143,50 +205,28 @@ const Notifications = () => {
             <div>
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Aujourd'hui</h2>
               <div className="space-y-3">
-                {today.map((notification) => (
+                {today.map((notification: any) => (
                   <Card key={notification.id} className={`border-l-4 ${notification.read ? 'border-gray-200 bg-white' : 'border-primary-500 bg-primary-50/30'} hover:shadow-md transition-all duration-200`}>
                     <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start space-x-3 flex-1">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${notification.color}`}>
-                            <notification.icon className="w-5 h-5" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className={`font-medium ${notification.read ? 'text-gray-900' : 'text-gray-900 font-semibold'}`}>
-                                {notification.title}
-                              </h3>
-                              {!notification.read && (
-                                <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                              )}
-                            </div>
-                            <p className="text-gray-600 text-sm mb-2">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {notification.time}
-                            </p>
-                          </div>
+                      <div className="flex items-start space-x-3 flex-1">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${notification.color}`}>
+                          <notification.icon className="w-5 h-5" />
                         </div>
-                        <div className="flex items-center space-x-2 ml-4">
-                          {!notification.read && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => markAsRead(notification.id)}
-                              className="text-primary-600 hover:text-primary-700 hover:bg-primary-50"
-                            >
-                              <Check className="w-4 h-4" />
-                            </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteNotification(notification.id)}
-                            className="text-gray-400 hover:text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className={`font-medium ${notification.read ? 'text-gray-900' : 'text-gray-900 font-semibold'}`}>
+                              {notification.title}
+                            </h3>
+                            {!notification.read && (
+                              <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+                            )}
+                          </div>
+                          <p className="text-gray-600 text-sm mb-2">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {notification.time}
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -201,50 +241,28 @@ const Notifications = () => {
             <div>
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Hier</h2>
               <div className="space-y-3">
-                {yesterday.map((notification) => (
+                {yesterday.map((notification: any) => (
                   <Card key={notification.id} className={`border-l-4 ${notification.read ? 'border-gray-200 bg-white' : 'border-primary-500 bg-primary-50/30'} hover:shadow-md transition-all duration-200`}>
                     <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start space-x-3 flex-1">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${notification.color}`}>
-                            <notification.icon className="w-5 h-5" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className={`font-medium ${notification.read ? 'text-gray-900' : 'text-gray-900 font-semibold'}`}>
-                                {notification.title}
-                              </h3>
-                              {!notification.read && (
-                                <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                              )}
-                            </div>
-                            <p className="text-gray-600 text-sm mb-2">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {notification.time}
-                            </p>
-                          </div>
+                      <div className="flex items-start space-x-3 flex-1">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${notification.color}`}>
+                          <notification.icon className="w-5 h-5" />
                         </div>
-                        <div className="flex items-center space-x-2 ml-4">
-                          {!notification.read && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => markAsRead(notification.id)}
-                              className="text-primary-600 hover:text-primary-700 hover:bg-primary-50"
-                            >
-                              <Check className="w-4 h-4" />
-                            </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteNotification(notification.id)}
-                            className="text-gray-400 hover:text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className={`font-medium ${notification.read ? 'text-gray-900' : 'text-gray-900 font-semibold'}`}>
+                              {notification.title}
+                            </h3>
+                            {!notification.read && (
+                              <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+                            )}
+                          </div>
+                          <p className="text-gray-600 text-sm mb-2">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {notification.time}
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -259,50 +277,28 @@ const Notifications = () => {
             <div>
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Plus ancien</h2>
               <div className="space-y-3">
-                {older.map((notification) => (
+                {older.map((notification: any) => (
                   <Card key={notification.id} className={`border-l-4 ${notification.read ? 'border-gray-200 bg-white' : 'border-primary-500 bg-primary-50/30'} hover:shadow-md transition-all duration-200`}>
                     <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start space-x-3 flex-1">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${notification.color}`}>
-                            <notification.icon className="w-5 h-5" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className={`font-medium ${notification.read ? 'text-gray-900' : 'text-gray-900 font-semibold'}`}>
-                                {notification.title}
-                              </h3>
-                              {!notification.read && (
-                                <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
-                              )}
-                            </div>
-                            <p className="text-gray-600 text-sm mb-2">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {notification.time}
-                            </p>
-                          </div>
+                      <div className="flex items-start space-x-3 flex-1">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${notification.color}`}>
+                          <notification.icon className="w-5 h-5" />
                         </div>
-                        <div className="flex items-center space-x-2 ml-4">
-                          {!notification.read && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => markAsRead(notification.id)}
-                              className="text-primary-600 hover:text-primary-700 hover:bg-primary-50"
-                            >
-                              <Check className="w-4 h-4" />
-                            </Button>
-                          )}
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteNotification(notification.id)}
-                            className="text-gray-400 hover:text-red-600 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className={`font-medium ${notification.read ? 'text-gray-900' : 'text-gray-900 font-semibold'}`}>
+                              {notification.title}
+                            </h3>
+                            {!notification.read && (
+                              <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
+                            )}
+                          </div>
+                          <p className="text-gray-600 text-sm mb-2">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {notification.time}
+                          </p>
                         </div>
                       </div>
                     </CardContent>

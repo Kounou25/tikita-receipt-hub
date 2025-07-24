@@ -14,42 +14,33 @@ const GenerateReceiptStep1 = () => {
 
   const templates = [
     {
-      id: "modern",
-      name: "Moderne",
-      description: "Design épuré et professionnel",
-      thumbnail: "/receipts_models/modern.png",
-      popular: true
-    },
-    {
       id: "classic",
       name: "Classique",
+      description: "Design épuré et professionnel",
+      thumbnail: "/receipts_models/classic.png",
+      popular: false
+    },
+    {
+      id: "modern",
+      name: "Moderne",
       description: "Style traditionnel et élégant",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
+      thumbnail: "/receipts_models/modern.png"
     },
     {
-      id: "minimal",
-      name: "Minimaliste",
+      id: "tarmamu",
+      name: "Tarmamu",
       description: "Simple et efficace",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
+      thumbnail: "/receipts_models/tarmamu.png",
+      popular : true
     },
     {
-      id: "colorful",
-      name: "Coloré",
-      description: "Design vibrant et attractif",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
-    },
-    {
-      id: "business",
-      name: "Business",
-      description: "Professionnel pour entreprises",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
-    },
-    {
-      id: "invoice",
-      name: "Facture",
-      description: "Format facture détaillé",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
+      id: "saraounia",
+      name: "Saraounia",
+      description: "Simple et efficace",
+      thumbnail: "/receipts_models/tarmamu.png",
+      popular : true
     }
+    
   ];
 
   const handleContinue = () => {

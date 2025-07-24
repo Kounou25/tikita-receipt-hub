@@ -82,74 +82,7 @@ const UserClients = () => {
       } catch (error) {
         console.error("Error fetching clients:", error);
         toast.error(error.message || "Une erreur est survenue lors du chargement des clients.", { duration: 5000 });
-        setClients([
-          {
-            id: 1,
-            name: "Marie Kouassi",
-            email: "marie.kouassi@email.com",
-            phone: "+227 96 12 34 56",
-            address: "Niamey, Niger",
-            totalOrders: 15,
-            totalAmount: "450,000 FCFA",
-            lastOrder: "18 Jan 2025",
-            status: "Actif"
-          },
-          {
-            id: 2,
-            name: "Ibrahim Moussa",
-            email: "ibrahim.moussa@email.com",
-            phone: "+227 97 23 45 67",
-            address: "Maradi, Niger",
-            totalOrders: 8,
-            totalAmount: "280,000 FCFA",
-            lastOrder: "15 Jan 2025",
-            status: "Actif"
-          },
-          {
-            id: 3,
-            name: "Fatou Diallo",
-            email: "fatou.diallo@email.com",
-            phone: "+227 98 34 56 78",
-            address: "Zinder, Niger",
-            totalOrders: 12,
-            totalAmount: "350,000 FCFA",
-            lastOrder: "12 Jan 2025",
-            status: "Actif"
-          },
-          {
-            id: 4,
-            name: "Kofi Asante",
-            email: "kofi.asante@email.com",
-            phone: "+227 99 45 67 89",
-            address: "Dosso, Niger",
-            totalOrders: 6,
-            totalAmount: "180,000 FCFA",
-            lastOrder: "10 Jan 2025",
-            status: "Inactif"
-          },
-          {
-            id: 5,
-            name: "Aminata Traoré",
-            email: "aminata.traore@email.com",
-            phone: "+227 95 56 78 90",
-            address: "Tahoua, Niger",
-            totalOrders: 20,
-            totalAmount: "650,000 FCFA",
-            lastOrder: "20 Jan 2025",
-            status: "Actif"
-          },
-          {
-            id: 6,
-            name: "Ousmane Sanogo",
-            email: "ousmane.sanogo@email.com",
-            phone: "+227 94 67 89 01",
-            address: "Agadez, Niger",
-            totalOrders: 3,
-            totalAmount: "95,000 FCFA",
-            lastOrder: "5 Jan 2025",
-            status: "Inactif"
-          }
-        ]);
+        
       } finally {
         setIsLoading(false);
       }

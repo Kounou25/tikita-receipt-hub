@@ -7,8 +7,17 @@ import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import LineChart from "@/components/charts/LineChart";
 import { Receipt, FileText, Users, TrendingUp, Plus, Eye, Download, Bell, Crown } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-200 rounded-md", className)} />
@@ -21,9 +30,12 @@ const UserDashboard = () => {
   const [recentReceipts, setRecentReceipts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [show500Error, setShow500Error] = useState(false);
+  const [showSessionExpired, setShowSessionExpired] = useState(false);
   const username = localStorage.getItem("user_name") || "Utilisateur";
   const companyId = localStorage.getItem("company_id") || null;
   const token = localStorage.getItem("token") || null;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,21 +58,51 @@ const UserDashboard = () => {
             ...(token && { "Authorization": `Bearer ${token}` }),
           },
         });
+
         if (!statsResponse.ok) {
-          throw new Error(`Failed to fetch stats: ${statsResponse.status} ${statsResponse.statusText}`);
+          if (statsResponse.status === 500) {
+            setShow500Error(true);
+            return;
+          } else if (statsResponse.status === 409 || statsResponse.status === 403) {
+            setShowSessionExpired(true);
+            return;
+          } else if (statsResponse.status === 404) {
+            // Treat 404 as no data, set default stats with values of 0
+            setStats([
+              { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+              { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+              { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+              { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+            ]);
+          } else {
+            throw new Error(`Échec du chargement des statistiques: ${statsResponse.status} ${statsResponse.statusText}`);
+          }
+        } else {
+          const statsData = await statsResponse.json();
+          if (!Array.isArray(statsData) || statsData.length === 0) {
+            // Set default stats with values of 0
+            setStats([
+              { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+              { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+              { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+              { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+            ]);
+          } else {
+            const apiStats = statsData[0];
+            const transformedStats = [
+              { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+              { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+              { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+              { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+            ];
+            setStats(transformedStats);
+          }
         }
-        const statsData = await statsResponse.json();
-        if (!Array.isArray(statsData) || statsData.length === 0) {
-          throw new Error("Invalid stats response: empty or not an array");
+
+        // If we have 500 or 409 error, we stop here
+        if (show500Error || showSessionExpired) {
+          return;
         }
-        const apiStats = statsData[0];
-        const transformedStats = [
-          { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
-          { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-          { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
-          { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
-        ];
-        setStats(transformedStats);
 
         // Fetch revenue per month
         const revenueResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/revenuePerMonth/${companyId}`, {
@@ -71,21 +113,59 @@ const UserDashboard = () => {
           },
         });
         if (!revenueResponse.ok) {
-          throw new Error(`Failed to fetch revenue: ${revenueResponse.status} ${revenueResponse.statusText}`);
+          if (revenueResponse.status === 500) {
+            setShow500Error(true);
+            return;
+          } else if (revenueResponse.status === 409 || revenueResponse.status === 403) {
+            setShowSessionExpired(true);
+            return;
+          } else if (revenueResponse.status === 404) {
+            // Treat 404 as no data, set default revenue data with 0 values for the last 12 months
+            const months = Array.from({ length: 12 }, (_, i) => {
+              const date = new Date();
+              date.setMonth(date.getMonth() - (11 - i));
+              return date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
+            });
+            setRevenueData([{
+              id: "revenus",
+              color: "#4CAF50",
+              data: months.map(month => ({
+                x: month,
+                y: 0
+              }))
+            }]);
+          } else {
+            throw new Error(`Échec du chargement des revenus: ${revenueResponse.status} ${revenueResponse.statusText}`);
+          }
+        } else {
+          const revenueData = await revenueResponse.json();
+          if (!Array.isArray(revenueData) || revenueData.length === 0) {
+            // Set default revenue data with 0 values for the last 12 months
+            const months = Array.from({ length: 12 }, (_, i) => {
+              const date = new Date();
+              date.setMonth(date.getMonth() - (11 - i));
+              return date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
+            });
+            setRevenueData([{
+              id: "revenus",
+              color: "#4CAF50",
+              data: months.map(month => ({
+                x: month,
+                y: 0
+              }))
+            }]);
+          } else {
+            const transformedRevenue = [{
+              id: "revenus",
+              color: "#4CAF50",
+              data: revenueData.map(item => ({
+                x: item.mois,
+                y: item.chiffre_affaire
+              }))
+            }];
+            setRevenueData(transformedRevenue);
+          }
         }
-        const revenueData = await revenueResponse.json();
-        if (!Array.isArray(revenueData)) {
-          throw new Error("Invalid revenue response: not an array");
-        }
-        const transformedRevenue = [{
-          id: "revenus",
-          color: "#4CAF50",
-          data: revenueData.map(item => ({
-            x: item.mois,
-            y: item.chiffre_affaire
-          }))
-        }];
-        setRevenueData(transformedRevenue);
 
         // Fetch top 5 clients
         const clientsResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/topFiveClients/${companyId}`, {
@@ -96,19 +176,31 @@ const UserDashboard = () => {
           },
         });
         if (!clientsResponse.ok) {
-          throw new Error(`Failed to fetch top clients: ${clientsResponse.status} ${clientsResponse.statusText}`);
+          if (clientsResponse.status === 500) {
+            setShow500Error(true);
+            return;
+          } else if (clientsResponse.status === 409 || clientsResponse.status === 403) {
+            setShowSessionExpired(true);
+            return;
+          } else if (clientsResponse.status === 404) {
+            setTopClients([]); // Treat 404 as no data
+          } else {
+            throw new Error(`Échec du chargement des clients: ${clientsResponse.status} ${clientsResponse.statusText}`);
+          }
+        } else {
+          const clientsData = await clientsResponse.json();
+          if (!Array.isArray(clientsData) || clientsData.length === 0) {
+            setTopClients([]); // Set empty array if no data
+          } else {
+            const transformedClients = clientsData.map(client => ({
+              name: client.client_name,
+              purchases: client.total_items,
+              amount: `${client.total_purchases.toLocaleString('fr-FR')} FCFA`,
+              growth: "+0%"
+            }));
+            setTopClients(transformedClients);
+          }
         }
-        const clientsData = await clientsResponse.json();
-        if (!Array.isArray(clientsData)) {
-          throw new Error("Invalid clients response: not an array");
-        }
-        const transformedClients = clientsData.map(client => ({
-          name: client.client_name,
-          purchases: client.total_items,
-          amount: `${client.total_purchases.toLocaleString('fr-FR')} FCFA`,
-          growth: "+0%"
-        }));
-        setTopClients(transformedClients);
 
         // Fetch recent receipts
         const receiptsResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/receipt/list/${companyId}/5`, {
@@ -119,60 +211,63 @@ const UserDashboard = () => {
           },
         });
         if (!receiptsResponse.ok) {
-          throw new Error(`Failed to fetch recent receipts: ${receiptsResponse.status} ${receiptsResponse.statusText}`);
+          if (receiptsResponse.status === 500) {
+            setShow500Error(true);
+            return;
+          } else if (receiptsResponse.status === 409 || receiptsResponse.status === 403) {
+            setShowSessionExpired(true);
+            return;
+          } else if (receiptsResponse.status === 404) {
+            setRecentReceipts([]); // Treat 404 as no data
+          } else {
+            throw new Error(`Échec du chargement des reçus récents: ${receiptsResponse.status} ${receiptsResponse.statusText}`);
+          }
+        } else {
+          const receiptsData = await receiptsResponse.json();
+          if (!Array.isArray(receiptsData) || receiptsData.length === 0) {
+            setRecentReceipts([]); // Set empty array if no data
+          } else {
+            const transformedReceipts = receiptsData.map(receipt => ({
+              id: receipt.receipt_number,
+              client: receipt.client_name,
+              amount: `${receipt.total_amount.toLocaleString('fr-FR')} FCFA`,
+              type: "Reçu",
+              status: receipt.payment_status === "paid" ? "Payé" : "En attente",
+              date: new Date(receipt.receipt_date).toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+              })
+            }));
+            setRecentReceipts(transformedReceipts);
+          }
         }
-        const receiptsData = await receiptsResponse.json();
-        if (!Array.isArray(receiptsData)) {
-          throw new Error("Invalid receipts response: not an array");
-        }
-        const transformedReceipts = receiptsData.map(receipt => ({
-          id: receipt.receipt_number,
-          client: receipt.client_name,
-          amount: `${receipt.total_amount.toLocaleString('fr-FR')} FCFA`,
-          type: "Reçu",
-          status: receipt.payment_status === "paid" ? "Payé" : "En attente",
-          date: new Date(receipt.receipt_date).toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-          })
-        }));
-        setRecentReceipts(transformedReceipts);
 
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Erreur lors du chargement des données:", error);
         setError(error.message || "Une erreur est survenue lors du chargement des données.");
+        // Set default stats with values of 0, default revenue data, and empty arrays for others
         setStats([
-          { title: "Reçus générés", value: "342", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+12%" },
-          { title: "Documents créés", value: "128", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+8%" },
-          { title: "Clients actifs", value: "89", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+25%" },
-          { title: "Revenus totaux", value: "4,250,000 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+18%" },
+          { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+          { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+          { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+          { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
         ]);
+        const months = Array.from({ length: 12 }, (_, i) => {
+          const date = new Date();
+          date.setMonth(date.getMonth() - (11 - i));
+          return date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
+        });
         setRevenueData([{
           id: "revenus",
           color: "#4CAF50",
-          data: [
-            { x: "Jan", y: 45000 },
-            { x: "Fév", y: 52000 },
-            { x: "Mar", y: 48000 },
-            { x: "Avr", y: 67000 },
-            { x: "Mai", y: 71000 },
-            { x: "Juin", y: 59000 }
-          ]
+          data: months.map(month => ({
+            x: month,
+            y: 0
+          }))
         }]);
-        setTopClients([
-          { name: "Boutique Elegance", purchases: 12, amount: "320,000 FCFA", growth: "+25%" },
-          { name: "Restaurant Sahel", purchases: 8, amount: "280,000 FCFA", growth: "+18%" },
-          { name: "Magasin Central", purchases: 6, amount: "195,000 FCFA", growth: "+12%" },
-          { name: "Pharmacie Moderne", purchases: 5, amount: "150,000 FCFA", growth: "+8%" },
-          { name: "Atelier Mécanique", purchases: 4, amount: "125,000 FCFA", growth: "+5%" },
-        ]);
-        setRecentReceipts([
-          { id: "TKT-20250118-001", client: "Marie Kouassi", amount: "25,000 FCFA", type: "Reçu", status: "Payé", date: "18 Jan 2025" },
-          { id: "TKT-20250118-002", client: "Ibrahim Moussa", amount: "45,000 FCFA", type: "Reçu", status: "En attente", date: "18 Jan 2025" },
-          { id: "TKT-20250117-003", client: "Fatou Diallo", amount: "12,500 FCFA", type: "Reçu", status: "Payé", date: "17 Jan 2025" },
-          { id: "TKT-20250117-004", client: "Kofi Asante", amount: "67,000 FCFA", type: "Reçu", status: "Payé", date: "17 Jan 2025" },
-        ]);
+        setTopClients([]);
+        setRecentReceipts([]);
       } finally {
         setIsLoading(false);
       }
@@ -180,6 +275,13 @@ const UserDashboard = () => {
 
     fetchData();
   }, [companyId]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user_name");
+    localStorage.removeItem("company_id");
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
@@ -204,6 +306,40 @@ const UserDashboard = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Error 500 Dialog */}
+        <AlertDialog open={show500Error} onOpenChange={setShow500Error}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Erreur de connexion</AlertDialogTitle>
+              <AlertDialogDescription>
+                Une erreur est survenue lors de la récupération des informations. Veuillez vérifier votre connexion internet et réessayer.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={() => window.location.reload()}>
+                Réessayer
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Session Expired Dialog */}
+        <AlertDialog open={showSessionExpired} onOpenChange={setShowSessionExpired}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Session expirée</AlertDialogTitle>
+              <AlertDialogDescription>
+                Votre session a expiré. Veuillez vous reconnecter pour continuer.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={handleLogout}>
+                Se connecter
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Welcome Section */}
         {isLoading ? (
@@ -259,37 +395,39 @@ const UserDashboard = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {isLoading
-            ? Array(4)
-                .fill(null)
-                .map((_, index) => (
-                  <Card key={index} className="border-gray-200">
-                    <CardContent className="p-6 space-y-4">
-                      <div className="flex items-center justify-between">
-                        <Skeleton className="w-12 h-12 rounded-lg" />
-                        <Skeleton className="h-4 w-16" />
-                      </div>
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-6 w-24" />
-                    </CardContent>
-                  </Card>
-                ))
-            : stats.map((stat, index) => (
+          {isLoading ? (
+            Array(4)
+              .fill(null)
+              .map((_, index) => (
                 <Card key={index} className="border-gray-200">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center`}>
-                        <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                      </div>
-                      <span className="text-sm font-medium text-green-600">{stat.growth}</span>
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="w-12 h-12 rounded-lg" />
+                      <Skeleton className="h-4 w-16" />
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
-                      <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                    </div>
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-6 w-24" />
                   </CardContent>
                 </Card>
-              ))}
+              ))
+          ) : (
+            stats.map((stat, index) => (
+              <Card key={index} className="border-gray-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center`}>
+                      <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                    </div>
+                    <span className="text-sm font-medium text-green-600">{stat.growth}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
 
         {/* Charts Section */}
@@ -348,25 +486,29 @@ const UserDashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {topClients.map((client, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                            {index + 1}
+                  {topClients.length === 0 ? (
+                    <p className="text-gray-600 text-center">Aucun client de premier plan disponible</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {topClients.map((client, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{client.name}</p>
+                              <p className="text-sm text-gray-600">{client.purchases} achats</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{client.name}</p>
-                            <p className="text-sm text-gray-600">{client.purchases} achats</p>
+                          <div className="text-right">
+                            <p className="font-medium text-gray-900">{client.amount}</p>
+                            <p className="text-sm text-green-600">{client.growth}</p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-medium text-gray-900">{client.amount}</p>
-                          <p className="text-sm text-green-600">{client.growth}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </>
@@ -410,27 +552,31 @@ const UserDashboard = () => {
               </Link>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentReceipts.map((receipt, index) => (
-                  <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <Receipt className="w-5 h-5 text-blue-600" />
+              {recentReceipts.length === 0 ? (
+                <p className="text-gray-600 text-center">Aucune activité récente disponible</p>
+              ) : (
+                <div className="space-y-4">
+                  {recentReceipts.map((receipt, index) => (
+                    <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                          <Receipt className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{receipt.id}</p>
+                          <p className="text-sm text-gray-600">{receipt.client}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{receipt.id}</p>
-                        <p className="text-sm text-gray-600">{receipt.client}</p>
+                      <div className="text-right">
+                        <p className="font-medium text-gray-900">{receipt.amount}</p>
+                        <p className={`text-sm ${receipt.status === "Payé" ? "text-green-600" : "text-orange-600"}`}>
+                          {receipt.status}
+                        </p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium text-gray-900">{receipt.amount}</p>
-                      <p className={`text-sm ${receipt.status === "Payé" ? "text-green-600" : "text-orange-600"}`}>
-                        {receipt.status}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

@@ -185,7 +185,7 @@ const GenerateReceiptStep2 = () => {
         unit_price: item.unit_price
       })),
       tva_rate: receiptInfo.tva_rate,
-      receipt_model: "classic",
+      receipt_model: localStorage.getItem("selectedTemplate") || "classic",
       payment_status: receiptInfo.payment_status,
       payment_method: receiptInfo.payment_method
     };

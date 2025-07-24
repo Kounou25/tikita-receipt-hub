@@ -1,19 +1,31 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const RegisterStep1 = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
+    user_phone: "",
     country: "",
     password: "",
     confirmPassword: ""
@@ -21,60 +33,122 @@ const RegisterStep1 = () => {
   const navigate = useNavigate();
 
   const countries = [
-    "France", "Cameroun", "Sénégal", "Côte d'Ivoire", "Mali", "Burkina Faso",
-    "Niger", "Guinée", "Bénin", "Togo", "Madagascar", "Congo", "Gabon"
+    "Niger", "France", "Cameroun", "Sénégal", "Côte d'Ivoire", "Mali", "Burkina Faso",
+    "Guinée", "Bénin", "Togo", "Madagascar", "Congo", "Gabon"
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Les mots de passe ne correspondent pas");
+
+    // Validate required fields
+    if (!formData.fullName || !formData.email || !formData.user_phone || !formData.country || !formData.password || !formData.confirmPassword) {
+      setErrorMessage("Veuillez remplir tous les champs obligatoires.");
+      setShowErrorPopup(true);
       return;
     }
-    // Store step 1 data and move to step 2
-    localStorage.setItem("registerStep1", JSON.stringify(formData));
-    navigate("/register/step2");
+
+    // Validate password match
+    if (formData.password !== formData.confirmPassword) {
+      setErrorMessage("Les mots de passe ne correspondent pas.");
+      setShowErrorPopup(true);
+      return;
+    }
+
+    // Build payload for /users/signIn/
+    const payload = {
+      full_name: formData.fullName,
+      email: formData.email,
+      user_phone: formData.user_phone,
+      country: formData.country,
+      password: formData.password
+    };
+    
+    
+
+    try {
+      setIsLoading(true);
+
+      console.log("Sending payload to /users/signIn/:", JSON.stringify(payload, null, 2));
+      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/signIn/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      console.log("Registration response status:", response.status);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Error response body:", errorData);
+        if (errorData.error) {
+          setErrorMessage(errorData.error);
+          setShowErrorPopup(true);
+          throw new Error(errorData.error);
+        }
+        if (response.status === 400) throw new Error("Données d'inscription invalides.");
+        if (response.status === 409) throw new Error("Cet email est déjà utilisé.");
+        if (response.status === 500) throw new Error("Erreur serveur. Veuillez réessayer plus tard.");
+        throw new Error(`Échec de l'inscription: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Registration successful, response:", result);
+      if (result.user && result.user.user_id) {
+        localStorage.setItem("user_id", result.user.user_id);
+        console.log("Stored user_id in localStorage:", result.user.user_id);
+      } else {
+        console.warn("No user_id returned in response");
+      }
+      
+
+      toast.success("Inscription réussie ! Veuillez vous connecter.");
+      navigate("/register/step2");
+    } catch (error) {
+      console.error("Error during registration:", error);
+      if (!showErrorPopup) {
+        setErrorMessage(error.message || "Échec de l'inscription. Veuillez réessayer.");
+        setShowErrorPopup(true);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-secondary/10 flex items-center justify-center p-4">
+      <style>
+        {`
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+          .animate-spin {
+            animation: spin 1s linear infinite;
+          }
+        `}
+      </style>
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="text-center">
           <div className="flex items-center justify-center mb-8">
             <img 
-              src="/lovable-uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
+              src="/lovable-Uploads/d1d0c3ac-8062-46a5-b530-0b60f9d9f249.png" 
               alt="Tikiita Logo" 
               className="h-12"
             />
           </div>
         </div>
 
-        {/* Progress indicator */}
-        <div className="flex items-center justify-center space-x-4 mb-8">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-medium">
-              1
-            </div>
-            <span className="ml-2 text-sm font-medium text-primary">Informations personnelles</span>
-          </div>
-          <div className="w-12 h-0.5 bg-gray-300"></div>
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 font-medium">
-              2
-            </div>
-            <span className="ml-2 text-sm text-gray-500">Entreprise</span>
-          </div>
-        </div>
-
-        {/* Registration Form Step 1 */}
+        {/* Registration Form */}
         <Card className="border-gray-200 shadow-lg">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-gray-900">
               Créer un compte
             </CardTitle>
             <p className="text-gray-600">
-              Étape 1 : Vos informations personnelles
+              Entrez vos informations personnelles
             </p>
           </CardHeader>
           
@@ -90,6 +164,7 @@ const RegisterStep1 = () => {
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   required
                   className="border-gray-300"
+                  disabled={isLoading}
                 />
               </div>
 
@@ -103,12 +178,13 @@ const RegisterStep1 = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   className="border-gray-300"
+                  disabled={isLoading}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="country">Pays</Label>
-                <Select onValueChange={(value) => setFormData({ ...formData, country: value })}>
+                <Select onValueChange={(value) => setFormData({ ...formData, country: value })} disabled={isLoading}>
                   <SelectTrigger className="border-gray-300">
                     <SelectValue placeholder="Sélectionnez votre pays" />
                   </SelectTrigger>
@@ -123,6 +199,20 @@ const RegisterStep1 = () => {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="user_phone">Numéro de téléphone</Label>
+                <Input
+                  id="user_phone"
+                  type="tel"
+                  placeholder="+227 XX XX XX XX"
+                  value={formData.user_phone}
+                  onChange={(e) => setFormData({ ...formData, user_phone: e.target.value })}
+                  required
+                  className="border-gray-300"
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="password">Mot de passe</Label>
                 <div className="relative">
                   <Input
@@ -133,6 +223,7 @@ const RegisterStep1 = () => {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     className="border-gray-300 pr-10"
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -140,6 +231,7 @@ const RegisterStep1 = () => {
                     size="icon"
                     className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4 text-gray-400" />
@@ -161,6 +253,7 @@ const RegisterStep1 = () => {
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     required
                     className="border-gray-300 pr-10"
+                    disabled={isLoading}
                   />
                   <Button
                     type="button"
@@ -168,6 +261,7 @@ const RegisterStep1 = () => {
                     size="icon"
                     className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    disabled={isLoading}
                   >
                     {showConfirmPassword ? (
                       <EyeOff className="w-4 h-4 text-gray-400" />
@@ -178,8 +272,12 @@ const RegisterStep1 = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                Continuer
+              <Button
+                type="submit"
+                className="w-full bg-primary hover:bg-primary/90"
+                disabled={isLoading}
+              >
+                {isLoading ? "Chargement..." : "S'inscrire"}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </form>
@@ -197,6 +295,32 @@ const RegisterStep1 = () => {
             </div>
           </CardContent>
         </Card>
+
+        <Dialog open={showErrorPopup} onOpenChange={setShowErrorPopup}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Erreur d'inscription</DialogTitle>
+              <DialogDescription>{errorMessage}</DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowErrorPopup(false)}
+              >
+                Fermer
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {isLoading && (
+          <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+            <div className="relative w-16 h-16">
+              <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-t-primary rounded-full animate-spin"></div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -13,11 +13,32 @@ const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-200 rounded-md", className)} />
 );
 
+const ErrorPopup = ({ message, onClose, actionButton }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+      <div className="flex items-start gap-4">
+        <AlertCircle className="w-6 h-6 text-red-500 mt-0.5" />
+        <div className="flex-1">
+          <h3 className="font-medium text-lg mb-2">Erreur</h3>
+          <p className="text-gray-600 mb-4">{message}</p>
+          <div className="flex justify-end gap-2">
+            {actionButton}
+            <Button variant="outline" onClick={onClose}>
+              Fermer
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const ReceiptHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [receipts, setReceipts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [errorType, setErrorType] = useState(null);
   const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({});
   const companyId = localStorage.getItem("company_id") || null;
   const token = localStorage.getItem("token") || null;
@@ -80,6 +101,7 @@ const ReceiptHistory = () => {
     const fetchReceipts = async () => {
       if (!companyId) {
         setError("ID de l'entreprise non défini. Veuillez vous reconnecter.");
+        setErrorType("auth");
         setIsLoading(false);
         return;
       }
@@ -87,6 +109,7 @@ const ReceiptHistory = () => {
       try {
         setIsLoading(true);
         setError(null);
+        setErrorType(null);
 
         const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/receipt/list/${companyId}/0`, {
           method: "GET",
@@ -97,12 +120,23 @@ const ReceiptHistory = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch receipts: ${response.status} ${response.statusText}`);
+          if (response.status === 500) {
+            setErrorType("server");
+            throw new Error("Erreur lors de la récupération des informations");
+          } else if (response.status === 409 || response.status === 403) {
+            setErrorType("auth");
+            throw new Error("Session expirée");
+          } else if (response.status === 404) {
+            setErrorType("not_found");
+            throw new Error("Aucune donnée trouvée");
+          } else {
+            throw new Error(`Échec de la récupération des reçus: ${response.status} ${response.statusText}`);
+          }
         }
 
         const receiptsData = await response.json();
         if (!Array.isArray(receiptsData)) {
-          throw new Error("Invalid receipts response: not an array");
+          throw new Error("Réponse invalide: pas un tableau");
         }
 
         const transformedReceipts = receiptsData.map(receipt => ({
@@ -124,60 +158,9 @@ const ReceiptHistory = () => {
 
         setReceipts(transformedReceipts);
       } catch (error) {
-        console.error("Error fetching receipts:", error);
-        setError(error.message || "Une erreur est survenue lors du chargement des reçus.");
-        setReceipts([
-          {
-            id: "R001",
-            receipt_number: "R001",
-            client: "Marie Kouassi",
-            amount: "45,000 FCFA",
-            raw_amount: 45000,
-            date: "2024-01-15",
-            status: "Payé",
-            items: 3
-          },
-          {
-            id: "R002",
-            receipt_number: "R002",
-            client: "Jean Ouattara",
-            amount: "78,500 FCFA",
-            raw_amount: 78500,
-            date: "2024-01-14",
-            status: "Payé",
-            items: 5
-          },
-          {
-            id: "R003",
-            receipt_number: "R003",
-            client: "Fatou Traoré",
-            amount: "125,000 FCFA",
-            raw_amount: 125000,
-            date: "2024-01-13",
-            status: "En attente",
-            items: 8
-          },
-          {
-            id: "R004",
-            receipt_number: "R004",
-            client: "Kofi Asante",
-            amount: "32,000 FCFA",
-            raw_amount: 32000,
-            date: "2024-01-12",
-            status: "Payé",
-            items: 2
-          },
-          {
-            id: "R005",
-            receipt_number: "R005",
-            client: "Aminata Diallo",
-            amount: "67,500 FCFA",
-            raw_amount: 67500,
-            date: "2024-01-11",
-            status: "Payé",
-            items: 4
-          }
-        ]);
+        console.error("Erreur lors de la récupération des reçus:", error);
+        setError(error.message);
+        setReceipts([]);
       } finally {
         setIsLoading(false);
       }
@@ -205,12 +188,32 @@ const ReceiptHistory = () => {
           </div>
         )}
 
-        {/* Error Message */}
-        {error && (
-          <Card className="border-red-200 bg-red-50">
-            <CardContent className="p-4 flex items-center gap-2 text-red-600">
-              <AlertCircle className="w-5 h-5" />
-              <p>{error}</p>
+        {/* Error Popups */}
+        {error && errorType === "server" && (
+          <ErrorPopup
+            message="Une erreur est survenue lors de la récupération des informations. Veuillez vérifier votre connexion internet et réessayer."
+            onClose={() => setError(null)}
+            actionButton={null}
+          />
+        )}
+
+        {error && errorType === "auth" && (
+          <ErrorPopup
+            message="Votre session a expiré. Veuillez vous reconnecter."
+            onClose={() => setError(null)}
+            actionButton={
+              <Link to="/login">
+                <Button>Se connecter</Button>
+              </Link>
+            }
+          />
+        )}
+
+        {/* Message pour erreur 404 */}
+        {errorType === "not_found" && (
+          <Card className="border-gray-200">
+            <CardContent className="p-6 text-center">
+              <p className="text-gray-500">Aucun reçu trouvé pour le moment.</p>
             </CardContent>
           </Card>
         )}
@@ -356,7 +359,7 @@ const ReceiptHistory = () => {
               </div>
             </CardContent>
           </Card>
-        ) : (
+        ) : errorType !== "not_found" && (
           <Card className="border-gray-200">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">

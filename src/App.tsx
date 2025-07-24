@@ -1,9 +1,12 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "../src/middleware/userProtectedRoute"
+
+// Layout
+import MainLayout from "./components/layout/Layout";
 
 // Auth Pages
 import Login from "./pages/auth/Login";
@@ -30,6 +33,7 @@ import PartnerNotifications from "./pages/partner/PartnerNotifications";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminPartners from "./pages/admin/AdminPartners";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminPayements from "./pages/admin/AdminPayements";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 
@@ -48,40 +52,204 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Public / Auth Pages - sans header */}
           <Route path="/" element={<Landing />} />
-          
-          {/* Auth Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterStep1 />} />
           <Route path="/register/step2" element={<RegisterStep2 />} />
-          
-          {/* User Routes */}
-          <Route path="/dashboard" element={<UserDashboard />} />
-          <Route path="/receipts" element={<ReceiptHistory />} />
-          <Route path="/receipts/:id" element={<ReceiptDetails />} />
-          <Route path="/profile" element={<UserProfile />} />
-          <Route path="/generate" element={<GenerateReceiptStep1 />} />
-          <Route path="/generate/step2" element={<GenerateReceiptStep2 />} />
-          <Route path="/clients" element={<UserClients />} />
-          <Route path="/notifications" element={<Notifications />} />
-          
-          {/* Partner Routes */}
-          <Route path="/partner/dashboard" element={<PartnerDashboard />} />
-          <Route path="/partner/profile" element={<PartnerProfile />} />
-          <Route path="/partner/receipts" element={<PartnerReceipts />} />
-          <Route path="/partner/notifications" element={<PartnerNotifications />} />
-          
-          {/* Admin Routes */}
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/partners" element={<AdminPartners />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
-          <Route path="/admin/notifications" element={<AdminNotifications />} />
-          
-          {/* Other Routes */}
-          <Route path="/subscription" element={<Subscription />} />
-          <Route path="/support" element={<Support />} />
-          
+
+          {/* Pages avec layout (Header fixe) */}
+          <Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <MainLayout>
+        <UserDashboard />
+      </MainLayout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/receipts"
+  element={
+    <ProtectedRoute>
+      <MainLayout>
+        <ReceiptHistory />
+      </MainLayout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/receipts/:id"
+  element={
+    <ProtectedRoute>
+      <MainLayout>
+        <ReceiptDetails />
+      </MainLayout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <MainLayout>
+        <UserProfile />
+      </MainLayout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/generate"
+  element={
+    <ProtectedRoute>
+      <MainLayout>
+        <GenerateReceiptStep1 />
+      </MainLayout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/generate/step2"
+  element={
+    <ProtectedRoute>
+      <MainLayout>
+        <GenerateReceiptStep2 />
+      </MainLayout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/clients"
+  element={
+    <ProtectedRoute>
+      <MainLayout>
+        <UserClients />
+      </MainLayout>
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/notifications"
+  element={
+    <ProtectedRoute>
+      <MainLayout>
+        <Notifications />
+      </MainLayout>
+    </ProtectedRoute>
+  }
+/>
+
+
+          {/* Partner */}
+          <Route
+            path="/partner/dashboard"
+            element={
+              <MainLayout>
+                <PartnerDashboard />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/partner/profile"
+            element={
+              <MainLayout>
+                <PartnerProfile />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/partner/receipts"
+            element={
+              <MainLayout>
+                <PartnerReceipts />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/partner/notifications"
+            element={
+              <MainLayout>
+                <PartnerNotifications />
+              </MainLayout>
+            }
+          />
+
+          {/* Admin */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <MainLayout>
+                <AdminDashboard />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/admin/partners"
+            element={
+              <MainLayout>
+                <AdminPartners />
+              </MainLayout>
+            }
+          />
+
+<Route
+            path="/admin/payements"
+            element={
+              <MainLayout>
+                <AdminPayements />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <MainLayout>
+                <AdminUsers />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <MainLayout>
+                <AdminSettings />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/admin/notifications"
+            element={
+              <MainLayout>
+                <AdminNotifications />
+              </MainLayout>
+            }
+          />
+
+          {/* Autres pages */}
+          <Route
+            path="/subscription"
+            element={
+              <MainLayout>
+                <Subscription />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/support"
+            element={
+              <MainLayout>
+                <Support />
+              </MainLayout>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

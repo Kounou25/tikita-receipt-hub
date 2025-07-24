@@ -9,6 +9,7 @@ import {
   Plus, 
   Settings,
   UserCheck,
+  DollarSign,
   Key,
   CreditCard
 } from "lucide-react";
@@ -40,6 +41,7 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
   const adminNavItems = [
     { icon: Home, label: "Dashboard", path: "/admin/dashboard" },
     { icon: Users, label: "Utilisateurs", path: "/admin/users" },
+    { icon: DollarSign, label: "Payements", path: "/admin/payements" },
     { icon: UserCheck, label: "Partenaires", path: "/admin/partners" },
     { icon: Settings, label: "Paramètres", path: "/admin/settings" },
   ];
