@@ -1,117 +1,131 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { createPortal } from "react-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Search, Trash2, Users, Phone, Mail, MapPin, Plus } from "lucide-react";
+import { Loader2, Search, Trash2, Users, Phone, Mail, MapPin, Plus, AlertCircle } from "lucide-react";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import toast, { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
+// Define Skeleton component
 const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-200 rounded-md", className)} />
 );
 
+// Function to fetch clients
+const fetchClients = async (companyId, token) => {
+  if (!companyId) {
+    throw new Error("ID de l'entreprise non défini. Veuillez vous reconnecter.");
+  }
+
+  // Use Promise.all for potential multiple requests
+  const [clientsResponse] = await Promise.all([
+    fetch(`${import.meta.env.VITE_BASE_API_URL}/user/clients/${companyId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    }),
+  ]);
+
+  if (clientsResponse.status === 404) {
+    return { clients: [], noClientsFound: true };
+  }
+
+  if (!clientsResponse.ok) {
+    throw new Error(`Échec de la récupération des clients: ${clientsResponse.status} ${clientsResponse.statusText}`);
+  }
+
+  const clientsData = await clientsResponse.json();
+  if (!Array.isArray(clientsData)) {
+    throw new Error("Réponse invalide: pas un tableau");
+  }
+
+  const transformedClients = clientsData.map(client => {
+    const lastOrderDate = new Date(client.last_order_date);
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.setDate(today.getDate() - 30));
+    return {
+      id: client.client_id,
+      name: client.client_name,
+      email: client.client_email,
+      phone: client.client_phone,
+      address: client.client_address,
+      totalOrders: client.total_receipts,
+      totalAmount: `${Math.round(client.total_spent).toLocaleString('fr-FR')} FCFA`,
+      lastOrder: lastOrderDate.toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }),
+      status: lastOrderDate >= thirtyDaysAgo ? "Actif" : "Inactif"
+    };
+  });
+
+  return { clients: transformedClients, noClientsFound: false };
+};
+
+// Function to delete a client
+const deleteClient = async ({ clientId, token }) => {
+  const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/clients/client/delete/${clientId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Échec de la suppression du client: ${response.status} ${response.statusText}`);
+  }
+
+  return clientId;
+};
+
 const UserClients = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [clients, setClients] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [noClientsFound, setNoClientsFound] = useState(false);
   const companyId = localStorage.getItem("company_id") || null;
   const token = localStorage.getItem("token") || null;
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchClients = async () => {
-      if (!companyId) {
-        toast.error("ID de l'entreprise non défini. Veuillez vous reconnecter.", { duration: 5000 });
-        setIsLoading(false);
-        return;
-      }
+  // Fetch clients with useQuery
+  const { data = { clients: [], noClientsFound: false }, isLoading, error } = useQuery({
+    queryKey: ['clients', companyId],
+    queryFn: () => fetchClients(companyId, token),
+    enabled: !!companyId,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
 
-      try {
-        setIsLoading(true);
-        setNoClientsFound(false);
+  const { clients, noClientsFound } = data;
 
-        const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/clients/${companyId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        });
-
-        if (response.status === 404) {
-          setNoClientsFound(true);
-          setClients([]);
-          return;
+  // Handle deletion with useMutation
+  const deleteMutation = useMutation({
+    mutationFn: deleteClient,
+    onSuccess: (clientId) => {
+      // Update client list locally
+      queryClient.setQueryData(['clients', companyId], (oldData: any) => {
+        if (!oldData || !Array.isArray(oldData.clients)) {
+          return oldData;
         }
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch clients: ${response.status} ${response.statusText}`);
-        }
-
-        const clientsData = await response.json();
-        if (!Array.isArray(clientsData)) {
-          throw new Error("Invalid clients response: not an array");
-        }
-
-        const transformedClients = clientsData.map(client => {
-          const lastOrderDate = new Date(client.last_order_date);
-          const today = new Date();
-          const thirtyDaysAgo = new Date(today.setDate(today.getDate() - 30));
-          return {
-            id: client.client_id,
-            name: client.client_name,
-            email: client.client_email,
-            phone: client.client_phone,
-            address: client.client_address,
-            totalOrders: client.total_receipts,
-            totalAmount: `${Math.round(client.total_spent).toLocaleString('fr-FR')} FCFA`,
-            lastOrder: lastOrderDate.toLocaleDateString('fr-FR', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric'
-            }),
-            status: lastOrderDate >= thirtyDaysAgo ? "Actif" : "Inactif"
-          };
-        });
-
-        setClients(transformedClients);
-      } catch (error) {
-        console.error("Error fetching clients:", error);
-        toast.error(error.message || "Une erreur est survenue lors du chargement des clients.", { duration: 5000 });
-        
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchClients();
-  }, [companyId]);
-
-  const handleDeleteClient = async (clientId) => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/clients/client/delete/${clientId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
+        return {
+          ...oldData,
+          clients: oldData.clients.filter((client: any) => client.id !== clientId),
+        };
       });
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete client: ${response.status} ${response.statusText}`);
-      }
-
-      setClients(prev => prev.filter(client => client.id !== clientId));
       toast.success("Client supprimé avec succès", { duration: 3000 });
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Error deleting client:", error);
       toast.error(error.message || "Une erreur est survenue lors de la suppression du client.", { duration: 5000 });
-    }
-  };
+    },
+  });
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -124,6 +138,9 @@ const UserClients = () => {
       <Toaster 
         position="top-right"
         toastOptions={{
+          style: {
+            zIndex: 10001,
+          },
           success: {
             style: {
               background: '#f0fdf4',
@@ -146,10 +163,41 @@ const UserClients = () => {
         <QuickNav userType="user" />
 
         {/* Loading Overlay */}
-        {isLoading && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        {isLoading && createPortal(
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
+          </div>,
+          document.body
+        )}
+
+        {/* Error Popup */}
+        {error && createPortal(
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-[10000]">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+              <div className="flex items-start gap-4">
+                <AlertCircle className="w-6 h-6 text-red-500 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-medium text-lg mb-2">Erreur</h3>
+                  <p className="text-gray-600 mb-4">
+                    {error.message.includes("ID de l'entreprise non défini")
+                      ? "ID de l'entreprise non défini. Veuillez vous reconnecter."
+                      : error.message || "Une erreur est survenue lors du chargement des clients."}
+                  </p>
+                  <div className="flex justify-end gap-2">
+                    {error.message.includes("ID de l'entreprise non défini") && (
+                      <Link to="/login">
+                        <Button>Se connecter</Button>
+                      </Link>
+                    )}
+                    <Button variant="outline" onClick={() => window.location.reload()}>
+                      Réessayer
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
         )}
 
         {/* Header Section */}
@@ -224,7 +272,7 @@ const UserClients = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-600">Total Clients</p>
                     <p className="text-2xl font-bold text-gray-900">
-                      {clients.length || (clients[0]?.total_clients ?? 0)}
+                      {clients.length || 0}
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -385,24 +433,27 @@ const UserClients = () => {
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Supprimer le client</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Êtes-vous sûr de vouloir supprimer <strong>{client.name}</strong> ? 
-                              Cette action ne peut pas être annulée.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Annuler</AlertDialogCancel>
-                            <AlertDialogAction 
-                              onClick={() => handleDeleteClient(client.id)}
-                              className="bg-red-600 hover:bg-red-700"
-                            >
-                              Supprimer
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
+                        {createPortal(
+                          <AlertDialogContent className="z-[10000]">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Supprimer le client</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Êtes-vous sûr de vouloir supprimer <strong>{client.name}</strong> ? 
+                                Cette action ne peut pas être annulée.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <div className="flex justify-end gap-2 pt-4">
+                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => deleteMutation.mutate({ clientId: client.id, token })}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Supprimer
+                              </AlertDialogAction>
+                            </div>
+                          </AlertDialogContent>,
+                          document.body
+                        )}
                       </AlertDialog>
                     </div>
                   </div>
