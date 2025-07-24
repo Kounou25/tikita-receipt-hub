@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle } from "lucide-react";
@@ -23,13 +24,171 @@ const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-200 rounded-md", className)} />
 );
 
+// Fonction pour fetch toutes les données en parallèle
+const fetchDashboardData = async (companyId, token) => {
+  const [statsResponse, revenueResponse, clientsResponse, receiptsResponse] = await Promise.all([
+    fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/${companyId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { "Authorization": `Bearer ${token}` }),
+      },
+    }),
+    fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/revenuePerMonth/${companyId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { "Authorization": `Bearer ${token}` }),
+      },
+    }),
+    fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/topFiveClients/${companyId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { "Authorization": `Bearer ${token}` }),
+      },
+    }),
+    fetch(`${import.meta.env.VITE_BASE_API_URL}/user/receipt/list/${companyId}/5`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { "Authorization": `Bearer ${token}` }),
+      },
+    }),
+  ]);
+
+  // Vérifier les erreurs pour chaque réponse
+  if (!statsResponse.ok) {
+    if (statsResponse.status === 500) throw new Error("500: Erreur serveur pour les statistiques");
+    if (statsResponse.status === 409 || statsResponse.status === 403) throw new Error("403/409: Session expirée");
+    if (statsResponse.status === 404) {
+      return {
+        stats: [
+          { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+          { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+          { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+          { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+        ],
+        revenueData: null,
+        topClients: null,
+        recentReceipts: null,
+      };
+    }
+    throw new Error(`Échec du chargement des statistiques: ${statsResponse.status} ${statsResponse.statusText}`);
+  }
+
+  if (!revenueResponse.ok) {
+    if (revenueResponse.status === 500) throw new Error("500: Erreur serveur pour les revenus");
+    if (revenueResponse.status === 409 || revenueResponse.status === 403) throw new Error("403/409: Session expirée");
+    if (revenueResponse.status === 404) {
+      const months = Array.from({ length: 12 }, (_, i) => {
+        const date = new Date();
+        date.setMonth(date.getMonth() - (11 - i));
+        return date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
+      });
+      return {
+        stats: null,
+        revenueData: [{
+          id: "revenus",
+          color: "#4CAF50",
+          data: months.map(month => ({ x: month, y: 0 })),
+        }],
+        topClients: null,
+        recentReceipts: null,
+      };
+    }
+    throw new Error(`Échec du chargement des revenus: ${revenueResponse.status} ${revenueResponse.statusText}`);
+  }
+
+  if (!clientsResponse.ok) {
+    if (clientsResponse.status === 500) throw new Error("500: Erreur serveur pour les clients");
+    if (clientsResponse.status === 409 || clientsResponse.status === 403) throw new Error("403/409: Session expirée");
+    if (clientsResponse.status === 404) return { stats: null, revenueData: null, topClients: [], recentReceipts: null };
+    throw new Error(`Échec du chargement des clients: ${clientsResponse.status} ${clientsResponse.statusText}`);
+  }
+
+  if (!receiptsResponse.ok) {
+    if (receiptsResponse.status === 500) throw new Error("500: Erreur serveur pour les reçus");
+    if (receiptsResponse.status === 409 || receiptsResponse.status === 403) throw new Error("403/409: Session expirée");
+    if (receiptsResponse.status === 404) return { stats: null, revenueData: null, topClients: null, recentReceipts: [] };
+    throw new Error(`Échec du chargement des reçus récents: ${receiptsResponse.status} ${receiptsResponse.statusText}`);
+  }
+
+  // Traiter les réponses valides
+  const [statsData, revenueData, clientsData, receiptsData] = await Promise.all([
+    statsResponse.json(),
+    revenueResponse.json(),
+    clientsResponse.json(),
+    receiptsResponse.json(),
+  ]);
+
+  // Transformer les stats
+  let stats = [
+    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+    { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+    { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+    { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+  ];
+  if (Array.isArray(statsData) && statsData.length > 0) {
+    const apiStats = statsData[0];
+    stats = [
+      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+      { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+      { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+    ];
+  }
+
+  // Transformer les revenus
+  let revenueTransformed = [{
+    id: "revenus",
+    color: "#4CAF50",
+    data: Array.from({ length: 12 }, (_, i) => {
+      const date = new Date();
+      date.setMonth(date.getMonth() - (11 - i));
+      return { x: date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' }), y: 0 };
+    }),
+  }];
+  if (Array.isArray(revenueData) && revenueData.length > 0) {
+    revenueTransformed = [{
+      id: "revenus",
+      color: "#4CAF50",
+      data: revenueData.map(item => ({ x: item.mois, y: item.chiffre_affaire })),
+    }];
+  }
+
+  // Transformer les clients
+  let clientsTransformed = [];
+  if (Array.isArray(clientsData) && clientsData.length > 0) {
+    clientsTransformed = clientsData.map(client => ({
+      name: client.client_name,
+      purchases: client.total_items,
+      amount: `${client.total_purchases.toLocaleString('fr-FR')} FCFA`,
+      growth: "+0%",
+    }));
+  }
+
+  // Transformer les reçus
+  let receiptsTransformed = [];
+  if (Array.isArray(receiptsData) && receiptsData.length > 0) {
+    receiptsTransformed = receiptsData.map(receipt => ({
+      id: receipt.receipt_number,
+      client: receipt.client_name,
+      amount: `${receipt.total_amount.toLocaleString('fr-FR')} FCFA`,
+      type: "Reçu",
+      status: receipt.payment_status === "paid" ? "Payé" : "En attente",
+      date: new Date(receipt.receipt_date).toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }),
+    }));
+  }
+
+  return { stats, revenueData: revenueTransformed, topClients: clientsTransformed, recentReceipts: receiptsTransformed };
+};
+
 const UserDashboard = () => {
-  const [stats, setStats] = useState([]);
-  const [revenueData, setRevenueData] = useState([]);
-  const [topClients, setTopClients] = useState([]);
-  const [recentReceipts, setRecentReceipts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [show500Error, setShow500Error] = useState(false);
   const [showSessionExpired, setShowSessionExpired] = useState(false);
   const username = localStorage.getItem("user_name") || "Utilisateur";
@@ -37,244 +196,39 @@ const UserDashboard = () => {
   const token = localStorage.getItem("token") || null;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!companyId) {
-        setError("ID de l'entreprise non défini. Veuillez vous reconnecter.");
-        setIsLoading(false);
-        return;
+  // Utiliser react-query pour gérer les requêtes
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['dashboardData', companyId],
+    queryFn: () => fetchDashboardData(companyId, token),
+    enabled: !!companyId,
+    staleTime: 5 * 60 * 1000, // Cache pendant 5 minutes
+    onError: (err) => {
+      if (err.message.includes("500")) {
+        setShow500Error(true);
+      } else if (err.message.includes("403/409")) {
+        setShowSessionExpired(true);
       }
+    },
+  });
 
-      try {
-        setIsLoading(true);
-        setError(null);
-        console.log("Fetching data with companyId:", companyId);
-
-        // Fetch stats
-        const statsResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/${companyId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { "Authorization": `Bearer ${token}` }),
-          },
-        });
-
-        if (!statsResponse.ok) {
-          if (statsResponse.status === 500) {
-            setShow500Error(true);
-            return;
-          } else if (statsResponse.status === 409 || statsResponse.status === 403) {
-            setShowSessionExpired(true);
-            return;
-          } else if (statsResponse.status === 404) {
-            // Treat 404 as no data, set default stats with values of 0
-            setStats([
-              { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
-              { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-              { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
-              { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
-            ]);
-          } else {
-            throw new Error(`Échec du chargement des statistiques: ${statsResponse.status} ${statsResponse.statusText}`);
-          }
-        } else {
-          const statsData = await statsResponse.json();
-          if (!Array.isArray(statsData) || statsData.length === 0) {
-            // Set default stats with values of 0
-            setStats([
-              { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
-              { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-              { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
-              { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
-            ]);
-          } else {
-            const apiStats = statsData[0];
-            const transformedStats = [
-              { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
-              { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-              { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
-              { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
-            ];
-            setStats(transformedStats);
-          }
-        }
-
-        // If we have 500 or 409 error, we stop here
-        if (show500Error || showSessionExpired) {
-          return;
-        }
-
-        // Fetch revenue per month
-        const revenueResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/revenuePerMonth/${companyId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { "Authorization": `Bearer ${token}` }),
-          },
-        });
-        if (!revenueResponse.ok) {
-          if (revenueResponse.status === 500) {
-            setShow500Error(true);
-            return;
-          } else if (revenueResponse.status === 409 || revenueResponse.status === 403) {
-            setShowSessionExpired(true);
-            return;
-          } else if (revenueResponse.status === 404) {
-            // Treat 404 as no data, set default revenue data with 0 values for the last 12 months
-            const months = Array.from({ length: 12 }, (_, i) => {
-              const date = new Date();
-              date.setMonth(date.getMonth() - (11 - i));
-              return date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
-            });
-            setRevenueData([{
-              id: "revenus",
-              color: "#4CAF50",
-              data: months.map(month => ({
-                x: month,
-                y: 0
-              }))
-            }]);
-          } else {
-            throw new Error(`Échec du chargement des revenus: ${revenueResponse.status} ${revenueResponse.statusText}`);
-          }
-        } else {
-          const revenueData = await revenueResponse.json();
-          if (!Array.isArray(revenueData) || revenueData.length === 0) {
-            // Set default revenue data with 0 values for the last 12 months
-            const months = Array.from({ length: 12 }, (_, i) => {
-              const date = new Date();
-              date.setMonth(date.getMonth() - (11 - i));
-              return date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
-            });
-            setRevenueData([{
-              id: "revenus",
-              color: "#4CAF50",
-              data: months.map(month => ({
-                x: month,
-                y: 0
-              }))
-            }]);
-          } else {
-            const transformedRevenue = [{
-              id: "revenus",
-              color: "#4CAF50",
-              data: revenueData.map(item => ({
-                x: item.mois,
-                y: item.chiffre_affaire
-              }))
-            }];
-            setRevenueData(transformedRevenue);
-          }
-        }
-
-        // Fetch top 5 clients
-        const clientsResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/topFiveClients/${companyId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { "Authorization": `Bearer ${token}` }),
-          },
-        });
-        if (!clientsResponse.ok) {
-          if (clientsResponse.status === 500) {
-            setShow500Error(true);
-            return;
-          } else if (clientsResponse.status === 409 || clientsResponse.status === 403) {
-            setShowSessionExpired(true);
-            return;
-          } else if (clientsResponse.status === 404) {
-            setTopClients([]); // Treat 404 as no data
-          } else {
-            throw new Error(`Échec du chargement des clients: ${clientsResponse.status} ${clientsResponse.statusText}`);
-          }
-        } else {
-          const clientsData = await clientsResponse.json();
-          if (!Array.isArray(clientsData) || clientsData.length === 0) {
-            setTopClients([]); // Set empty array if no data
-          } else {
-            const transformedClients = clientsData.map(client => ({
-              name: client.client_name,
-              purchases: client.total_items,
-              amount: `${client.total_purchases.toLocaleString('fr-FR')} FCFA`,
-              growth: "+0%"
-            }));
-            setTopClients(transformedClients);
-          }
-        }
-
-        // Fetch recent receipts
-        const receiptsResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/receipt/list/${companyId}/5`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { "Authorization": `Bearer ${token}` }),
-          },
-        });
-        if (!receiptsResponse.ok) {
-          if (receiptsResponse.status === 500) {
-            setShow500Error(true);
-            return;
-          } else if (receiptsResponse.status === 409 || receiptsResponse.status === 403) {
-            setShowSessionExpired(true);
-            return;
-          } else if (receiptsResponse.status === 404) {
-            setRecentReceipts([]); // Treat 404 as no data
-          } else {
-            throw new Error(`Échec du chargement des reçus récents: ${receiptsResponse.status} ${receiptsResponse.statusText}`);
-          }
-        } else {
-          const receiptsData = await receiptsResponse.json();
-          if (!Array.isArray(receiptsData) || receiptsData.length === 0) {
-            setRecentReceipts([]); // Set empty array if no data
-          } else {
-            const transformedReceipts = receiptsData.map(receipt => ({
-              id: receipt.receipt_number,
-              client: receipt.client_name,
-              amount: `${receipt.total_amount.toLocaleString('fr-FR')} FCFA`,
-              type: "Reçu",
-              status: receipt.payment_status === "paid" ? "Payé" : "En attente",
-              date: new Date(receipt.receipt_date).toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-              })
-            }));
-            setRecentReceipts(transformedReceipts);
-          }
-        }
-
-      } catch (error) {
-        console.error("Erreur lors du chargement des données:", error);
-        setError(error.message || "Une erreur est survenue lors du chargement des données.");
-        // Set default stats with values of 0, default revenue data, and empty arrays for others
-        setStats([
-          { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
-          { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-          { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
-          { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
-        ]);
-        const months = Array.from({ length: 12 }, (_, i) => {
-          const date = new Date();
-          date.setMonth(date.getMonth() - (11 - i));
-          return date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
-        });
-        setRevenueData([{
-          id: "revenus",
-          color: "#4CAF50",
-          data: months.map(month => ({
-            x: month,
-            y: 0
-          }))
-        }]);
-        setTopClients([]);
-        setRecentReceipts([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [companyId]);
+  // Définir les états à partir des données ou valeurs par défaut
+  const stats = data?.stats || [
+    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+    { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+    { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+    { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+  ];
+  const revenueData = data?.revenueData || [{
+    id: "revenus",
+    color: "#4CAF50",
+    data: Array.from({ length: 12 }, (_, i) => {
+      const date = new Date();
+      date.setMonth(date.getMonth() - (11 - i));
+      return { x: date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' }), y: 0 };
+    }),
+  }];
+  const topClients = data?.topClients || [];
+  const recentReceipts = data?.recentReceipts || [];
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -284,25 +238,28 @@ const UserDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 mobile-nav-padding">
+    <div className="relative min-h-screen bg-gray-50 mobile-nav-padding">
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
+          style={{ zIndex: 9999 }}
+        >
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      )}
+
       <Header title="Dashboard" />
       
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="user" />
 
-        {/* Loading Overlay */}
-        {isLoading && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
-        )}
-
         {/* Error Message */}
-        {error && (
+        {error && !show500Error && !showSessionExpired && (
           <Card className="border-red-200 bg-red-50">
             <CardContent className="p-4 flex items-center gap-2 text-red-600">
               <AlertCircle className="w-5 h-5" />
-              <p>{error}</p>
+              <p>{error.message || "Une erreur est survenue lors du chargement des données."}</p>
             </CardContent>
           </Card>
         )}
