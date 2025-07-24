@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,15 +8,15 @@ import { Loader2, AlertCircle, Search, Download, Eye, Filter, Calendar } from "l
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-200 rounded-md", className)} />
 );
 
-const ErrorPopup = ({ message, onClose, actionButton }) => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+const ErrorPopup = ({ message, onClose, actionButton }) => createPortal(
+  <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-[10000]">
     <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
       <div className="flex items-start gap-4">
         <AlertCircle className="w-6 h-6 text-red-500 mt-0.5" />
@@ -30,24 +32,107 @@ const ErrorPopup = ({ message, onClose, actionButton }) => (
         </div>
       </div>
     </div>
-  </div>
+  </div>,
+  document.body
 );
+
+// Fonction pour déterminer le type d'erreur
+const getErrorType = (error) => {
+  if (!error) return null;
+  if (error.message.includes("500")) return "server";
+  if (error.message.includes("403/409") || error.message.includes("ID de l'entreprise non défini")) return "auth";
+  if (error.message.includes("404")) return "not_found";
+  return "generic";
+};
+
+// Fonction pour récupérer les reçus
+const fetchReceipts = async (companyId, token) => {
+  if (!companyId) {
+    throw new Error("ID de l'entreprise non défini. Veuillez vous reconnecter.");
+  }
+
+  const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/receipt/list/${companyId}/0`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 500) {
+      throw new Error("500: Erreur serveur lors de la récupération des reçus");
+    } else if (response.status === 409 || response.status === 403) {
+      throw new Error("403/409: Session expirée");
+    } else if (response.status === 404) {
+      throw new Error("404: Aucune donnée trouvée");
+    } else {
+      throw new Error(`Échec de la récupération des reçus: ${response.status} ${response.statusText}`);
+    }
+  }
+
+  const receiptsData = await response.json();
+  if (!Array.isArray(receiptsData)) {
+    throw new Error("Réponse invalide: pas un tableau");
+  }
+
+  return receiptsData.map(receipt => ({
+    id: receipt.receipt_id,
+    receipt_number: receipt.receipt_number,
+    client: receipt.client_name || "Client inconnu",
+    amount: `${receipt.total_amount.toLocaleString('fr-FR')} FCFA`,
+    raw_amount: receipt.total_amount || 0,
+    date: receipt.receipt_date
+      ? new Date(receipt.receipt_date).toLocaleDateString('fr-FR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        })
+      : 'Date inconnue',
+    status: receipt.payment_status === "paid" ? "Payé" : "En attente",
+    items: receipt.total_items || 0,
+  }));
+};
+
+// Fonction pour télécharger un PDF
+const downloadPDF = async ({ id, token }) => {
+  const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/receipt/generate/${id}`, {
+    method: "GET",
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Échec du téléchargement du PDF: ${response.status} ${response.statusText}`);
+  }
+
+  const blob = await response.blob();
+  return { blob, id };
+};
 
 const ReceiptHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [receipts, setReceipts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [errorType, setErrorType] = useState(null);
-  const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({});
+  const [downloadProgress, setDownloadProgress] = useState({});
+  const [downloadError, setDownloadError] = useState(null);
   const companyId = localStorage.getItem("company_id") || null;
   const token = localStorage.getItem("token") || null;
+  const navigate = useNavigate();
 
-  const handleDownloadPDF = async (id, receiptNumber) => {
-    try {
-      setError(null);
+  // Gérer les reçus avec useQuery
+  const { data: receipts = [], isLoading, error } = useQuery({
+    queryKey: ['receipts', companyId],
+    queryFn: () => fetchReceipts(companyId, token),
+    enabled: !!companyId,
+    staleTime: 5 * 60 * 1000, // Cache pendant 5 minutes
+  });
+
+  // Gérer le téléchargement PDF avec useMutation
+  const downloadMutation = useMutation({
+    mutationFn: downloadPDF,
+    onMutate: ({ id }) => {
+      setDownloadError(null);
       setDownloadProgress(prev => ({ ...prev, [id]: 0 }));
-
       const progressInterval = setInterval(() => {
         setDownloadProgress(prev => {
           if (!prev[id]) return prev;
@@ -55,22 +140,14 @@ const ReceiptHistory = () => {
           return { ...prev, [id]: newProgress };
         });
       }, 200);
-
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/receipt/generate/${id}`, {
-        method: "GET",
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
-
+      return { progressInterval };
+    },
+    onSuccess: ({ blob, id }, _, { progressInterval }) => {
       clearInterval(progressInterval);
       setDownloadProgress(prev => ({ ...prev, [id]: 100 }));
 
-      if (!response.ok) {
-        throw new Error(`Failed to download PDF: ${response.status} ${response.statusText}`);
-      }
-
-      const blob = await response.blob();
+      const receipt = receipts.find(r => r.id === id);
+      const receiptNumber = receipt?.receipt_number || id;
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -82,97 +159,28 @@ const ReceiptHistory = () => {
 
       setTimeout(() => {
         setDownloadProgress(prev => {
-          const { [id as string]: _, ...rest } = prev;
+          const { [id]: _, ...rest } = prev;
           return rest;
         });
       }, 500);
-    } catch (error) {
-      console.error("Error downloading PDF:", error);
-      setError(error.message || "Une erreur est survenue lors du téléchargement du PDF.");
+    },
+    onError: (error, { id }, { progressInterval }) => {
+      clearInterval(progressInterval);
       setDownloadProgress(prev => {
         const { [id]: _, ...rest } = prev;
         return rest;
       });
-      setTimeout(() => setError(null), 5000);
-    }
-  };
-
-  useEffect(() => {
-    const fetchReceipts = async () => {
-      if (!companyId) {
-        setError("ID de l'entreprise non défini. Veuillez vous reconnecter.");
-        setErrorType("auth");
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        setError(null);
-        setErrorType(null);
-
-        const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/receipt/list/${companyId}/0`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        });
-
-        if (!response.ok) {
-          if (response.status === 500) {
-            setErrorType("server");
-            throw new Error("Erreur lors de la récupération des informations");
-          } else if (response.status === 409 || response.status === 403) {
-            setErrorType("auth");
-            throw new Error("Session expirée");
-          } else if (response.status === 404) {
-            setErrorType("not_found");
-            throw new Error("Aucune donnée trouvée");
-          } else {
-            throw new Error(`Échec de la récupération des reçus: ${response.status} ${response.statusText}`);
-          }
-        }
-
-        const receiptsData = await response.json();
-        if (!Array.isArray(receiptsData)) {
-          throw new Error("Réponse invalide: pas un tableau");
-        }
-
-        const transformedReceipts = receiptsData.map(receipt => ({
-          id: receipt.receipt_id,
-          receipt_number: receipt.receipt_number,
-          client: receipt.client_name,
-          amount: `${receipt.total_amount.toLocaleString('fr-FR')} FCFA`,
-          raw_amount: receipt.total_amount,
-          date: receipt.receipt_date
-            ? new Date(receipt.receipt_date).toLocaleDateString('fr-FR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-              })
-            : 'Date inconnue',
-          status: receipt.payment_status === "paid" ? "Payé" : "En attente",
-          items: receipt.total_items
-        }));
-
-        setReceipts(transformedReceipts);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des reçus:", error);
-        setError(error.message);
-        setReceipts([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchReceipts();
-  }, [companyId]);
+      setDownloadError(error.message || "Une erreur est survenue lors du téléchargement du PDF.");
+      setTimeout(() => setDownloadError(null), 5000);
+    },
+  });
 
   const filteredReceipts = receipts.filter(receipt =>
     receipt.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
     receipt.receipt_number.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const errorType = getErrorType(error);
 
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
@@ -182,30 +190,43 @@ const ReceiptHistory = () => {
         <QuickNav userType="user" />
 
         {/* Loading Overlay for Receipts */}
-        {isLoading && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        {isLoading && createPortal(
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Error Popups */}
         {error && errorType === "server" && (
           <ErrorPopup
             message="Une erreur est survenue lors de la récupération des informations. Veuillez vérifier votre connexion internet et réessayer."
-            onClose={() => setError(null)}
-            actionButton={null}
+            onClose={() => {}}
+            actionButton={
+              <Button onClick={() => window.location.reload()}>
+                Réessayer
+              </Button>
+            }
           />
         )}
 
         {error && errorType === "auth" && (
           <ErrorPopup
-            message="Votre session a expiré. Veuillez vous reconnecter."
-            onClose={() => setError(null)}
+            message="Votre session a expirée. Veuillez vous reconnecter."
+            onClose={() => navigate("/login")}
             actionButton={
               <Link to="/login">
                 <Button>Se connecter</Button>
               </Link>
             }
+          />
+        )}
+
+        {downloadError && (
+          <ErrorPopup
+            message={downloadError}
+            onClose={() => setDownloadError(null)}
+            actionButton={null}
           />
         )}
 
@@ -219,8 +240,8 @@ const ReceiptHistory = () => {
         )}
 
         {/* PDF Download Progress Overlay */}
-        {Object.keys(downloadProgress).length > 0 && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        {Object.keys(downloadProgress).length > 0 && createPortal(
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center gap-4">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
               <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -233,7 +254,8 @@ const ReceiptHistory = () => {
                 Téléchargement en cours... {String(Object.values(downloadProgress)[0])}%
               </p>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Filtres et recherche */}
@@ -401,7 +423,7 @@ const ReceiptHistory = () => {
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          onClick={() => handleDownloadPDF(receipt.id, receipt.receipt_number)}
+                          onClick={() => downloadMutation.mutate({ id: receipt.id, token })}
                           disabled={downloadProgress[receipt.id] !== undefined}
                         >
                           {downloadProgress[receipt.id] ? (
@@ -482,7 +504,7 @@ const ReceiptHistory = () => {
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              onClick={() => handleDownloadPDF(receipt.id, receipt.receipt_number)}
+                              onClick={() => downloadMutation.mutate({ id: receipt.id, token })}
                               disabled={downloadProgress[receipt.id] !== undefined}
                             >
                               {downloadProgress[receipt.id] ? (
