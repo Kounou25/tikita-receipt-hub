@@ -64,9 +64,9 @@ const fetchDashboardData = async (companyId, token) => {
     if (statsResponse.status === 404) {
       return {
         stats: [
-          { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+          { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
           { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-          { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+          { title: "Clients actifs", value: "0", icon: Users, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
           { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
         ],
         revenueData: null,
@@ -90,7 +90,7 @@ const fetchDashboardData = async (companyId, token) => {
         stats: null,
         revenueData: [{
           id: "revenus",
-          color: "#4CAF50",
+          color: "#16a34a",
           data: months.map(month => ({ x: month, y: 0 })),
         }],
         topClients: null,
@@ -114,7 +114,6 @@ const fetchDashboardData = async (companyId, token) => {
     throw new Error(`Échec du chargement des reçus récents: ${receiptsResponse.status} ${receiptsResponse.statusText}`);
   }
 
-  // Traiter les réponses valides
   const [statsData, revenueData, clientsData, receiptsData] = await Promise.all([
     statsResponse.json(),
     revenueResponse.json(),
@@ -122,27 +121,25 @@ const fetchDashboardData = async (companyId, token) => {
     receiptsResponse.json(),
   ]);
 
-  // Transformer les stats
   let stats = [
-    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
     { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-    { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+    { title: "Clients actifs", value: "0", icon: Users, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
     { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
   ];
   if (Array.isArray(statsData) && statsData.length > 0) {
     const apiStats = statsData[0];
     stats = [
-      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
       { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
       { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
     ];
   }
 
-  // Transformer les revenus
   let revenueTransformed = [{
     id: "revenus",
-    color: "#4CAF50",
+    color: "#16a34a",
     data: Array.from({ length: 12 }, (_, i) => {
       const date = new Date();
       date.setMonth(date.getMonth() - (11 - i));
@@ -152,12 +149,11 @@ const fetchDashboardData = async (companyId, token) => {
   if (Array.isArray(revenueData) && revenueData.length > 0) {
     revenueTransformed = [{
       id: "revenus",
-      color: "#4CAF50",
+      color: "#16a34a",
       data: revenueData.map(item => ({ x: item.mois, y: item.chiffre_affaire })),
     }];
   }
 
-  // Transformer les clients
   let clientsTransformed = [];
   if (Array.isArray(clientsData) && clientsData.length > 0) {
     clientsTransformed = clientsData.map(client => ({
@@ -168,7 +164,6 @@ const fetchDashboardData = async (companyId, token) => {
     }));
   }
 
-  // Transformer les reçus
   let receiptsTransformed = [];
   if (Array.isArray(receiptsData) && receiptsData.length > 0) {
     receiptsTransformed = receiptsData.map(receipt => ({
@@ -196,12 +191,11 @@ const UserDashboard = () => {
   const token = localStorage.getItem("token") || null;
   const navigate = useNavigate();
 
-  // Utiliser react-query pour gérer les requêtes
   const { data, isLoading, error } = useQuery({
     queryKey: ['dashboardData', companyId],
     queryFn: () => fetchDashboardData(companyId, token),
     enabled: !!companyId,
-    staleTime: 5 * 60 * 1000, // Cache pendant 5 minutes
+    staleTime: 5 * 60 * 1000,
     onError: (err) => {
       if (err.message.includes("500")) {
         setShow500Error(true);
@@ -211,16 +205,15 @@ const UserDashboard = () => {
     },
   });
 
-  // Définir les états à partir des données ou valeurs par défaut
   const stats = data?.stats || [
-    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
     { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-    { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
+    { title: "Clients actifs", value: "0", icon: Users, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
     { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
   ];
   const revenueData = data?.revenueData || [{
     id: "revenus",
-    color: "#4CAF50",
+    color: "#16a34a",
     data: Array.from({ length: 12 }, (_, i) => {
       const date = new Date();
       date.setMonth(date.getMonth() - (11 - i));
@@ -245,13 +238,13 @@ const UserDashboard = () => {
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
           style={{ zIndex: 9999 }}
         >
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <Loader2 className="w-8 h-8 animate-spin text-green-500" />
         </div>
       )}
 
       <Header title="Dashboard" />
       
-      <main className="p-4 md:p-6 space-y-6">
+      <main className="pt-2 p-4 md:pt-6 md:p-6 space-y-6">
         <QuickNav userType="user" />
 
         {/* Error Message */}
@@ -274,7 +267,7 @@ const UserDashboard = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction onClick={() => window.location.reload()}>
+              <AlertDialogAction className="bg-green-500 hover:bg-green-600 text-white" onClick={() => window.location.reload()}>
                 Réessayer
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -291,7 +284,7 @@ const UserDashboard = () => {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction onClick={handleLogout}>
+              <AlertDialogAction className="bg-green-500 hover:bg-green-600 text-white" onClick={handleLogout}>
                 Se connecter
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -300,7 +293,7 @@ const UserDashboard = () => {
 
         {/* Welcome Section */}
         {isLoading ? (
-          <Card className="border-primary">
+          <Card className="border-green-500">
             <CardContent className="p-6 space-y-4">
               <Skeleton className="h-8 w-64" />
               <Skeleton className="h-4 w-full max-w-md" />
@@ -312,7 +305,7 @@ const UserDashboard = () => {
             </CardContent>
           </Card>
         ) : (
-          <Card className="border-primary bg-gradient-to-r from-primary/5 to-secondary/5">
+          <Card className="border-green-500 bg-gradient-to-r from-green-50 to-orange-50">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                 <div>
@@ -324,13 +317,13 @@ const UserDashboard = () => {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <Link to="/generate">
-                      <Button className="bg-primary hover:bg-primary/90">
+                      <Button className="bg-green-500 hover:bg-green-600 text-white">
                         <Plus className="w-4 h-4 mr-2" />
                         Nouveau reçu
                       </Button>
                     </Link>
                     <Link to="/receipts">
-                      <Button variant="outline">
+                      <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
                         <Eye className="w-4 h-4 mr-2" />
                         Voir l'historique
                       </Button>
@@ -339,7 +332,7 @@ const UserDashboard = () => {
                 </div>
                 <div className="mt-4 md:mt-0">
                   <Link to="/notifications">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50" size="sm">
                       <Bell className="w-4 h-4 mr-2" />
                       Notifications
                     </Button>
@@ -351,7 +344,7 @@ const UserDashboard = () => {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {isLoading ? (
             Array(4)
               .fill(null)
@@ -375,7 +368,7 @@ const UserDashboard = () => {
                     <div className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center`}>
                       <stat.icon className={`w-6 h-6 ${stat.color}`} />
                     </div>
-                    <span className="text-sm font-medium text-green-600">{stat.growth}</span>
+                    <span className="text-sm font-medium text-orange-600">{stat.growth}</span>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
@@ -438,7 +431,7 @@ const UserDashboard = () => {
               <Card className="border-gray-200">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
-                    <Crown className="w-5 h-5 text-yellow-600" />
+                    <Crown className="w-5 h-5 text-orange-600" />
                     Top 5 Clients du Mois
                   </CardTitle>
                 </CardHeader>
@@ -448,9 +441,9 @@ const UserDashboard = () => {
                   ) : (
                     <div className="space-y-4">
                       {topClients.map((client, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div key={index} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                           <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                               {index + 1}
                             </div>
                             <div>
@@ -460,7 +453,7 @@ const UserDashboard = () => {
                           </div>
                           <div className="text-right">
                             <p className="font-medium text-gray-900">{client.amount}</p>
-                            <p className="text-sm text-green-600">{client.growth}</p>
+                            <p className="text-sm text-orange-600">{client.growth}</p>
                           </div>
                         </div>
                       ))}
@@ -503,7 +496,7 @@ const UserDashboard = () => {
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Activité récente</CardTitle>
               <Link to="/receipts">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50" size="sm">
                   Voir tout
                 </Button>
               </Link>
@@ -516,8 +509,8 @@ const UserDashboard = () => {
                   {recentReceipts.map((receipt, index) => (
                     <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                       <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                          <Receipt className="w-5 h-5 text-blue-600" />
+                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                          <Receipt className="w-5 h-5 text-green-600" />
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">{receipt.id}</p>
@@ -565,18 +558,18 @@ const UserDashboard = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Link to="/generate">
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
                       <Plus className="w-4 h-4 mr-2" />
                       Nouveau document
                     </Button>
                   </Link>
                   <Link to="/clients">
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
                       <Users className="w-4 h-4 mr-2" />
                       Gérer les clients
                     </Button>
                   </Link>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
                     <Download className="w-4 h-4 mr-2" />
                     Exporter les données
                   </Button>
@@ -589,13 +582,13 @@ const UserDashboard = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Link to="/receipts">
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
                       <Receipt className="w-4 h-4 mr-2" />
                       Mes reçus
                     </Button>
                   </Link>
                   <Link to="/profile">
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
                       <Users className="w-4 h-4 mr-2" />
                       Mon profil
                     </Button>
@@ -608,12 +601,12 @@ const UserDashboard = () => {
                   <CardTitle className="text-lg">Support</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
                     <FileText className="w-4 h-4 mr-2" />
                     Documentation
                   </Button>
                   <Link to="/support">
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
                       <Users className="w-4 h-4 mr-2" />
                       Contacter le support
                     </Button>
