@@ -88,7 +88,7 @@ const fetchProfileData = async (companyId, token) => {
     email: profileDataResponse.user.email,
     phone: profileDataResponse.user.phone_number,
     country: profileDataResponse.user.country,
-    avatar: profileDataResponse.logos[0]?.logo_url || "",
+    avatar: profileDataResponse.logos && profileDataResponse.logos.length > 0 ? profileDataResponse.logos[0].logo_url : "",
     userNumber: `TKT-USER-${profileDataResponse.user.user_id.toString().padStart(5, "0")}`,
     companyName: profileDataResponse.company.company_name,
     slogan: profileDataResponse.company.company_slogan,
@@ -231,7 +231,7 @@ const UserProfile = () => {
                   <h3 className="font-medium text-lg mb-2">Erreur</h3>
                   <p className="text-gray-600 mb-4">
                     {error.cause === "auth"
-                      ? "Votre session a expiré. Veuillez vous reconnecter."
+                      ? "Votre session a expirée. Veuillez vous reconnecter."
                       : error.cause === "not_found"
                       ? "Aucune donnée de profil trouvée."
                       : error.message || "Une erreur est survenue lors du chargement des données."}
