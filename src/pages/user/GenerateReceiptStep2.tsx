@@ -419,7 +419,8 @@ const GenerateReceiptStep2 = () => {
                       <Label className="text-sm font-medium">Quantité</Label>
                       <Input
                         type="number"
-                        min="1"
+                        placeholder="1"
+                      
                         value={item.quantity}
                         onChange={(e) => updateItem(item.id, 'quantity', e.target.value)}
                         className="border-gray-300 text-sm h-12 px-4"
