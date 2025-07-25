@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -109,7 +109,7 @@ const GenerateReceiptStep2 = () => {
               field === "quantity"
                 ? Math.max(1, parseInt(value) || 1)
                 : field === "unit_price"
-                ? Math.max(0, parseFloat(value) || 0)
+                ? Math.max(0, parseFloat(value.replace(/^0+/, '') || '0'))
                 : value
           }
         : item
@@ -142,7 +142,6 @@ const GenerateReceiptStep2 = () => {
   const total = subtotal + tvaAmount;
 
   const handleGenerateReceipt = async () => {
-    // Validate required fields
     if (!companyId || isNaN(parseInt(companyId))) {
       toast.error("Invalid company ID. Please log in again.");
       return;
@@ -165,7 +164,6 @@ const GenerateReceiptStep2 = () => {
       return;
     }
 
-    // Build client_info, excluding empty optional fields
     const clientInfoPayload = {
       full_name: clientInfo.full_name,
       ...(clientInfo.email && { email: clientInfo.email }),
@@ -173,7 +171,6 @@ const GenerateReceiptStep2 = () => {
       ...(clientInfo.address && { address: clientInfo.address })
     };
 
-    // Build payload, placing client_id at top level if selected
     const payload = {
       company_id: parseInt(companyId),
       user_id: userId,
@@ -192,10 +189,9 @@ const GenerateReceiptStep2 = () => {
 
     try {
       setLoading(true);
-      setIsDownloading(true); // Start progress bar at the beginning
+      setIsDownloading(true);
       setDownloadProgress(0);
 
-      // Simulate progress for /receipts/receipt/ (0% to 50%)
       const simulateProgress = () => {
         return new Promise((resolve) => {
           let progress = 0;
@@ -204,14 +200,14 @@ const GenerateReceiptStep2 = () => {
             setDownloadProgress(Math.min(progress, 50));
             if (progress >= 50) {
               clearInterval(interval);
-              resolve();
+              resolve(null);
             }
-          }, 200); // Adjust interval for smoother/faster animation
+          }, 200);
         });
       };
 
       console.log("Sending payload to /receipts/receipt/:", JSON.stringify(payload, null, 2));
-      await simulateProgress(); // Simulate progress during POST
+      await simulateProgress();
       const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/receipts/receipt/`, {
         method: "POST",
         headers: {
@@ -254,7 +250,7 @@ const GenerateReceiptStep2 = () => {
         responseType: "blob",
         onDownloadProgress: (progressEvent) => {
           if (progressEvent.total) {
-            const percentCompleted = 50 + Math.round((progressEvent.loaded * 50) / progressEvent.total); // Map 0-100% to 50-100%
+            const percentCompleted = 50 + Math.round((progressEvent.loaded * 50) / progressEvent.total);
             setDownloadProgress(percentCompleted);
           }
         }
@@ -265,7 +261,6 @@ const GenerateReceiptStep2 = () => {
         throw new Error("Invalid response format: Expected a PDF file.");
       }
 
-      // Sanitize receipt_number for filename
       const sanitizedReceiptNumber = result.receipt_number.replace(/[\/\\:*?"<>|]/g, "_");
       let filename = `receipt_${sanitizedReceiptNumber}.pdf`;
       const contentDisposition = generateResponse.headers["content-disposition"];
@@ -306,7 +301,7 @@ const GenerateReceiptStep2 = () => {
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
       <Header title="Générer un reçu" />
 
-      <main className="p-4 md:p-6 space-y-6">
+      <main className="p-4 sm:p-6 space-y-6">
         <QuickNav userType="user" />
 
         <div className="flex items-center justify-center space-x-4 mb-8">
@@ -333,9 +328,9 @@ const GenerateReceiptStep2 = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="clientSelect">Sélectionner un client</Label>
+                  <Label htmlFor="clientSelect" className="text-sm font-medium">Sélectionner un client</Label>
                   <Select onValueChange={handleClientSelect} disabled={loading || isDownloading}>
-                    <SelectTrigger id="clientSelect" className="border-gray-300">
+                    <SelectTrigger id="clientSelect" className="border-gray-300 text-sm h-12">
                       <SelectValue placeholder={loading || isDownloading ? "Chargement..." : "Choisir un client"} />
                     </SelectTrigger>
                     <SelectContent>
@@ -347,51 +342,51 @@ const GenerateReceiptStep2 = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="clientName">Nom complet *</Label>
+                    <Label htmlFor="clientName" className="text-sm font-medium">Nom complet *</Label>
                     <Input
                       id="clientName"
                       value={clientInfo.full_name}
                       onChange={(e) => setClientInfo({ ...clientInfo, full_name: e.target.value })}
                       placeholder="Nom du client"
-                      className="border-gray-300"
+                      className="border-gray-300 text-sm h-12 px-4"
                       disabled={loading || isDownloading}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="clientEmail">Email</Label>
+                    <Label htmlFor="clientEmail" className="text-sm font-medium">Email</Label>
                     <Input
                       id="clientEmail"
                       type="email"
                       value={clientInfo.email}
                       onChange={(e) => setClientInfo({ ...clientInfo, email: e.target.value })}
                       placeholder="email@exemple.com"
-                      className="border-gray-300"
+                      className="border-gray-300 text-sm h-12 px-4"
                       disabled={loading || isDownloading}
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="clientPhone">Téléphone</Label>
+                    <Label htmlFor="clientPhone" className="text-sm font-medium">Téléphone</Label>
                     <Input
                       id="clientPhone"
                       value={clientInfo.phone_number}
                       onChange={(e) => setClientInfo({ ...clientInfo, phone_number: e.target.value })}
                       placeholder="+227 XX XX XX XX"
-                      className="border-gray-300"
+                      className="border-gray-300 text-sm h-12 px-4"
                       disabled={loading || isDownloading}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="clientAddress">Adresse</Label>
+                    <Label htmlFor="clientAddress" className="text-sm font-medium">Adresse</Label>
                     <Input
                       id="clientAddress"
                       value={clientInfo.address}
                       onChange={(e) => setClientInfo({ ...clientInfo, address: e.target.value })}
                       placeholder="Adresse du client"
-                      className="border-gray-300"
+                      className="border-gray-300 text-sm h-12 px-4"
                       disabled={loading || isDownloading}
                     />
                   </div>
@@ -402,58 +397,58 @@ const GenerateReceiptStep2 = () => {
             <Card className="border-gray-200">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl font-bold">Articles</CardTitle>
-                <Button onClick={addItem} size="sm" className="bg-primary hover:bg-primary/90" disabled={loading || isDownloading}>
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button onClick={addItem} size="sm" className="bg-orange-600 hover:bg-orange-700 h-10 px-4" disabled={loading || isDownloading}>
+                  <Plus className="w-5 h-5 mr-2" />
                   Ajouter
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 {items.map((item, index) => (
-                  <div key={item.id} className="grid grid-cols-12 gap-2 items-end">
-                    <div className="col-span-5 space-y-2">
-                      <Label>Article {index + 1}</Label>
+                  <div key={item.id} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+                    <div className="sm:col-span-5 space-y-2">
+                      <Label className="text-sm font-medium">Article {index + 1}</Label>
                       <Input
                         value={item.description}
                         onChange={(e) => updateItem(item.id, 'description', e.target.value)}
                         placeholder="Description de l'article"
-                        className="border-gray-300"
+                        className="border-gray-300 text-sm h-12 px-4"
                         disabled={loading || isDownloading}
                       />
                     </div>
-                    <div className="col-span-2 space-y-2">
-                      <Label>Quantité</Label>
+                    <div className="sm:col-span-2 space-y-2">
+                      <Label className="text-sm font-medium">Quantité</Label>
                       <Input
                         type="number"
                         min="1"
                         value={item.quantity}
                         onChange={(e) => updateItem(item.id, 'quantity', e.target.value)}
-                        className="border-gray-300"
+                        className="border-gray-300 text-sm h-12 px-4"
                         disabled={loading || isDownloading}
                       />
                     </div>
-                    <div className="col-span-3 space-y-2">
-                      <Label>Prix unitaire</Label>
+                    <div className="sm:col-span-3 space-y-2">
+                      <Label className="text-sm font-medium">Prix unitaire</Label>
                       <Input
                         type="number"
                         min="0"
                         step="0.01"
-                        value={item.unit_price}
-                        onChange={(e) => updateItem(item.id, 'unit_price', e.target.value)}
+                        value={item.unit_price === 0 ? '' : item.unit_price} // Hide 0 in the input field
+                        onChange={(e) => updateItem(item.id, 'unit_price', e.target.value.replace(/^0+(?=\d)/, ''))}
                         placeholder="0"
-                        className="border-gray-300"
+                        className="border-gray-300 text-sm h-12 px-4"
                         disabled={loading || isDownloading}
                       />
                     </div>
-                    <div className="col-span-2 flex justify-end">
+                    <div className="sm:col-span-2 flex justify-end mt-4 sm:mt-0">
                       {items.length > 1 && (
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => removeItem(item.id)}
-                          className="text-red-600 border-red-300 hover:bg-red-50"
+                          className="text-red-600 border-red-300 hover:bg-red-50 h-10 w-10"
                           disabled={loading || isDownloading}
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-5 h-5" />
                         </Button>
                       )}
                     </div>
@@ -467,31 +462,34 @@ const GenerateReceiptStep2 = () => {
                 <CardTitle className="text-xl font-bold">Paramètres additionnels</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="tva">TVA (%)</Label>
+                    <Label htmlFor="tva" className="text-sm font-medium">TVA (%)</Label>
                     <Input
                       id="tva"
                       type="number"
                       min="0"
                       max="100"
                       step="0.1"
-                      value={receiptInfo.tva_rate}
+                      value={receiptInfo.tva_rate === 0 ? '' : receiptInfo.tva_rate} // Hide 0 in TVA input for consistency
                       onChange={(e) =>
-                        setReceiptInfo({ ...receiptInfo, tva_rate: Math.max(0, parseFloat(e.target.value) || 0) })
+                        setReceiptInfo({
+                          ...receiptInfo,
+                          tva_rate: Math.max(0, parseFloat(e.target.value.replace(/^0+(?=\d)/, '') || '0'))
+                        })
                       }
-                      placeholder="18"
-                      className="border-gray-300"
+                      placeholder="0"
+                      className="border-gray-300 text-sm h-12 px-4"
                       disabled={loading || isDownloading}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="paymentMethod">Méthode de paiement</Label>
+                    <Label htmlFor="paymentMethod" className="text-sm font-medium">Méthode de paiement</Label>
                     <Select
                       onValueChange={(value) => setReceiptInfo({ ...receiptInfo, payment_method: value })}
                       disabled={loading || isDownloading}
                     >
-                      <SelectTrigger id="paymentMethod" className="border-gray-300">
+                      <SelectTrigger id="paymentMethod" className="border-gray-300 text-sm h-12">
                         <SelectValue placeholder="Choisir une méthode" />
                       </SelectTrigger>
                       <SelectContent>
@@ -504,12 +502,12 @@ const GenerateReceiptStep2 = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="paymentStatus">Statut de paiement</Label>
+                  <Label htmlFor="paymentStatus" className="text-sm font-medium">Statut de paiement</Label>
                   <Select
                     onValueChange={(value) => setReceiptInfo({ ...receiptInfo, payment_status: value })}
                     disabled={loading || isDownloading}
                   >
-                    <SelectTrigger id="paymentStatus" className="border-gray-300">
+                    <SelectTrigger id="paymentStatus" className="border-gray-300 text-sm h-12">
                       <SelectValue placeholder="Choisir un statut" />
                     </SelectTrigger>
                     <SelectContent>
@@ -551,15 +549,15 @@ const GenerateReceiptStep2 = () => {
                   <Button
                     onClick={() => navigate('/generate')}
                     variant="outline"
-                    className="w-full"
+                    className="w-full h-12 text-sm"
                     disabled={loading || isDownloading}
                   >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    <ArrowLeft className="w-5 h-5 mr-2" />
                     Retour
                   </Button>
                   <Button
                     onClick={handleGenerateReceipt}
-                    className="w-full bg-primary hover:bg-primary/90"
+                    className="w-full bg-primary hover:bg-primary/90 h-12 text-sm"
                     disabled={
                       loading ||
                       isDownloading ||
@@ -570,7 +568,7 @@ const GenerateReceiptStep2 = () => {
                     }
                   >
                     {loading || isDownloading ? "Chargement..." : "Générer le reçu"}
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </div>
               </CardContent>
@@ -590,12 +588,13 @@ const GenerateReceiptStep2 = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowSubscriptionPopup(false)}
+                className="h-10 text-sm"
               >
                 Fermer
               </Button>
               <Button
                 onClick={() => navigate('/subscription/')}
-                className="bg-primary hover:bg-primary/90"
+                className="bg-primary hover:bg-primary/90 h-10 text-sm"
               >
                 Souscrire maintenant
               </Button>
@@ -615,12 +614,13 @@ const GenerateReceiptStep2 = () => {
               <Button
                 variant="outline"
                 onClick={() => setShowQuotaPopup(false)}
+                className="h-10 text-sm"
               >
                 Fermer
               </Button>
               <Button
                 onClick={() => navigate('/subscription/')}
-                className="bg-primary hover:bg-primary/90"
+                className="bg-primary hover:bg-primary/90 h-10 text-sm"
               >
                 Mettre à jour l'abonnement
               </Button>
@@ -630,7 +630,7 @@ const GenerateReceiptStep2 = () => {
 
         {isDownloading && (
           <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-            <div className="w-1/2 max-w-md space-y-2">
+            <div className="w-3/4 sm:w-1/2 max-w-md space-y-2">
               <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div
                   className="bg-primary h-2.5 rounded-full transition-all duration-300"
