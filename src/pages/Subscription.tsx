@@ -7,30 +7,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
-import { Check, Crown, Zap, Star } from "lucide-react";
+import { Check, Zap, Star, Briefcase } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 
 const Skeleton = ({ className }) => (
-  <div className={cn("animate-pulse bg-gray-200 rounded-2xl", className)} />
+  <div className={cn("animate-pulse bg-gray-200 rounded-full", className)} />
 );
 
 const Subscription = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [plansLoading, setPlansLoading] = useState(true);
-  const [currentPlanData, setCurrentPlanData] = useState({
-    name: "Premium",
-    status: "active",
-    endDate: "15/07/2024",
-    receiptsUsed: 847,
-    receiptsTotal: 1000,
-    receiptsRemaining: 153,
-  });
+  const [plans, setPlans] = useState([]);
+  const [currentPlanData, setCurrentPlanData] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentCode, setPaymentCode] = useState("");
-  const [plans, setPlans] = useState([]);
-  const companyId = localStorage.getItem("company_id") || "18";
+  const companyId = localStorage.getItem("companyId") || "24";
   const token = localStorage.getItem("token") || null;
 
   // Map plan names to icons and colors
@@ -41,12 +34,12 @@ const Subscription = () => {
       buttonColor: "bg-black hover:bg-gray-800",
     },
     Premium: {
-      icon: Crown,
+      icon: Star,
       color: "bg-green-600 text-white",
       buttonColor: "bg-green-700 hover:bg-green-800",
     },
     Entreprise: {
-      icon: Star,
+      icon: Briefcase,
       color: "bg-red-600 text-white",
       buttonColor: "bg-red-700 hover:bg-red-800",
     },
@@ -57,6 +50,15 @@ const Subscription = () => {
     const fetchPlans = async () => {
       try {
         setPlansLoading(true);
+        console.log("Récupération des plans depuis /plans", {
+          url: `${import.meta.env.VITE_BASE_API_URL}/plans`,
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          date: new Date().toISOString(),
+        });
+
         const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/plans`, {
           method: "GET",
           headers: {
@@ -66,30 +68,39 @@ const Subscription = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`Échec de la récupération des plans: ${response.status} ${response.statusText}`);
+          throw new Error(`Échec de la récupération des plans : ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
+        console.log("Données brutes des plans reçues :", data);
+
         // Transform API data to match frontend structure
-        const transformedPlans = data.map((plan, index) => ({
-          plan_id: plan.plan_id,
-          name: plan.plan_name,
-          price: plan.price_per_month.toLocaleString("fr-FR"),
-          max_receipts_per_month: plan.max_receipts_per_month,
-          period: "mois",
-          description: getPlanDescription(plan.plan_name),
-          features: getPlanFeatures(plan),
-          popular: index === 1, // Mark the second plan as popular
-          ...planStyles[plan.plan_name] || {
-            icon: Zap,
-            color: "bg-black text-white",
-            buttonColor: "bg-gray-700 hover:bg-gray-800",
-            popular: index === 1, // Ensure default plans also respect the second plan rule
-          },
-        }));
+        const transformedPlans = data.map((plan, index) => {
+          const transformed = {
+            plan_id: plan.id || plan.planId || plan.plan_id || `fallback-${index}`,
+            name: plan.name || plan.plan_name || `Plan ${index + 1}`,
+            price: plan.price_per_month ? plan.price_per_month.toLocaleString("fr-FR") : "N/A",
+            max_receipts_per_month: plan.max_receipts_per_month || 0,
+            period: "mois",
+            description: getPlanDescription(plan.name || plan.plan_name || `Plan ${index + 1}`),
+            features: getPlanFeatures(plan),
+            popular: index === 1,
+            ...planStyles[plan.name || plan.plan_name] || {
+              icon: Zap,
+              color: "bg-black text-white",
+              buttonColor: "bg-gray-700 hover:bg-gray-800",
+              popular: index === 1,
+            },
+          };
+          if (!transformed.plan_id || !transformed.name) {
+            console.warn("Plan mal formé détecté :", { plan, transformed });
+          }
+          return transformed;
+        });
+        console.log("Plans transformés :", transformedPlans);
         setPlans(transformedPlans);
       } catch (error) {
-        console.error("Erreur lors de la récupération des plans:", error);
+        console.error("Erreur lors de la récupération des plans :", error);
         toast.error(error.message || "Erreur lors du chargement des plans.", { duration: 5000 });
       } finally {
         setPlansLoading(false);
@@ -122,22 +133,32 @@ const Subscription = () => {
     if (plan.max_api_requests_per_month) {
       features.push(`${plan.max_api_requests_per_month} requêtes API par mois`);
     }
-    features.push(plan.plan_name === "Boubeyni" ? "3 modèles de reçus" : "Tous les modèles");
-    features.push(plan.plan_name === "Entreprise" ? "Support téléphonique" : "Support par email");
-    features.push(plan.plan_name === "Premium" || plan.plan_name === "Entreprise" ? "Historique illimité" : "Historique 3 mois");
-    if (plan.plan_name === "Premium" || plan.plan_name === "Entreprise") {
+    features.push(plan.name === "Boubeyni" ? "3 modèles de reçus" : "Tous les modèles");
+    features.push(plan.name === "Entreprise" ? "Support téléphonique" : "Support par email");
+    features.push(plan.name === "Premium" || plan.name === "Entreprise" ? "Historique illimité" : "Historique 3 mois");
+    if (plan.name === "Premium" || plan.name === "Entreprise") {
       features.push("Personnalisation avancée", "Statistiques détaillées", "Export PDF/Excel");
     }
-    if (plan.plan_name === "Entreprise") {
+    if (plan.name === "Entreprise") {
       features.push("API dédiée", "Multi-utilisateurs", "Intégrations avancées", "Manager dédié");
     }
     return features;
   };
 
+  // Fetch subscription data
   useEffect(() => {
     const fetchSubscriptionData = async () => {
       try {
         setIsLoading(true);
+        console.log("Récupération des données d'abonnement depuis /user/subscriptions/subscription/", {
+          url: `${import.meta.env.VITE_BASE_API_URL}/user/subscriptions/subscription/${companyId}`,
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          date: new Date().toISOString(),
+        });
+
         const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/subscriptions/subscription/${companyId}`, {
           headers: {
             "Content-Type": "application/json",
@@ -146,10 +167,11 @@ const Subscription = () => {
         });
 
         if (!response.ok) {
-          throw new Error(`Échec de la récupération des données d'abonnement: ${response.status} ${response.statusText}`);
+          throw new Error(`Échec de la récupération des données d'abonnement : ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
+        console.log("Données d'abonnement reçues :", data);
         setCurrentPlanData({
           name: data.plan_name,
           status: data.subscription_status,
@@ -158,21 +180,13 @@ const Subscription = () => {
             month: "2-digit",
             year: "numeric",
           }),
-          receiptsUsed: data.receipts_generated,
-          receiptsTotal: data.total_quota,
-          receiptsRemaining: data.remaining_quota,
+          receiptsUsed: data.receipts_generated || 0,
+          receiptsTotal: data.total_quota || 0,
+          receiptsRemaining: data.remaining_quota || 0,
         });
       } catch (error) {
-        console.error("Erreur lors de la récupération des données d'abonnement:", error);
+        console.error("Erreur lors de la récupération des données d'abonnement :", error);
         toast.error(error.message || "Erreur lors du chargement des données d'abonnement.", { duration: 5000 });
-        setCurrentPlanData({
-          name: "Premium",
-          status: "active",
-          endDate: "15/07/2024",
-          receiptsUsed: 847,
-          receiptsTotal: 1000,
-          receiptsRemaining: 153,
-        });
       } finally {
         setIsLoading(false);
       }
@@ -182,66 +196,158 @@ const Subscription = () => {
   }, [companyId, token]);
 
   const handlePurchase = async () => {
+    console.log("Démarrage de handlePurchase", {
+      companyId,
+      token: token ? "Présent" : "Absent",
+      selectedPlan,
+      paymentMethod,
+      paymentCode,
+      date: new Date().toISOString(),
+    });
+
     if (!paymentMethod || !paymentCode) {
-      toast.error("Veuillez sélectionner un mode de paiement et entrer un code.", { duration: 5000 });
+      console.warn("Validation échouée : méthode de paiement ou code manquant", { paymentMethod, paymentCode });
+      toast.error("Veuillez sélectionner un mode de paiement et entrer une référence.", { duration: 5000 });
       return;
     }
 
-    if (!selectedPlan) {
-      toast.error("Veuillez sélectionner un plan.", { duration: 5000 });
+    if (!selectedPlan || !selectedPlan.plan_id || !selectedPlan.name) {
+      console.warn("Validation échouée : plan sélectionné invalide", { selectedPlan });
+      toast.error("Veuillez sélectionner un plan valide.", { duration: 5000 });
       return;
     }
 
     const selectedPlanData = plans.find((plan) => plan.plan_id === selectedPlan.plan_id);
     if (!selectedPlanData) {
+      console.warn("Plan sélectionné non trouvé dans la liste des plans", { selectedPlan, plans });
       toast.error("Plan sélectionné invalide.", { duration: 5000 });
       return;
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/subscriptions/purchase/${companyId}`, {
+      // Préparer et logger la requête d'abonnement
+      const subscribePayload = {
+        companyId: String(companyId),
+        planId: String(selectedPlan.plan_id),
+      };
+      console.log("Envoi à /user/subscriptions/subscribe/", {
+        url: `${import.meta.env.VITE_BASE_API_URL}/user/subscriptions/subscribe/`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "Aucun",
+        },
+        payload: subscribePayload,
+        date: new Date().toISOString(),
+      });
+
+      // Étape 1 : Créer l'abonnement
+      const subscribeResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/subscriptions/subscribe/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-        body: JSON.stringify({
-          plan_id: selectedPlan.plan_id,
-          plan_name: selectedPlan.name,
-          price_per_month: parseInt(selectedPlan.price.replace(/\s/g, "")),
-          payment_method: paymentMethod,
-          payment_code: paymentCode,
-        }),
+        body: JSON.stringify(subscribePayload),
       });
 
-      if (!response.ok) {
-        throw new Error(`Échec de l'achat: ${response.status} ${response.statusText}`);
+      const subscribeResponseText = await subscribeResponse.text();
+      console.log("Réponse brute de /user/subscriptions/subscribe/", {
+        status: subscribeResponse.status,
+        statusText: subscribeResponse.statusText,
+        responseText: subscribeResponseText,
+        date: new Date().toISOString(),
+      });
+
+      if (!subscribeResponse.ok) {
+        let errorMessage = `Échec de la création de l'abonnement : ${subscribeResponse.status} ${subscribeResponse.statusText}`;
+        try {
+          const parsedError = JSON.parse(subscribeResponseText);
+          console.log("Réponse d'erreur parsée :", parsedError);
+          errorMessage = parsedError.message || errorMessage;
+        } catch (e) {
+          console.error("Impossible de parser la réponse d'erreur en JSON :", e);
+        }
+        throw new Error(errorMessage);
       }
 
-      toast.success(`Abonnement ${selectedPlan.name} acheté avec succès !`, { duration: 3000 });
+      const subscribeData = JSON.parse(subscribeResponseText);
+      const subscriptionId = subscribeData.data[0].subscription_id;
+      console.log("Abonnement créé avec succès :", subscribeData);
+
+      // Préparer et logger la requête de paiement
+      const paymentPayload = {
+        company_id: String(companyId),
+        subscription_id: subscriptionId,
+        amount: parseInt(selectedPlan.price.replace(/\s/g, ""), 10),
+        payment_method: paymentMethod,
+        reference: paymentCode,
+      };
+      console.log("Envoi à /payments/", {
+        url: `${import.meta.env.VITE_BASE_API_URL}/payments/`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "Aucun",
+        },
+        payload: paymentPayload,
+        date: new Date().toISOString(),
+      });
+
+      // Étape 2 : Créer le paiement
+      const paymentResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/payments/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify(paymentPayload),
+      });
+
+      const paymentResponseText = await paymentResponse.text();
+      console.log("Réponse brute de /payments/", {
+        status: paymentResponse.status,
+        statusText: paymentResponse.statusText,
+        responseText: paymentResponseText,
+        date: new Date().toISOString(),
+      });
+
+      if (!paymentResponse.ok) {
+        let errorMessage = `Échec de la création du paiement : ${paymentResponse.status} ${paymentResponse.statusText}`;
+        try {
+          const parsedError = JSON.parse(paymentResponseText);
+          console.log("Réponse d'erreur parsée (paiement) :", parsedError);
+          errorMessage = parsedError.message || errorMessage;
+        } catch (e) {
+          console.error("Impossible de parser la réponse d'erreur (paiement) en JSON :", e);
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Mettre à jour l'état après succès
+      toast.success(`Abonnement ${selectedPlan.name} créé avec succès !`, { duration: 5000 });
       setCurrentPlanData({
-        ...currentPlanData,
         name: selectedPlan.name,
-        status: "active",
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString("fr-FR", {
+        status: subscribeData.data[0].status,
+        endDate: new Date(subscribeData.data[0].end_date).toLocaleDateString("fr-FR", {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
         }),
         receiptsUsed: 0,
-        receiptsTotal: selectedPlanData.max_receipts_per_month || Infinity,
-        receiptsRemaining: selectedPlanData.max_receipts_per_month || Infinity,
+        receiptsTotal: selectedPlanData.max_receipts_per_month || 0,
+        receiptsRemaining: selectedPlanData.max_receipts_per_month || 0,
       });
       setSelectedPlan(null);
       setPaymentMethod("");
       setPaymentCode("");
     } catch (error) {
-      console.error("Erreur lors de l'achat:", error);
-      toast.error(error.message || "Erreur lors de l'achat de l'abonnement.", { duration: 5000 });
+      console.error("Erreur lors de l'achat :", error);
+      toast.error(error.message || "Erreur lors de la création de l'abonnement ou du paiement.", { duration: 5000 });
     }
   };
 
-  const usagePercentage = currentPlanData.receiptsTotal ? (currentPlanData.receiptsUsed / currentPlanData.receiptsTotal) * 100 : 0;
+  const usagePercentage = currentPlanData && currentPlanData.receiptsTotal
+    ? (currentPlanData.receiptsUsed / currentPlanData.receiptsTotal) * 100
+    : 0;
   const getGaugeColor = () => {
     if (usagePercentage <= 50) return "bg-green-600";
     if (usagePercentage <= 80) return "bg-black";
@@ -255,7 +361,7 @@ const Subscription = () => {
         toastOptions={{
           success: {
             style: {
-              background: "#f0fdf4",
+              background: "#f0fff4",
               color: "#15803d",
               border: "1px solid #bbf7d0",
             },
@@ -273,7 +379,7 @@ const Subscription = () => {
 
       <main className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto">
         {/* Current Plan Status */}
-        {isLoading ? (
+        {isLoading || !currentPlanData ? (
           <Card className="shadow-lg rounded-3xl border-none bg-white">
             <CardContent className="p-8">
               <div className="flex items-center justify-between">
@@ -395,8 +501,8 @@ const Subscription = () => {
                   )}
 
                   <CardHeader className="text-center pb-6 pt-8">
-                    <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 bg-white/20">
-                      <plan.icon className="w-10 h-10" />
+                    <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 bg-white/30 transform hover:scale-110 transition-transform duration-300">
+                      <plan.icon className="w-12 h-12" />
                     </div>
 
                     <CardTitle className="text-3xl font-bold text-white">
@@ -429,18 +535,24 @@ const Subscription = () => {
                           className={cn(
                             "w-full text-lg font-semibold shadow-md rounded-xl py-6 transition-all duration-300",
                             plan.buttonColor,
-                            currentPlanData.name === plan.name ? "opacity-60 cursor-not-allowed" : "hover:shadow-lg"
+                            currentPlanData && currentPlanData.name === plan.name ? "opacity-60 cursor-not-allowed" : "hover:shadow-lg"
                           )}
-                          disabled={currentPlanData.name === plan.name}
-                          onClick={() =>
+                          disabled={currentPlanData && currentPlanData.name === plan.name}
+                          onClick={() => {
+                            if (!plan.plan_id || !plan.name) {
+                              console.warn("Tentative de sélection d'un plan invalide :", plan);
+                              toast.error("Le plan sélectionné est invalide. Veuillez réessayer.", { duration: 5000 });
+                              return;
+                            }
+                            console.log("Plan sélectionné :", plan);
                             setSelectedPlan({
                               plan_id: plan.plan_id,
                               name: plan.name,
                               price: plan.price,
-                            })
-                          }
+                            });
+                          }}
                         >
-                          {currentPlanData.name === plan.name ? "Plan Actuel" : "Choisir ce Plan"}
+                          {currentPlanData && currentPlanData.name === plan.name ? "Plan Actuel" : "Choisir ce Plan"}
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl shadow-xl animate-in fade-in duration-300">
@@ -449,7 +561,7 @@ const Subscription = () => {
                             Acheter le Plan {plan.name}
                           </AlertDialogTitle>
                           <AlertDialogDescription className="text-gray-600">
-                            Sélectionnez un mode de paiement et entrez votre code de recharge ou d'envoi.
+                            Sélectionnez un mode de paiement et entrez votre code de recharge ou référence.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <div className="space-y-6">
@@ -483,13 +595,13 @@ const Subscription = () => {
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="paymentCode" className="text-gray-900 font-medium">
-                              Code de recharge ou d'envoi
+                              Code de recharge ou référence
                             </Label>
                             <Input
                               id="paymentCode"
                               value={paymentCode}
                               onChange={(e) => setPaymentCode(e.target.value)}
-                              placeholder="Entrez le code"
+                              placeholder="Entrez le code ou la référence"
                               className="border-gray-300 rounded-lg"
                             />
                           </div>
