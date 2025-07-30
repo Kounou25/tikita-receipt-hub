@@ -23,7 +23,7 @@ const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentCode, setPaymentCode] = useState("");
-  const companyId = localStorage.getItem("companyId") || "24";
+  const companyId = localStorage.getItem("company_id");
   const token = localStorage.getItem("token") || null;
 
   // Map plan names to icons and colors
