@@ -122,18 +122,18 @@ const fetchDashboardData = async (companyId, token) => {
   ]);
 
   let stats = [
-    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-    { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-    { title: "Clients actifs", value: "0", icon: Users, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-    { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600" },
+    { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600" },
+    { title: "Clients actifs", value: "0", icon: Users, color: "text-green-600" },
+    { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600" },
   ];
   if (Array.isArray(statsData) && statsData.length > 0) {
     const apiStats = statsData[0];
     stats = [
-      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-      { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-      { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-green-600" },
+      { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-green-600" },
+      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-green-600" },
+      { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600" },
     ];
   }
 
@@ -160,7 +160,7 @@ const fetchDashboardData = async (companyId, token) => {
       name: client.client_name,
       purchases: client.total_items,
       amount: `${client.total_purchases.toLocaleString('fr-FR')} FCFA`,
-      growth: "+0%",
+     
     }));
   }
 
@@ -196,7 +196,7 @@ const UserDashboard = () => {
     queryFn: () => fetchDashboardData(companyId, token),
     enabled: !!companyId,
     staleTime: 5 * 60 * 1000,
-    onError: (err) => {
+    onError: (err: { message: string | string[]; }) => {
       if (err.message.includes("500")) {
         setShow500Error(true);
       } else if (err.message.includes("403/409")) {
