@@ -24,12 +24,12 @@ const Landing = () => {
             whileHover={{ scale: 1.05 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
-            <div className="w-16 h-16 rounded-xl flex items-center justify-center">
+            <div className="w-35 h-35 rounded-xl flex items-center justify-center">
               <img
                 src="/lovable-uploads/tikiita.png"
                 alt="Tikiita Logo"
-                className="h-14 w-14 object-contain"
-                style={{ filter: 'drop-shadow(0 3px 6px rgba(20,184,166,0.3))' }}
+                className="h-20 w-20 object-contain"
+                style={{ filter: 'drop-shadow(0 3px 6px rgba(20,184,166,0.3))', transform: 'scale(1.2)' }}
               />
             </div>
             {/* <span className="text-2xl font-extrabold text-green-700">Tikiita</span> */}
@@ -258,7 +258,8 @@ const Landing = () => {
       >
         <span className="text-sm text-gray-600">
           Powered by{' '}
-          <span className="font-semibold text-green-600">Urban</span>
+          <a href="https://web.facebook.com/urbancreativeagency" target="_blank" rel="noopener noreferrer"><span className="font-semibold text-green-600">Urban Agency</span></a>
+          
         </span>
       </motion.footer>
     </div>

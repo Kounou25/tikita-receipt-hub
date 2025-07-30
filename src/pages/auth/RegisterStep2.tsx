@@ -328,14 +328,14 @@ const RegisterStep2 = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="flex items-center justify-center">
+          {/* <div className="flex items-center justify-center">
             <img
               src="/lovable-uploads/tikiita.png"
               alt="Tikiita Logo"
               className="h-14 object-contain"
               style={{ filter: 'drop-shadow(0 3px 6px rgba(20,184,166,0.3))' }}
             />
-          </div>
+          </div> */}
           <h1 className="text-3xl font-extrabold text-green-700">Tikiita</h1>
           <p className="text-gray-600 text-sm">Simplifiez vos reçus numériques avec style</p>
         </motion.div>
