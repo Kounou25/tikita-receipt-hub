@@ -561,7 +561,7 @@ const Subscription = () => {
                             Acheter le Plan {plan.name}
                           </AlertDialogTitle>
                           <AlertDialogDescription className="text-gray-600">
-                            Sélectionnez un mode de paiement et entrez votre code de recharge ou référence.
+                            Sélectionnez un mode de paiement et suivez les instructions pour effectuer le paiement.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <div className="space-y-6">
@@ -586,13 +586,39 @@ const Subscription = () => {
                                 </SelectItem>
                                 <SelectItem value="Amanata">
                                   <div className="flex items-center gap-3">
-                                    <div className="h-6 w-6 bg-gray-200 rounded" />
+                                    <img
+                                      src="https://play-lh.googleusercontent.com/3VQdrow4EaN_z5Vt-2qYJOKZ2L5c8VAqf-QYGqD7wxgqR4PE2KUc9NbsUkjT60cIlg0=w240-h480"
+                                      alt="Amanata"
+                                      className="h-6 w-auto"
+                                    />
                                     Amanata
                                   </div>
                                 </SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
+                          {/* Payment Instructions */}
+                          {paymentMethod === "NITA" && (
+                            <div className="space-y-4">
+                              <div className="flex justify-center">
+                                <img
+                                  src="/payment/nitaQrCode.jpeg"
+                                  alt="NITA QR Code"
+                                  className="h-49 w-49 object-contain"
+                                />
+                              </div>
+                              <p className="text-gray-700 text-center">
+                                Scannez le QR code ci-dessus ou effectuez un compte-à-compte au numéro <span className="font-semibold">94591058</span>, puis renseignez le code ou la référence de l'opération ci-dessous.
+                              </p>
+                            </div>
+                          )}
+                          {paymentMethod === "Amanata" && (
+                            <div className="space-y-4">
+                              <p className="text-gray-700 text-center">
+                                Effectuez un compte-à-compte au numéro <span className="font-semibold">88715276</span>, puis renseignez le code ou la référence de l'opération ci-dessous.
+                              </p>
+                            </div>
+                          )}
                           <div className="space-y-2">
                             <Label htmlFor="paymentCode" className="text-gray-900 font-medium">
                               Code de recharge ou référence
