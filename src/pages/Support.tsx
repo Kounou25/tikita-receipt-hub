@@ -1,30 +1,11 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
-import { MessageSquare, Mail, FileText, HelpCircle, Send } from "lucide-react";
-import { useState } from "react";
+import { MessageSquare, Mail, FileText, HelpCircle } from "lucide-react";
 
 const Support = () => {
-  const [supportForm, setSupportForm] = useState({
-    subject: "",
-    category: "",
-    message: "",
-    email: ""
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle support form submission
-    console.log("Support form submitted:", supportForm);
-  };
-
   const faqs = [
     {
       question: "Comment générer mon premier reçu ?",
@@ -57,7 +38,7 @@ const Support = () => {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Centre d'aide</h2>
           <p className="text-gray-600">
-            Nous sommes là pour vous aider à utiliser Tikita au mieux
+            Nous sommes là pour vous aider à utiliser Tikiita au mieux
           </p>
         </div>
 
@@ -118,79 +99,6 @@ const Support = () => {
           </CardContent>
         </Card>
 
-        {/* Contact Form */}
-        <Card className="border-gray-200">
-          <CardHeader>
-            <CardTitle>Nous contacter</CardTitle>
-            <p className="text-gray-600">
-              Vous ne trouvez pas la réponse à votre question ? Envoyez-nous un message.
-            </p>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Votre email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={supportForm.email}
-                    onChange={(e) => setSupportForm({ ...supportForm, email: e.target.value })}
-                    required
-                    className="border-gray-300"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="category">Catégorie</Label>
-                  <Select onValueChange={(value) => setSupportForm({ ...supportForm, category: value })}>
-                    <SelectTrigger className="border-gray-300">
-                      <SelectValue placeholder="Choisissez une catégorie" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      <SelectItem value="technical">Problème technique</SelectItem>
-                      <SelectItem value="billing">Facturation</SelectItem>
-                      <SelectItem value="feature">Demande de fonctionnalité</SelectItem>
-                      <SelectItem value="other">Autre</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="subject">Sujet</Label>
-                <Input
-                  id="subject"
-                  placeholder="Décrivez brièvement votre problème"
-                  value={supportForm.subject}
-                  onChange={(e) => setSupportForm({ ...supportForm, subject: e.target.value })}
-                  required
-                  className="border-gray-300"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
-                <Textarea
-                  id="message"
-                  placeholder="Décrivez votre problème en détail..."
-                  value={supportForm.message}
-                  onChange={(e) => setSupportForm({ ...supportForm, message: e.target.value })}
-                  required
-                  className="border-gray-300 resize-none"
-                  rows={6}
-                />
-              </div>
-
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                <Send className="w-4 h-4 mr-2" />
-                Envoyer le message
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
         {/* Contact Info */}
         <Card className="border-gray-200 bg-primary/5">
           <CardContent className="pt-6">
@@ -198,8 +106,8 @@ const Support = () => {
               <div>
                 <h3 className="font-medium text-gray-900 mb-2">Autres moyens de contact</h3>
                 <div className="space-y-2 text-sm text-gray-600">
-                  <p><strong>Email :</strong> support@tikita.com</p>
-                  <p><strong>Téléphone :</strong> +225 01 02 03 04 05</p>
+                  <p><strong>Email :</strong> hello@tikiita.com</p>
+                  <p><strong>Téléphone :</strong> 98362116</p>
                   <p><strong>Horaires :</strong> Lun-Ven 8h-18h (GMT)</p>
                 </div>
               </div>
