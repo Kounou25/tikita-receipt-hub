@@ -424,7 +424,7 @@ const RegisterStep2 = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-gray-700 font-medium text-sm">Numéro de téléphone</Label>
+                  <Label htmlFor="phone" className="text-gray-700 font-medium text-sm">Numéro de téléphone de l'entreprise</Label>
                   <Input
                     id="phone"
                     type="tel"
@@ -453,7 +453,7 @@ const RegisterStep2 = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="nif" className="text-gray-700 font-medium text-sm">NIF</Label>
+                    <Label htmlFor="nif" className="text-gray-700 font-medium text-sm">NIF (optionnel)</Label>
                     <Input
                       id="nif"
                       type="text"
@@ -466,7 +466,7 @@ const RegisterStep2 = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="rccm" className="text-gray-700 font-medium text-sm">RCCM</Label>
+                    <Label htmlFor="rccm" className="text-gray-700 font-medium text-sm">RCCM (optionnel)</Label>
                     <Input
                       id="rccm"
                       type="text"

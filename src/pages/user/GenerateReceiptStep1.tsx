@@ -37,7 +37,7 @@ const GenerateReceiptStep1 = () => {
       id: "saraounia",
       name: "Saraounia",
       description: "Simple et efficace",
-      thumbnail: "/receipts_models/tarmamu.png",
+      thumbnail: "/receipts_models/saraounia.png",
       popular : true
     }
     
