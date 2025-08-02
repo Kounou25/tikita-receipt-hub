@@ -60,13 +60,14 @@ const fetchDashboardData = async (companyId, token) => {
   // Vérifier les erreurs pour chaque réponse
   if (!statsResponse.ok) {
     if (statsResponse.status === 500) throw new Error("500: Erreur serveur pour les statistiques");
-    if (statsResponse.status === 409 || statsResponse.status === 403) throw new Error("403/409: Session expirée");
+    if (statsResponse.status === 401 || statsResponse.status === 409 || statsResponse.status === 403)
+      throw new Error("401/403/409: Session expirée ou non autorisée");
     if (statsResponse.status === 404) {
       return {
         stats: [
           { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-          { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-          { title: "Clients actifs", value: "0", icon: Users, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+          { title: "Documents créés", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+          { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
           { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
         ],
         revenueData: null,
@@ -79,7 +80,8 @@ const fetchDashboardData = async (companyId, token) => {
 
   if (!revenueResponse.ok) {
     if (revenueResponse.status === 500) throw new Error("500: Erreur serveur pour les revenus");
-    if (revenueResponse.status === 409 || revenueResponse.status === 403) throw new Error("403/409: Session expirée");
+    if (revenueResponse.status === 401 || revenueResponse.status === 409 || revenueResponse.status === 403)
+      throw new Error("401/403/409: Session expirée ou non autorisée");
     if (revenueResponse.status === 404) {
       const months = Array.from({ length: 12 }, (_, i) => {
         const date = new Date();
@@ -102,14 +104,16 @@ const fetchDashboardData = async (companyId, token) => {
 
   if (!clientsResponse.ok) {
     if (clientsResponse.status === 500) throw new Error("500: Erreur serveur pour les clients");
-    if (clientsResponse.status === 409 || clientsResponse.status === 403) throw new Error("403/409: Session expirée");
+    if (clientsResponse.status === 401 || clientsResponse.status === 409 || clientsResponse.status === 403)
+      throw new Error("401/403/409: Session expirée ou non autorisée");
     if (clientsResponse.status === 404) return { stats: null, revenueData: null, topClients: [], recentReceipts: null };
     throw new Error(`Échec du chargement des clients: ${clientsResponse.status} ${clientsResponse.statusText}`);
   }
 
   if (!receiptsResponse.ok) {
     if (receiptsResponse.status === 500) throw new Error("500: Erreur serveur pour les reçus");
-    if (receiptsResponse.status === 409 || receiptsResponse.status === 403) throw new Error("403/409: Session expirée");
+    if (receiptsResponse.status === 401 || receiptsResponse.status === 409 || receiptsResponse.status === 403)
+      throw new Error("401/403/409: Session expirée ou non autorisée");
     if (receiptsResponse.status === 404) return { stats: null, revenueData: null, topClients: null, recentReceipts: [] };
     throw new Error(`Échec du chargement des reçus récents: ${receiptsResponse.status} ${receiptsResponse.statusText}`);
   }
@@ -122,18 +126,19 @@ const fetchDashboardData = async (companyId, token) => {
   ]);
 
   let stats = [
-    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600" },
-    { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600" },
-    { title: "Clients actifs", value: "0", icon: Users, color: "text-green-600" },
-    { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600" },
+    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50" },
+    { title: "Documents créés", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
+    { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
+    { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50" },
   ];
+
   if (Array.isArray(statsData) && statsData.length > 0) {
     const apiStats = statsData[0];
     stats = [
-      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-green-600" },
-      { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-green-600" },
-      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-green-600" },
-      { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600" },
+      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50" },
+      { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
+      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
+      { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50" },
     ];
   }
 
@@ -146,6 +151,7 @@ const fetchDashboardData = async (companyId, token) => {
       return { x: date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' }), y: 0 };
     }),
   }];
+
   if (Array.isArray(revenueData) && revenueData.length > 0) {
     revenueTransformed = [{
       id: "revenus",
@@ -160,7 +166,6 @@ const fetchDashboardData = async (companyId, token) => {
       name: client.client_name,
       purchases: client.total_items,
       amount: `${client.total_purchases.toLocaleString('fr-FR')} FCFA`,
-     
     }));
   }
 
@@ -196,10 +201,10 @@ const UserDashboard = () => {
     queryFn: () => fetchDashboardData(companyId, token),
     enabled: !!companyId,
     staleTime: 5 * 60 * 1000,
-    onError: (err: { message: string | string[]; }) => {
+    onError: (err) => {
       if (err.message.includes("500")) {
         setShow500Error(true);
-      } else if (err.message.includes("403/409")) {
+      } else if (err.message.includes("401/403/409")) {
         setShowSessionExpired(true);
       }
     },
@@ -207,10 +212,11 @@ const UserDashboard = () => {
 
   const stats = data?.stats || [
     { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-    { title: "Documents créés", value: "0", icon: FileText, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-    { title: "Clients actifs", value: "0", icon: Users, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
+    { title: "Documents créés", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+    { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
     { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
   ];
+
   const revenueData = data?.revenueData || [{
     id: "revenus",
     color: "#16a34a",
@@ -220,6 +226,7 @@ const UserDashboard = () => {
       return { x: date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' }), y: 0 };
     }),
   }];
+
   const topClients = data?.topClients || [];
   const recentReceipts = data?.recentReceipts || [];
 
@@ -229,6 +236,14 @@ const UserDashboard = () => {
     localStorage.removeItem("company_id");
     navigate("/login");
   };
+
+  // Define background colors for the stat cards
+  const cardBackgrounds = [
+    "bg-green-50",
+    "bg-blue-50",
+    "bg-purple-50",
+    "bg-orange-50",
+  ];
 
   return (
     <div className="relative min-h-screen bg-gray-50 mobile-nav-padding">
@@ -241,12 +256,9 @@ const UserDashboard = () => {
           <Loader2 className="w-8 h-8 animate-spin text-green-500" />
         </div>
       )}
-
-      <Header title="Dashboard" />
-      
+      <Header title="Tableau de bord" />
       <main className="pt-2 p-4 md:pt-6 md:p-6 space-y-6">
         <QuickNav userType="user" />
-
         {/* Error Message */}
         {error && !show500Error && !showSessionExpired && (
           <Card className="border-red-200 bg-red-50">
@@ -256,7 +268,6 @@ const UserDashboard = () => {
             </CardContent>
           </Card>
         )}
-
         {/* Error 500 Dialog */}
         <AlertDialog open={show500Error} onOpenChange={setShow500Error}>
           <AlertDialogContent>
@@ -273,24 +284,22 @@ const UserDashboard = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-
-        {/* Session Expired Dialog */}
+        {/* Session Expired or Unauthorized Dialog */}
         <AlertDialog open={showSessionExpired} onOpenChange={setShowSessionExpired}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Session expirée</AlertDialogTitle>
+              <AlertDialogTitle>Session expirée ou non autorisée</AlertDialogTitle>
               <AlertDialogDescription>
-                Votre session a expiré. Veuillez vous reconnecter pour continuer.
+                Votre session a expiré ou vous n'êtes pas autorisé. Veuillez vous reconnecter pour continuer.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogAction className="bg-green-500 hover:bg-green-600 text-white" onClick={handleLogout}>
-                Se connecter
+                Se reconnecter
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-
         {/* Welcome Section */}
         {isLoading ? (
           <Card className="border-green-500">
@@ -342,7 +351,6 @@ const UserDashboard = () => {
             </CardContent>
           </Card>
         )}
-
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {isLoading ? (
@@ -362,7 +370,7 @@ const UserDashboard = () => {
               ))
           ) : (
             stats.map((stat, index) => (
-              <Card key={index} className="border-gray-200">
+              <Card key={index} className={`border-gray-200 ${cardBackgrounds[index]}`}>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center`}>
@@ -379,7 +387,6 @@ const UserDashboard = () => {
             ))
           )}
         </div>
-
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {isLoading ? (
@@ -427,7 +434,6 @@ const UserDashboard = () => {
                   <LineChart data={revenueData} height={300} />
                 </CardContent>
               </Card>
-
               <Card className="border-gray-200">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
@@ -464,7 +470,6 @@ const UserDashboard = () => {
             </>
           )}
         </div>
-
         {/* Recent Activity */}
         {isLoading ? (
           <Card className="border-gray-200">
@@ -530,7 +535,6 @@ const UserDashboard = () => {
             </CardContent>
           </Card>
         )}
-
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {isLoading ? (
@@ -552,72 +556,11 @@ const UserDashboard = () => {
             </>
           ) : (
             <>
-              <Card className="border-gray-200">
-                <CardHeader>
-                  <CardTitle className="text-lg">Actions rapides</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Link to="/generate">
-                    <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Nouveau document
-                    </Button>
-                  </Link>
-                  <Link to="/clients">
-                    <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
-                      <Users className="w-4 h-4 mr-2" />
-                      Gérer les clients
-                    </Button>
-                  </Link>
-                  <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
-                    <Download className="w-4 h-4 mr-2" />
-                    Exporter les données
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="border-gray-200">
-                <CardHeader>
-                  <CardTitle className="text-lg">Raccourcis</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Link to="/receipts">
-                    <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
-                      <Receipt className="w-4 h-4 mr-2" />
-                      Mes reçus
-                    </Button>
-                  </Link>
-                  <Link to="/profile">
-                    <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
-                      <Users className="w-4 h-4 mr-2" />
-                      Mon profil
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-
-              <Card className="border-gray-200">
-                <CardHeader>
-                  <CardTitle className="text-lg">Support</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Documentation
-                  </Button>
-                  <Link to="/support">
-                    <Button variant="outline" className="w-full justify-start border-green-500 text-green-600 hover:bg-green-50">
-                      <Users className="w-4 h-4 mr-2" />
-                      Contacter le support
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+             
             </>
           )}
         </div>
       </main>
-
       <MobileNav />
     </div>
   );

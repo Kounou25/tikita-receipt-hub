@@ -302,7 +302,7 @@ const UserProfile = () => {
                         <p className="text-xs text-gray-500">ID: {profileData.userNumber}</p>
                       </div>
                     </div>
-                    <Button
+                    {/* <Button
                       variant={isEditing ? "default" : "outline"}
                       onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
                       className={cn(
@@ -324,7 +324,7 @@ const UserProfile = () => {
                       ) : (
                         "Modifier mon profil"
                       )}
-                    </Button>
+                    </Button> */}
                   </div>
                 </CardContent>
               </Card>
@@ -628,15 +628,15 @@ const UserProfile = () => {
                           {profileData.subscription?.docsTotal - profileData.subscription?.docsUsed} documents restants ce mois
                         </p>
                       </div>
-                      <div className="pt-4 border-t border-white/20">
+                      {/* <div className="pt-4 border-t border-white/20">
                         <Button variant="secondary" className="w-full bg-white text-primary-700 hover:bg-gray-100 shadow-md hover:shadow-lg transition-all duration-200">
                           Gérer l'abonnement
                         </Button>
-                      </div>
+                      </div> */}
                     </CardContent>
                   </Card>
 
-                  {/* Security */}
+                  {/* Security
                   <Card className="border-gray-200 shadow-lg rounded-xl">
                     <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50">
                       <CardTitle className="text-lg font-semibold text-primary-600">Sécurité</CardTitle>
@@ -651,10 +651,10 @@ const UserProfile = () => {
                         </Button>
                       </div>
                     </CardContent>
-                  </Card>
+                  </Card> */}
 
                   {/* Support */}
-                  <Card className="border-gray-200 shadow-lg rounded-xl bg-gradient-to-br from-gray-50 to-blue-50">
+                  {/* <Card className="border-gray-200 shadow-lg rounded-xl bg-gradient-to-br from-gray-50 to-blue-50">
                     <CardContent className="p-6 text-center">
                       <h3 className="font-semibold mb-2 text-primary-600">Besoin d'aide ?</h3>
                       <p className="text-sm text-gray-600 mb-4">Notre équipe est disponible pour vous aider avec toutes vos questions.</p>
@@ -662,7 +662,7 @@ const UserProfile = () => {
                         Contacter le support
                       </Button>
                     </CardContent>
-                  </Card>
+                  </Card> */}
                 </div>
               )}
             </div>

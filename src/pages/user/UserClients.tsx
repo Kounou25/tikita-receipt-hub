@@ -215,10 +215,10 @@ const UserClients = () => {
               <h1 className="text-2xl font-bold text-gray-900">Mes Clients</h1>
               <p className="text-gray-600">Gérez votre base de clients</p>
             </div>
-            <Button className="bg-primary hover:bg-primary/90">
+            {/* <Button className="bg-primary hover:bg-primary/90">
               <Plus className="w-4 h-4 mr-2" />
               Nouveau client
-            </Button>
+            </Button> */}
           </div>
         )}
 

@@ -270,10 +270,10 @@ const ReceiptDetails = () => {
           </div>
           
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            {/* <Button variant="outline" size="sm">
               <Eye className="w-4 h-4 mr-2" />
               Aperçu
-            </Button>
+            </Button> */}
             <Button 
               variant="outline" 
               size="sm" 
@@ -287,10 +287,10 @@ const ReceiptDetails = () => {
               )}
               PDF
             </Button>
-            <Button variant="outline" size="sm">
+            {/* <Button variant="outline" size="sm">
               <Share2 className="w-4 h-4 mr-2" />
               Partager
-            </Button>
+            </Button> */}
           </div>
         </div>
 
