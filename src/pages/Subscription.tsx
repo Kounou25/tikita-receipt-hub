@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,19 +29,19 @@ const Subscription = () => {
 
   // Map plan names to icons and colors
   const planStyles = {
-    Boubeyni: {
+    Gratuit: {
       icon: Zap,
       color: "bg-black text-white",
-      buttonColor: "bg-black hover:bg-gray-800",
-    },
-    Premium: {
-      icon: Star,
-      color: "bg-green-600 text-white",
       buttonColor: "bg-green-700 hover:bg-green-800",
     },
-    Entreprise: {
+    "Tikiita plus": {
+      icon: Star,
+      color: "bg-black text-white",
+      buttonColor: "bg-green-700 hover:bg-green-800",
+    },
+    "Tikiita pro": {
       icon: Briefcase,
-      color: "bg-red-600 text-white",
+      color: "bg-black text-white",
       buttonColor: "bg-red-700 hover:bg-red-800",
     },
   };
@@ -58,7 +59,6 @@ const Subscription = () => {
           },
           date: new Date().toISOString(),
         });
-
         const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/plans`, {
           method: "GET",
           headers: {
@@ -66,11 +66,9 @@ const Subscription = () => {
             ...(token && { Authorization: `Bearer ${token}` }),
           },
         });
-
         if (!response.ok) {
           throw new Error(`Échec de la récupération des plans : ${response.status} ${response.statusText}`);
         }
-
         const data = await response.json();
         console.log("Données brutes des plans reçues :", data);
 
@@ -79,7 +77,7 @@ const Subscription = () => {
           const transformed = {
             plan_id: plan.id || plan.planId || plan.plan_id || `fallback-${index}`,
             name: plan.name || plan.plan_name || `Plan ${index + 1}`,
-            price: plan.price_per_month ? plan.price_per_month.toLocaleString("fr-FR") : "N/A",
+            price: plan.price_per_month ? plan.price_per_month.toLocaleString("fr-FR") : "0",
             max_receipts_per_month: plan.max_receipts_per_month || 0,
             period: "mois",
             description: getPlanDescription(plan.name || plan.plan_name || `Plan ${index + 1}`),
@@ -106,43 +104,52 @@ const Subscription = () => {
         setPlansLoading(false);
       }
     };
-
     fetchPlans();
   }, [token]);
 
   // Helper function to generate plan description
   const getPlanDescription = (planName) => {
     switch (planName) {
-      case "Boubeyni":
+      case "Gratuit":
         return "Parfait pour débuter";
-      case "Premium":
+      case "Tikiita plus":
         return "Le plus populaire";
-      case "Entreprise":
+      case "Tikiita pro":
         return "Pour les grandes entreprises";
       default:
         return "Plan personnalisé";
     }
   };
 
-  // Helper function to generate plan features based on API data
+  // Helper function to generate plan features
   const getPlanFeatures = (plan) => {
-    const features = [];
-    if (plan.max_receipts_per_month) {
-      features.push(`${plan.max_receipts_per_month} reçus par mois`);
+    const planName = plan.name || plan.plan_name;
+    switch (planName) {
+      case "Gratuit":
+        return [
+          "5 reçus par mois",
+          "1 modèle de reçus",
+          "Support 24h/24",
+          "Historique 3 mois",
+        ];
+      case "Tikiita plus":
+        return [
+          "120 reçus par mois",
+          "3 modèles de reçus",
+          "Support 24/7",
+          "Historique 5 mois",
+        ];
+      case "Tikiita pro":
+        return [
+          "Reçus illimités",
+          "Modèles illimités",
+          "Support 24h/7",
+          "Historique illimité",
+          "Statistiques détaillées (à venir)",
+        ];
+      default:
+        return ["Fonctionnalités personnalisées"];
     }
-    if (plan.max_api_requests_per_month) {
-      features.push(`${plan.max_api_requests_per_month} requêtes API par mois`);
-    }
-    features.push(plan.name === "Boubeyni" ? "3 modèles de reçus" : "Tous les modèles");
-    features.push(plan.name === "Entreprise" ? "Support téléphonique" : "Support par email");
-    features.push(plan.name === "Premium" || plan.name === "Entreprise" ? "Historique illimité" : "Historique 3 mois");
-    if (plan.name === "Premium" || plan.name === "Entreprise") {
-      features.push("Personnalisation avancée", "Statistiques détaillées", "Export PDF/Excel");
-    }
-    if (plan.name === "Entreprise") {
-      features.push("API dédiée", "Multi-utilisateurs", "Intégrations avancées", "Manager dédié");
-    }
-    return features;
   };
 
   // Fetch subscription data
@@ -158,18 +165,15 @@ const Subscription = () => {
           },
           date: new Date().toISOString(),
         });
-
         const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/subscriptions/subscription/${companyId}`, {
           headers: {
             "Content-Type": "application/json",
             ...(token && { Authorization: `Bearer ${token}` }),
           },
         });
-
         if (!response.ok) {
           throw new Error(`Échec de la récupération des données d'abonnement : ${response.status} ${response.statusText}`);
         }
-
         const data = await response.json();
         console.log("Données d'abonnement reçues :", data);
         setCurrentPlanData({
@@ -191,7 +195,6 @@ const Subscription = () => {
         setIsLoading(false);
       }
     };
-
     fetchSubscriptionData();
   }, [companyId, token]);
 
@@ -204,26 +207,22 @@ const Subscription = () => {
       paymentCode,
       date: new Date().toISOString(),
     });
-
     if (!paymentMethod || !paymentCode) {
       console.warn("Validation échouée : méthode de paiement ou code manquant", { paymentMethod, paymentCode });
       toast.error("Veuillez sélectionner un mode de paiement et entrer une référence.", { duration: 5000 });
       return;
     }
-
     if (!selectedPlan || !selectedPlan.plan_id || !selectedPlan.name) {
       console.warn("Validation échouée : plan sélectionné invalide", { selectedPlan });
       toast.error("Veuillez sélectionner un plan valide.", { duration: 5000 });
       return;
     }
-
     const selectedPlanData = plans.find((plan) => plan.plan_id === selectedPlan.plan_id);
     if (!selectedPlanData) {
       console.warn("Plan sélectionné non trouvé dans la liste des plans", { selectedPlan, plans });
       toast.error("Plan sélectionné invalide.", { duration: 5000 });
       return;
     }
-
     try {
       // Préparer et logger la requête d'abonnement
       const subscribePayload = {
@@ -239,7 +238,6 @@ const Subscription = () => {
         payload: subscribePayload,
         date: new Date().toISOString(),
       });
-
       // Étape 1 : Créer l'abonnement
       const subscribeResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/subscriptions/subscribe/`, {
         method: "POST",
@@ -249,7 +247,6 @@ const Subscription = () => {
         },
         body: JSON.stringify(subscribePayload),
       });
-
       const subscribeResponseText = await subscribeResponse.text();
       console.log("Réponse brute de /user/subscriptions/subscribe/", {
         status: subscribeResponse.status,
@@ -257,7 +254,6 @@ const Subscription = () => {
         responseText: subscribeResponseText,
         date: new Date().toISOString(),
       });
-
       if (!subscribeResponse.ok) {
         let errorMessage = `Échec de la création de l'abonnement : ${subscribeResponse.status} ${subscribeResponse.statusText}`;
         try {
@@ -269,11 +265,9 @@ const Subscription = () => {
         }
         throw new Error(errorMessage);
       }
-
       const subscribeData = JSON.parse(subscribeResponseText);
       const subscriptionId = subscribeData.data[0].subscription_id;
       console.log("Abonnement créé avec succès :", subscribeData);
-
       // Préparer et logger la requête de paiement
       const paymentPayload = {
         company_id: String(companyId),
@@ -291,7 +285,6 @@ const Subscription = () => {
         payload: paymentPayload,
         date: new Date().toISOString(),
       });
-
       // Étape 2 : Créer le paiement
       const paymentResponse = await fetch(`${import.meta.env.VITE_BASE_API_URL}/payments/`, {
         method: "POST",
@@ -301,7 +294,6 @@ const Subscription = () => {
         },
         body: JSON.stringify(paymentPayload),
       });
-
       const paymentResponseText = await paymentResponse.text();
       console.log("Réponse brute de /payments/", {
         status: paymentResponse.status,
@@ -309,7 +301,6 @@ const Subscription = () => {
         responseText: paymentResponseText,
         date: new Date().toISOString(),
       });
-
       if (!paymentResponse.ok) {
         let errorMessage = `Échec de la création du paiement : ${paymentResponse.status} ${paymentResponse.statusText}`;
         try {
@@ -321,7 +312,6 @@ const Subscription = () => {
         }
         throw new Error(errorMessage);
       }
-
       // Mettre à jour l'état après succès
       toast.success(`Abonnement ${selectedPlan.name} créé avec succès !`, { duration: 5000 });
       setCurrentPlanData({
@@ -348,6 +338,7 @@ const Subscription = () => {
   const usagePercentage = currentPlanData && currentPlanData.receiptsTotal
     ? (currentPlanData.receiptsUsed / currentPlanData.receiptsTotal) * 100
     : 0;
+
   const getGaugeColor = () => {
     if (usagePercentage <= 50) return "bg-green-600";
     if (usagePercentage <= 80) return "bg-black";
@@ -376,7 +367,6 @@ const Subscription = () => {
         }}
       />
       <Header title="Abonnement" />
-
       <main className="p-4 md:p-8 space-y-8 max-w-7xl mx-auto">
         {/* Current Plan Status */}
         {isLoading || !currentPlanData ? (
@@ -451,7 +441,6 @@ const Subscription = () => {
             </CardContent>
           </Card>
         )}
-
         {/* Plans Grid */}
         <div className="space-y-8">
           <div className="text-center">
@@ -462,7 +451,6 @@ const Subscription = () => {
               Boostez votre expérience avec l'abonnement parfait pour vos besoins professionnels.
             </p>
           </div>
-
           {plansLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[...Array(3)].map((_, index) => (
@@ -499,26 +487,21 @@ const Subscription = () => {
                       </span>
                     </div>
                   )}
-
                   <CardHeader className="text-center pb-6 pt-8">
                     <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 bg-white/30 transform hover:scale-110 transition-transform duration-300">
                       <plan.icon className="w-12 h-12" />
                     </div>
-
                     <CardTitle className="text-3xl font-bold text-white">
                       {plan.name}
                     </CardTitle>
-
                     <div className="text-center mt-2">
                       <span className="text-5xl font-extrabold text-orange-600">
                         {plan.price}
                       </span>
                       <span className="text-white/80 text-lg"> FCFA/{plan.period}</span>
                     </div>
-
                     <p className="text-white/90 mt-3 text-base font-medium">{plan.description}</p>
                   </CardHeader>
-
                   <CardContent className="space-y-6 px-6 pb-8">
                     <ul className="space-y-3">
                       {plan.features.map((feature, index) => (
@@ -528,7 +511,6 @@ const Subscription = () => {
                         </li>
                       ))}
                     </ul>
-
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
@@ -657,7 +639,6 @@ const Subscription = () => {
             </div>
           )}
         </div>
-
         {/* FAQ Section */}
         <Card className="border-none shadow-lg rounded-3xl bg-gradient-to-br from-white to-gray-100">
           <CardHeader>
@@ -676,7 +657,6 @@ const Subscription = () => {
                   Les changements prennent effet immédiatement.
                 </p>
               </div>
-
               <div>
                 <h4 className="font-semibold text-lg text-gray-900 mb-2">
                   Que se passe-t-il si je dépasse ma limite de reçus ?
@@ -686,21 +666,19 @@ const Subscription = () => {
                   au tarif de 100 FCFA par reçu.
                 </p>
               </div>
-
               <div>
                 <h4 className="font-semibold text-lg text-gray-900 mb-2">
                   Y a-t-il une période d'essai gratuite ?
                 </h4>
                 <p className="text-gray-600 text-base">
                   Oui, tous les nouveaux utilisateurs bénéficient de 7 jours d'essai
-                  gratuit sur le plan Premium.
+                  gratuit sur le plan "Tikiita plus".
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
       </main>
-
       <MobileNav />
     </div>
   );
