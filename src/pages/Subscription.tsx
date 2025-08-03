@@ -134,7 +134,7 @@ const Subscription = () => {
         ];
       case "Tikiita plus":
         return [
-          "120 reçus par mois",
+          "140 reçus par mois",
           "3 modèles de reçus",
           "Support 24/7",
           "Historique 5 mois",
