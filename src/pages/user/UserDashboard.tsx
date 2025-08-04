@@ -66,7 +66,7 @@ const fetchDashboardData = async (companyId, token) => {
       return {
         stats: [
           { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-          { title: "Documents créés", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+          { title: "Articles", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
           { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
           { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
         ],
@@ -127,7 +127,7 @@ const fetchDashboardData = async (companyId, token) => {
 
   let stats = [
     { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50" },
-    { title: "Documents créés", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
+    { title: "Articles", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
     { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
     { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50" },
   ];
@@ -136,7 +136,7 @@ const fetchDashboardData = async (companyId, token) => {
     const apiStats = statsData[0];
     stats = [
       { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50" },
-      { title: "Documents créés", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
+      { title: "Articles", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
       { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
       { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50" },
     ];
@@ -212,7 +212,7 @@ const UserDashboard = () => {
 
   const stats = data?.stats || [
     { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-    { title: "Documents créés", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
+    { title: "Articles", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
     { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
     { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
   ];

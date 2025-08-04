@@ -586,7 +586,7 @@ const Subscription = () => {
                                 <img
                                   src="/payment/nitaQrCode.jpeg"
                                   alt="NITA QR Code"
-                                  className="h-49 w-49 object-contain"
+                                  className="h-48 w-48 object-contain"
                                 />
                               </div>
                               <p className="text-gray-700 text-center">

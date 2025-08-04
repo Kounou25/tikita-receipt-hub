@@ -1,47 +1,97 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight, Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
-import { ArrowRight, Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 const GenerateReceiptStep1 = () => {
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [filteredTemplates, setFilteredTemplates] = useState([]);
   const navigate = useNavigate();
 
-  const templates = [
+  const allTemplates = [
     {
       id: "classic",
       name: "Classique",
       description: "Design épuré et professionnel",
       thumbnail: "/receipts_models/classic.png",
-      popular: false
+      popular: false,
     },
     {
       id: "modern",
       name: "Moderne",
       description: "Style traditionnel et élégant",
-      thumbnail: "/receipts_models/modern.png"
+      thumbnail: "/receipts_models/modern.png",
+      popular: false,
     },
     {
       id: "tarmamu",
       name: "Tarmamu",
       description: "Simple et efficace",
       thumbnail: "/receipts_models/tarmamu.png",
-      popular : true
+      popular: true,
     },
     {
       id: "saraounia",
       name: "Saraounia",
       description: "Simple et efficace",
       thumbnail: "/receipts_models/saraounia.png",
-      popular : true
-    }
-    
+      popular: true,
+    },
   ];
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      try {
+        const companyId = localStorage.getItem("company_id");
+        if (!companyId) {
+          console.error("No company ID found in localStorage");
+          setFilteredTemplates([allTemplates[0]]); // Default to first template
+          return;
+        }
+
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_API_URL}/user/subscriptions/subscription/${companyId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              // Add any necessary authentication headers
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch subscription");
+        }
+
+        const data = await response.json();
+        const planName = data.plan_name;
+
+        // Filter templates based on plan
+        let availableTemplates = [];
+        if (planName === "Gratuit") {
+          availableTemplates = [allTemplates[0]]; // Only first template
+        } else if (planName === "Tikiita plus") {
+          availableTemplates = allTemplates.slice(0, 3); // First 3 templates
+        } else if (planName === "Tikiita pro") {
+          availableTemplates = allTemplates; // All templates
+        } else {
+          availableTemplates = [allTemplates[0]]; // Default fallback
+        }
+
+        setFilteredTemplates(availableTemplates);
+      } catch (error) {
+        console.error("Error fetching subscription:", error);
+        setFilteredTemplates([allTemplates[0]]); // Fallback to first template
+      }
+    };
+
+    fetchSubscription();
+  }, []);
 
   const handleContinue = () => {
     if (selectedTemplate) {
@@ -53,10 +103,8 @@ const GenerateReceiptStep1 = () => {
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
       <Header title="Générer un reçu" />
-      
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="user" />
-
         {/* Progress indicator */}
         <div className="flex items-center justify-center space-x-4 mb-8">
           <div className="flex items-center">
@@ -83,10 +131,9 @@ const GenerateReceiptStep1 = () => {
               Sélectionnez le design qui correspond le mieux à votre marque
             </p>
           </CardHeader>
-          
           <CardContent className="px-6 pb-6">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {templates.map((template) => (
+              {filteredTemplates.map((template) => (
                 <div
                   key={template.id}
                   className={`relative border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${
@@ -101,13 +148,11 @@ const GenerateReceiptStep1 = () => {
                       Populaire
                     </div>
                   )}
-                  
                   {selectedTemplate === template.id && (
                     <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10">
                       <Check className="w-3 h-3 text-white" />
                     </div>
                   )}
-
                   <div className="p-3">
                     <div className="aspect-[3/4] bg-gray-100 rounded-lg mb-2 overflow-hidden">
                       <img
@@ -122,9 +167,8 @@ const GenerateReceiptStep1 = () => {
                 </div>
               ))}
             </div>
-
             <div className="mt-8 flex justify-center">
-              <Button 
+              <Button
                 onClick={handleContinue}
                 disabled={!selectedTemplate}
                 className="bg-primary hover:bg-primary/90 px-8 py-2 rounded-lg font-medium"
@@ -137,7 +181,6 @@ const GenerateReceiptStep1 = () => {
           </CardContent>
         </Card>
       </main>
-
       <MobileNav />
     </div>
   );
