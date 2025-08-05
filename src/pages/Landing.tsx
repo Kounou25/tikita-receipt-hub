@@ -234,7 +234,7 @@ const Landing = () => {
                     </motion.div>
                   </motion.button>
                 </Link>
-                <Link to="/demo">
+                {/* <Link to="/demo">
                   <motion.button
                     className="border-2 border-green-300 text-green-700 px-5 py-3 sm:px-8 sm:py-4 rounded-full text-base sm:text-lg font-semibold hover:bg-green-50 flex items-center mx-auto"
                     whileHover={{ scale: 1.05, boxShadow: '0 12px 24px rgba(20,184,166,0.2)' }}
@@ -243,7 +243,7 @@ const Landing = () => {
                     <Download className="w-5 h-5 mr-2 sm:w-6 sm:h-6" />
                     Voir la démo
                   </motion.button>
-                </Link>
+                </Link> */}
             </motion.div>
             </motion.div>
           </div>
