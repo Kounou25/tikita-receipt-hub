@@ -73,9 +73,7 @@ const App = () => (
           <Route
             path="/receipt/verify/"
             element={
-              <MainLayout>
                 <FeatureInDevelopment />
-              </MainLayout>
             }
           />
 
