@@ -267,7 +267,7 @@ const Subscription = () => {
       }
       const subscribeData = JSON.parse(subscribeResponseText);
       const subscriptionId = subscribeData.data[0].subscription_id;
-      console.log("Abonnement créé avec succès :", subscribeData);
+      console.log("Abonnement créé avec succès :", subscribeData,"Veuillez patienter pendant que nous activons votre abonnement.");
       // Préparer et logger la requête de paiement
       const paymentPayload = {
         company_id: String(companyId),
@@ -313,7 +313,9 @@ const Subscription = () => {
         throw new Error(errorMessage);
       }
       // Mettre à jour l'état après succès
-      toast.success(`Abonnement ${selectedPlan.name} créé avec succès !`, { duration: 5000 });
+      toast.success(`Veuillez patienter pendant que nous activons votre abonnement. \n cela peut prendre un certain temps`, { duration: 7000 });
+      toast.success(`Abonnement ${selectedPlan.name} créé avec succès !`, { duration: 7000 });
+
       setCurrentPlanData({
         name: selectedPlan.name,
         status: subscribeData.data[0].status,

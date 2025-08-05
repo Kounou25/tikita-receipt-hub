@@ -42,6 +42,7 @@ import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
 import Subscription from "./pages/Subscription";
 import Support from "./pages/Support";
+import FeatureInDevelopment from "./comingSoon";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,26 @@ const App = () => (
     </ProtectedRoute>
   }
 />
+          <Route
+            path="/receipt/verify/"
+            element={
+              <MainLayout>
+                <FeatureInDevelopment />
+              </MainLayout>
+            }
+          />
+
+          {/* User */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <UserDashboard />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
 
 <Route
   path="/receipts"
