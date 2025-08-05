@@ -107,7 +107,7 @@ const Support = () => {
                 <h3 className="font-medium text-gray-900 mb-2">Autres moyens de contact</h3>
                 <div className="space-y-2 text-sm text-gray-600">
                   <p><strong>Email :</strong> contact.tikiita@gmail.com</p>
-                  <p><strong>Téléphone :</strong> 98362116</p>
+                  <p><strong>Téléphone :</strong>+227 98362116</p>
                   <p><strong>Horaires :</strong> Lun-Ven 8h-18h </p>
                 </div>
               </div>

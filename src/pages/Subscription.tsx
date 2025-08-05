@@ -590,14 +590,14 @@ const Subscription = () => {
                                 />
                               </div>
                               <p className="text-gray-700 text-center">
-                                Scannez le QR code ci-dessus ou effectuez un compte-à-compte au numéro <span className="font-semibold">94591058</span>, puis renseignez le code ou la référence de l'opération ci-dessous.
+                                Scannez le QR code ci-dessus ou effectuez un compte-à-compte au numéro <span className="font-semibold">+227 94591058</span>, puis renseignez le code ou la référence de l'opération ci-dessous.
                               </p>
                             </div>
                           )}
                           {paymentMethod === "Amanata" && (
                             <div className="space-y-4">
                               <p className="text-gray-700 text-center">
-                                Effectuez un compte-à-compte au numéro <span className="font-semibold">88715276</span>, puis renseignez le code ou la référence de l'opération ci-dessous.
+                                Effectuez un compte-à-compte au numéro <span className="font-semibold">+227 88715276</span>, puis renseignez le code ou la référence de l'opération ci-dessous.
                               </p>
                             </div>
                           )}
@@ -657,7 +657,7 @@ const Subscription = () => {
                   Les changements prennent effet immédiatement.
                 </p>
               </div>
-              <div>
+              {/* <div>
                 <h4 className="font-semibold text-lg text-gray-900 mb-2">
                   Que se passe-t-il si je dépasse ma limite de reçus ?
                 </h4>
@@ -665,14 +665,14 @@ const Subscription = () => {
                   Vous serez automatiquement facturé pour les reçus supplémentaires
                   au tarif de 100 FCFA par reçu.
                 </p>
-              </div>
+              </div> */}
               <div>
                 <h4 className="font-semibold text-lg text-gray-900 mb-2">
                   Y a-t-il une période d'essai gratuite ?
                 </h4>
                 <p className="text-gray-600 text-base">
-                  Oui, tous les nouveaux utilisateurs bénéficient de 7 jours d'essai
-                  gratuit sur le plan "Tikiita plus".
+                  Oui, tous les nouveaux utilisateurs bénéficient de 1 mois d'essai
+                  gratuit sur le plan "Gratuit".
                 </p>
               </div>
             </div>
