@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => ({
     // 💡 Proxy les appels API vers ton backend (ex: localhost:3000)
     proxy: {
       "/api": {
-        target: "http://localhost:3000", // ton backend Express
+        target: "http://localhost:8444", // ton backend Express
         changeOrigin: true,
         secure: false,
       },
