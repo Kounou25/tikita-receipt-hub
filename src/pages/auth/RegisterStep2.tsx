@@ -166,7 +166,7 @@ const RegisterStep2 = () => {
       setIsLoading(true);
 
       console.log("Sending payload to /company/company/:");
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/company/company/`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/company/company`, {
         method: "POST",
         body: formDataToSend,
       });
