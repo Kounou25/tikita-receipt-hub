@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff, Sparkles, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -67,109 +67,54 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-4 sm:px-6 lg:px-8">
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-md flex items-center justify-center z-50">
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="w-10 h-10 text-green-500 animate-spin" />
-            <p className="text-white font-semibold">Connexion en cours...</p>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-10 h-10 text-gray-800 animate-spin" />
+            <p className="text-white font-medium">Connexion en cours...</p>
           </div>
         </div>
       )}
 
-      {/* Background Ripples */}
-      <svg
-        className="absolute inset-0 w-full h-full"
-        preserveAspectRatio="xMidYMid slice"
-        viewBox="0 0 100 100"
-      >
-        <motion.circle
-          cx="50"
-          cy="50"
-          r="20"
-          fill="none"
-          stroke="#14b8a6"
-          strokeWidth="0.5"
-          strokeOpacity="0.2"
-          animate={{
-            r: [20, 30, 20],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{ repeat: Infinity, duration: 6, ease: 'easeInOut' }}
-        />
-        <motion.circle
-          cx="50"
-          cy="50"
-          r="25"
-          fill="none"
-          stroke="#f97316"
-          strokeWidth="0.5"
-          strokeOpacity="0.15"
-          animate={{
-            r: [25, 35, 25],
-            opacity: [0.15, 0.3, 0.15],
-          }}
-          transition={{ repeat: Infinity, duration: 8, ease: 'easeInOut', delay: 1 }}
-        />
-      </svg>
-      {/* Animated Particles */}
-      {[...Array(6)].map((_, i) => (
+      <div className="w-full max-w-md mx-auto">
+        {/* Header - Optimisé mobile */}
         <motion.div
-          key={i}
-          className={`absolute w-2 h-2 rounded-full ${i % 2 === 0 ? 'bg-green-400' : 'bg-orange-400'}`}
-          style={{
-            left: `${10 + i * 15}%`,
-            top: `${20 + i * 10}%`,
-          }}
-          animate={{
-            y: [0, -20, 0],
-            opacity: [0.2, 0.5, 0.2],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 4 + i * 0.4,
-            delay: i * 0.3,
-          }}
-        />
-      ))}
-
-      <div className="w-full max-w-md space-y-6 relative z-10">
-        {/* Header Section */}
-        <motion.div
-          className="text-center space-y-3"
+          className="text-center mb-8 sm:mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
         >
-          <h1 className="text-3xl font-extrabold text-green-700">Tikiita</h1>
-          <p className="text-gray-600 text-sm">Simplifiez vos reçus numériques avec style</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Tikiita</h1>
+          <p className="mt-2 text-sm sm:text-base text-gray-600">Connectez-vous à votre compte</p>
         </motion.div>
 
-        {/* Login Form Card */}
+        {/* Form Card - Responsive */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <Card className="border-none shadow-xl bg-white/95 backdrop-blur-md rounded-2xl">
-            <CardHeader className="text-center pb-4">
-              <CardTitle className="text-xl font-semibold text-gray-800 flex items-center justify-center gap-2">
-                <Sparkles className="w-5 h-5 text-green-500" />
+          <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
+            <CardHeader className="text-center pb-6 pt-8 px-6">
+              <CardTitle className="text-2xl sm:text-3xl font-semibold text-gray-900">
                 Se connecter
               </CardTitle>
-              <p className="text-gray-600 text-sm">Accédez à votre espace sécurisé</p>
             </CardHeader>
 
-            <CardContent className="pt-0">
-              <form onSubmit={handleSubmit} className="space-y-5">
+            <CardContent className="px-6 pb-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 {error && (
-                  <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg text-center">{error}</div>
+                  <div className="bg-red-50 text-red-700 text-sm p-4 rounded-lg text-center font-medium">
+                    {error}
+                  </div>
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-700 font-medium text-sm">Email ou téléphone</Label>
+                  <Label htmlFor="email" className="text-gray-700 font-medium text-sm sm:text-base">
+                    Email ou téléphone
+                  </Label>
                   <Input
                     id="email"
                     type="text"
@@ -178,59 +123,70 @@ const Login = () => {
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
                     disabled={isLoading}
-                    className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white h-11 rounded-lg transition-all duration-200"
+                    className="h-12 sm:h-14 rounded-xl border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 text-base transition-all"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-gray-700 font-medium text-sm">Mot de passe</Label>
+                  <Label htmlFor="password" className="text-gray-700 font-medium text-sm sm:text-base">
+                    Mot de passe
+                  </Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Votre mot de passe"
+                      placeholder="••••••••"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       required
                       disabled={isLoading}
-                      className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white h-11 rounded-lg pr-10 transition-all duration-200"
+                      className="h-12 sm:h-14 rounded-xl border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 pr-14 text-base transition-all"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-gray-100 h-10 w-10"
                       onClick={() => setShowPassword(!showPassword)}
                       disabled={isLoading}
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4 text-gray-500" /> : <Eye className="w-4 h-4 text-gray-500" />}
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5 text-gray-500" />
+                      ) : (
+                        <Eye className="w-5 h-5 text-gray-500" />
+                      )}
                     </Button>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm">
+                  <div className="flex items-center space-x-3">
                     <Checkbox
                       id="remember"
                       checked={formData.rememberMe}
                       onCheckedChange={(checked) => setFormData({ ...formData, rememberMe: checked as boolean })}
                       disabled={isLoading}
                     />
-                    <Label htmlFor="remember" className="text-gray-700 font-medium">Se souvenir de moi</Label>
+                    <Label htmlFor="remember" className="text-gray-700 cursor-pointer font-medium">
+                      Se souvenir de moi
+                    </Label>
                   </div>
-                  <Link to="/forgot-password" className="text-green-600 hover:text-green-700 font-medium hover:underline">
+                  <Link
+                    to="/forgot-password"
+                    className="text-gray-600 hover:text-gray-900 underline-offset-4 hover:underline transition text-right"
+                  >
                     Mot de passe oublié ?
                   </Link>
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full bg-orange-500 hover:bg-orange-600 h-11 rounded-lg font-semibold text-white shadow-md hover:shadow-lg transition-all duration-300"
+                  className="w-full h-12 sm:h-14 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-base"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-5 h-5 animate-spin" />
                       Connexion...
                     </span>
                   ) : (
@@ -239,13 +195,14 @@ const Login = () => {
                 </Button>
               </form>
 
-              <div className="mt-6 text-center text-sm">
-                <p className="text-gray-600">
-                  Pas encore de compte ?{" "}
-                  <Link to="/register" className="text-orange-500 hover:text-orange-600 font-semibold hover:underline">
-                    Inscrivez-vous
-                  </Link>
-                </p>
+              <div className="mt-8 text-center text-sm sm:text-base text-gray-600">
+                Pas encore de compte ?{" "}
+                <Link
+                  to="/register"
+                  className="font-medium text-gray-900 hover:underline transition"
+                >
+                  Inscrivez-vous
+                </Link>
               </div>
             </CardContent>
           </Card>

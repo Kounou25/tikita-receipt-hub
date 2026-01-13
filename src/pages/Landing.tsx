@@ -1,267 +1,193 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Receipt, Download, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useRef } from 'react';
+import { ArrowRight, ReceiptText } from "lucide-react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Landing = () => {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
-  const backgroundOpacity = useTransform(scrollY, [0, 400], [0.5, 0.2]);
-  const heroScale = useTransform(scrollY, [0, 400], [1, 0.94]);
-
   return (
-    <div className="min-h-screen bg-white overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 overflow-hidden">
       {/* Navbar */}
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-green-100 shadow-sm"
-      >
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <motion.div
-            className="flex items-center space-x-3"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 300 }}
-          >
-            <div className="w-35 h-35 rounded-xl flex items-center justify-center">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex items-center justify-between">
+          <Link to="/" className="flex items-center">
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+            >
               <img
                 src="/lovable-uploads/tikiita.png"
                 alt="Tikiita Logo"
-                className="h-20 w-20 object-contain"
-                style={{ filter: 'drop-shadow(0 3px 6px rgba(20,184,166,0.3))', transform: 'scale(1.2)' }}
+                className="h-12 w-12 sm:h-14 sm:w-14 object-contain drop-shadow-md"
               />
-            </div>
-            {/* <span className="text-2xl font-extrabold text-green-700">Tikiita</span> */}
-          </motion.div>
+            </motion.div>
+          </Link>
+
+          {/* Desktop */}
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/login">
               <motion.button
-                className="border-2 border-green-300 text-green-700 px-5 py-2 rounded-full font-medium hover:bg-green-50"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 text-gray-700 font-medium hover:text-gray-900 transition"
               >
                 Connexion
               </motion.button>
             </Link>
             <Link to="/register">
               <motion.button
-                className="bg-orange-500 text-white px-6 py-2 rounded-full font-medium shadow-md hover:bg-orange-600 flex items-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="px-8 py-3.5 bg-gray-900 text-white font-semibold rounded-2xl shadow-xl hover:bg-gray-800 transition flex items-center gap-3"
               >
-                Inscription
-                <ArrowRight className="w-4 h-4 ml-2" />
+                Inscription gratuite
+                <ArrowRight className="w-5 h-5" />
               </motion.button>
             </Link>
           </div>
-          <div className="md:hidden flex items-center space-x-3">
-            <Link to="/login">
+
+          {/* Mobile - Boutons plus gros et espacés */}
+          <div className="md:hidden flex items-center gap-3">
+            <Link to="/login" className="flex-1">
               <motion.button
-                className="border-2 border-green-300 text-green-700 px-3 py-1.5 rounded-full text-sm font-medium"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full px-5 py-3 text-base font-medium text-gray-700 border border-gray-300 rounded-2xl"
               >
                 Connexion
               </motion.button>
             </Link>
-            <Link to="/register">
+            <Link to="/register" className="flex-1">
               <motion.button
-                className="bg-orange-500 text-white px-3 py-1.5 rounded-full text-sm font-medium"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full px-5 py-3 text-base font-semibold bg-gray-900 text-white rounded-2xl shadow-lg"
               >
-                Inscription
+                S'inscrire
               </motion.button>
             </Link>
           </div>
         </nav>
-      </motion.header>
+      </header>
 
-      {/* Hero Section */}
-      <motion.section
-        ref={heroRef}
-        style={{ scale: heroScale }}
-        className="relative min-h-screen flex items-center pt-24 flex-grow"
-      >
-        {/* Background Layers */}
-        <motion.div
-          className="absolute inset-0 bg-green-50/50"
-          style={{ opacity: backgroundOpacity }}
-        />
-        <svg
-          className="absolute inset-0 w-full h-full"
-          preserveAspectRatio="xMidYMid slice"
-          viewBox="0 0 100 100"
-        >
-          <motion.path
-            d="M0,10 C20,20 40,5 60,15 S80,25 100,15 V100 H0 Z"
-            fill="#14b8a6"
-            fillOpacity="0.15"
-            animate={{
-              d: [
-                "M0,10 C20,20 40,5 60,15 S80,25 100,15 V100 H0 Z",
-                "M0,15 C25,30 45,10 65,25 S85,35 100,20 V100 H0 Z",
-                "M0,10 C20,20 40,5 60,15 S80,25 100,15 V100 H0 Z",
-              ],
-            }}
-            transition={{ repeat: Infinity, duration: 10, ease: 'easeInOut' }}
-          />
-          <motion.path
-            d="M0,30 C30,45 50,25 70,40 S90,50 100,35 V100 H0 Z"
-            fill="#f97316"
-            fillOpacity="0.1"
-            animate={{
-              d: [
-                "M0,30 C30,45 50,25 70,40 S90,50 100,35 V100 H0 Z",
-                "M0,35 C25,50 45,30 65,45 S85,55 100,40 V100 H0 Z",
-                "M0,30 C30,45 50,25 70,40 S90,50 100,35 V100 H0 Z",
-              ],
-            }}
-            transition={{ repeat: Infinity, duration: 12, ease: 'easeInOut', delay: 1 }}
-          />
-        </svg>
-        {/* Animated Particles */}
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className={`absolute w-2 h-2 rounded-full ${i % 2 === 0 ? 'bg-green-400' : 'bg-orange-400'}`}
-            style={{
-              left: `${10 + i * 15}%`,
-              top: `${20 + i * 10}%`,
-            }}
-            animate={{
-              y: [0, -20, 0],
-              opacity: [0.2, 0.5, 0.2],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 4 + i * 0.4,
-              delay: i * 0.3,
-            }}
-          />
-        ))}
+      {/* Hero Principal - Optimisé mobile */}
+      <section className="relative pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+        {/* Blobs subtils */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-96 h-96 sm:w-[600px] sm:h-[600px] bg-gray-900/5 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 right-0 w-80 h-80 sm:w-[500px] sm:h-[500px] bg-gray-900/5 rounded-full blur-3xl" />
+        </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24 text-center z-10">
+        <div className="max-w-4xl mx-auto text-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: 'easeOut' }}
-            className="space-y-8"
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="space-y-8 sm:space-y-12"
           >
+            {/* Badge */}
             <motion.div
-              className="inline-flex items-center bg-green-100 text-green-800 px-6 py-2 rounded-full font-medium shadow-md"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 200 }}
-            >
-              <Sparkles className="w-5 h-5 mr-2" />
-              🇳🇪 Fièrement Nigérien
-            </motion.div>
-            <motion.h1
-              className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight"
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.2 }}
+              transition={{ delay: 0.2, duration: 0.7 }}
+              className="inline-flex items-center bg-gray-900 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full text-sm sm:text-base font-semibold shadow-2xl"
             >
-              Reçus professionnels
-              <motion.span
-                className="block text-orange-500"
-                animate={{ y: [0, -5, 0], opacity: [1, 0.8, 1] }}
-                transition={{ repeat: Infinity, duration: 2.5 }}
-              >
-                en quelques clics
-              </motion.span>
-            </motion.h1>
-            <motion.p
-              className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              Tikiita : la solution nigérienne pour des reçus modernes, conformes et adaptés à votre business.
-            </motion.p>
-            <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-                <Link to="/register">
-                  <motion.button
-                    className="relative bg-orange-500 text-white px-5 py-3 sm:px-8 sm:py-4 rounded-full text-base sm:text-lg font-semibold shadow-xl flex items-center mx-auto hover:bg-orange-600 overflow-hidden"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {/* Glowing Halo Effect */}
-                    <motion.div
-                      className="absolute inset-0 bg-orange-400 opacity-0 rounded-full"
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0, 0.3, 0],
-                      }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 2,
-                        ease: 'easeOut',
-                      }}
-                    />
-                    <motion.div
-                      className="relative flex items-center"
-                      animate={{
-                        scale: [1, 1.05, 1],
-                      }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 1.5,
-                        ease: 'easeInOut',
-                      }}
-                    >
-                      <motion.span
-                        className="inline-block mr-2"
-                        animate={{ y: [0, -3, 0] }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 2,
-                          delay: 0.2,
-                          ease: 'easeInOut',
-                        }}
-                      >
-                        <Receipt className="w-5 h-5 sm:w-6 sm:h-6" />
-                      </motion.span>
-                      Créer un reçu
-                      <ArrowRight className="w-5 h-5 ml-2 sm:w-6 sm:h-6" />
-                    </motion.div>
-                  </motion.button>
-                </Link>
-                {/* <Link to="/demo">
-                  <motion.button
-                    className="border-2 border-green-300 text-green-700 px-5 py-3 sm:px-8 sm:py-4 rounded-full text-base sm:text-lg font-semibold hover:bg-green-50 flex items-center mx-auto"
-                    whileHover={{ scale: 1.05, boxShadow: '0 12px 24px rgba(20,184,166,0.2)' }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Download className="w-5 h-5 mr-2 sm:w-6 sm:h-6" />
-                    Voir la démo
-                  </motion.button>
-                </Link> */}
+              La gestion de reçus réinventée
             </motion.div>
-            </motion.div>
-          </div>
-        </motion.section>
 
-      {/* Footer */}
-      <motion.footer
-        className="w-full py-4 text-center bg-gray-100"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 1 }}
-      >
-        <span className="text-sm text-gray-600">
-          Powered by{' '}
-          <a href="https://web.facebook.com/urbancreativeagency" target="_blank" rel="noopener noreferrer"><span className="font-semibold text-green-600">Urban Agency</span></a>
-          
-        </span>
-      </motion.footer>
+            {/* Titre responsive */}
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-none">
+              Reçus pro.
+              <br />
+              <motion.span
+                className="inline-block bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+              >
+                Instantanés.
+              </motion.span>
+            </h1>
+
+            {/* Sous-titre */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-light px-4"
+            >
+              Créez des reçus numériques personnalisés et conformes en quelques secondes.
+              Idéal pour les commerçants, freelances et entrepreneurs.
+            </motion.p>
+
+            {/* CTA principal - Très gros sur mobile */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.9 }}
+              className="pt-6 sm:pt-8"
+            >
+              <Link to="/register">
+                <motion.button
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.96 }}
+                  animate={{
+                    boxShadow: [
+                      "0 20px 40px rgba(0,0,0,0.15)",
+                      "0 30px 60px rgba(0,0,0,0.25)",
+                      "0 20px 40px rgba(0,0,0,0.15)",
+                    ],
+                  }}
+                  transition={{ boxShadow: { repeat: Infinity, duration: 4 } }}
+                  className="group relative w-full sm:w-auto px-10 sm:px-12 py-5 sm:py-6 bg-gray-900 text-white text-lg sm:text-xl font-bold rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center gap-4"
+                >
+                  <ReceiptText className="w-7 h-7 sm:w-8 sm:h-8 group-hover:scale-110 transition" />
+                  Commencer gratuitement
+                  <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 group-hover:translate-x-3 transition-transform" />
+
+                  {/* Brillance */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+                    animate={{ x: ["-100%", "100%"] }}
+                    transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+                  />
+                </motion.button>
+              </Link>
+            </motion.div>
+
+            {/* Mockup - Pleine largeur sur mobile */}
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1, duration: 1 }}
+              className="mt-16 sm:mt-20 relative"
+            >
+              <div className="relative mx-auto max-w-5xl">
+                {/* Ombre douce */}
+                <div className="absolute inset-x-4 sm:inset-x-0 inset-y-4 bg-gray-900/20 rounded-3xl blur-3xl -z-10 scale-95" />
+
+                {/* Mockup principal */}
+                <div className="bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-300 rounded-3xl w-full aspect-video sm:aspect-[21/9] shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-700">
+                  <div className="h-full flex flex-col items-center justify-center p-8 text-center">
+                    <ReceiptText className="w-20 h-20 sm:w-32 sm:h-32 text-gray-400 mb-6" />
+                    <p className="text-2xl sm:text-4xl font-bold text-gray-700">
+                      Votre interface Tikiita
+                    </p>
+                    <p className="text-lg sm:text-xl text-gray-500 mt-3">
+                      Simple. Moderne. Efficace.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Petit mockup mobile (visible seulement sur md+) */}
+                <div className="hidden md:block absolute -bottom-12 -left-12 w-48 aspect-[9/16] bg-gray-800 rounded-3xl shadow-2xl transform -rotate-12 hover:-rotate-6 transition-transform duration-700 overflow-hidden border border-gray-700">
+                  <div className="h-full bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center">
+                    <p className="text-white font-bold text-xl rotate-90">Mobile</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 };

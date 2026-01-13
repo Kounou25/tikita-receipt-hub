@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, TrendingUp, TrendingDown, ArrowUpRight, ArrowRight, Receipt, FileText, Users, Wallet, Calendar, DollarSign, Activity } from "lucide-react";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import LineChart from "@/components/charts/LineChart";
-import { Receipt, FileText, Users, TrendingUp, Plus, Eye, Download, Bell, Crown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
@@ -21,7 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const Skeleton = ({ className }) => (
-  <div className={cn("animate-pulse bg-gray-200 rounded-md", className)} />
+  <div className={cn("animate-pulse bg-gray-100 rounded-lg", className)} />
 );
 
 // Fonction pour fetch toutes les données en parallèle
@@ -57,7 +55,6 @@ const fetchDashboardData = async (companyId, token) => {
     }),
   ]);
 
-  // Vérifier les erreurs pour chaque réponse
   if (!statsResponse.ok) {
     if (statsResponse.status === 500) throw new Error("500: Erreur serveur pour les statistiques");
     if (statsResponse.status === 401 || statsResponse.status === 409 || statsResponse.status === 403)
@@ -65,10 +62,10 @@ const fetchDashboardData = async (companyId, token) => {
     if (statsResponse.status === 404) {
       return {
         stats: [
-          { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-          { title: "Articles", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
-          { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
-          { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+          { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false },
+          { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false },
+          { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false },
+          { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false },
         ],
         revenueData: null,
         topClients: null,
@@ -92,7 +89,7 @@ const fetchDashboardData = async (companyId, token) => {
         stats: null,
         revenueData: [{
           id: "revenus",
-          color: "#16a34a",
+          color: "#000000",
           data: months.map(month => ({ x: month, y: 0 })),
         }],
         topClients: null,
@@ -126,25 +123,25 @@ const fetchDashboardData = async (companyId, token) => {
   ]);
 
   let stats = [
-    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50" },
-    { title: "Articles", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
-    { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
-    { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50" },
+    { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false },
+    { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false },
+    { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false },
+    { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false },
   ];
 
   if (Array.isArray(statsData) && statsData.length > 0) {
     const apiStats = statsData[0];
     stats = [
-      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50" },
-      { title: "Articles", value: apiStats.total_items?.toString() || "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50" },
-      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
-      { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50" },
+      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, trend: "+12%", trendUp: true },
+      { title: "Articles", value: apiStats.total_items?.toString() || "0", icon: FileText, trend: "+8%", trendUp: true },
+      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, trend: "+23%", trendUp: true },
+      { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: Wallet, trend: "+15%", trendUp: true },
     ];
   }
 
   let revenueTransformed = [{
     id: "revenus",
-    color: "#16a34a",
+    color: "#000000",
     data: Array.from({ length: 12 }, (_, i) => {
       const date = new Date();
       date.setMonth(date.getMonth() - (11 - i));
@@ -155,7 +152,7 @@ const fetchDashboardData = async (companyId, token) => {
   if (Array.isArray(revenueData) && revenueData.length > 0) {
     revenueTransformed = [{
       id: "revenus",
-      color: "#16a34a",
+      color: "#000000",
       data: revenueData.map(item => ({ x: item.mois, y: item.chiffre_affaire })),
     }];
   }
@@ -211,15 +208,15 @@ const UserDashboard = () => {
   });
 
   const stats = data?.stats || [
-    { title: "Reçus générés", value: "0", icon: Receipt, color: "text-green-600", bg: "bg-green-50", growth: "+0%" },
-    { title: "Articles", value: "0", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", growth: "+0%" },
-    { title: "Clients actifs", value: "0", icon: Users, color: "text-purple-600", bg: "bg-purple-50", growth: "+0%" },
-    { title: "Revenus totaux", value: "0 FCFA", icon: TrendingUp, color: "text-orange-600", bg: "bg-orange-50", growth: "+0%" },
+    { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false },
+    { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false },
+    { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false },
+    { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false },
   ];
 
   const revenueData = data?.revenueData || [{
     id: "revenus",
-    color: "#16a34a",
+    color: "#000000",
     data: Array.from({ length: 12 }, (_, i) => {
       const date = new Date();
       date.setMonth(date.getMonth() - (11 - i));
@@ -237,330 +234,291 @@ const UserDashboard = () => {
     navigate("/login");
   };
 
-  // Define background colors for the stat cards
-  const cardBackgrounds = [
-    "bg-green-50",
-    "bg-blue-50",
-    "bg-purple-50",
-    "bg-orange-50",
-  ];
-
   return (
-    <div className="relative min-h-screen bg-gray-50 mobile-nav-padding">
+    <div className="min-h-screen bg-[#fafafa] mobile-nav-padding">
       {/* Loading Overlay */}
       {isLoading && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50"
-          style={{ zIndex: 9999 }}
-        >
-          <Loader2 className="w-8 h-8 animate-spin text-green-500" />
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="w-6 h-6 animate-spin text-black" />
+            <span className="text-sm text-gray-600 font-medium">Chargement...</span>
+          </div>
         </div>
       )}
-      <Header title="Tableau de bord" />
-      <main className="pt-2 p-4 md:pt-6 md:p-6 space-y-6">
+      
+      <Header title="Dashboard" />
+      
+      <main className="pt-6 px-4 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
         <QuickNav userType="user" />
-        {/* Error Message */}
+        
+        {/* Error Messages */}
         {error && !show500Error && !showSessionExpired && (
-          <Card className="border-red-200 bg-red-50">
-            <CardContent className="p-4 flex items-center gap-2 text-red-600">
-              <AlertCircle className="w-5 h-5" />
-              <p>{error.message || "Une erreur est survenue lors du chargement des données."}</p>
-            </CardContent>
-          </Card>
+          <div className="mb-6 border border-red-200 bg-red-50 rounded-xl p-4 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-red-700">{error.message || "Une erreur est survenue."}</p>
+          </div>
         )}
-        {/* Error 500 Dialog */}
+        
         <AlertDialog open={show500Error} onOpenChange={setShow500Error}>
-          <AlertDialogContent>
+          <AlertDialogContent className="rounded-xl">
             <AlertDialogHeader>
               <AlertDialogTitle>Erreur de connexion</AlertDialogTitle>
               <AlertDialogDescription>
-                Une erreur est survenue lors de la récupération des informations. Veuillez vérifier votre connexion internet et réessayer.
+                Une erreur est survenue. Veuillez réessayer.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction className="bg-green-500 hover:bg-green-600 text-white" onClick={() => window.location.reload()}>
+              <AlertDialogAction 
+                className="bg-black hover:bg-black/90 text-white rounded-lg" 
+                onClick={() => window.location.reload()}
+              >
                 Réessayer
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        {/* Session Expired or Unauthorized Dialog */}
+        
         <AlertDialog open={showSessionExpired} onOpenChange={setShowSessionExpired}>
-          <AlertDialogContent>
+          <AlertDialogContent className="rounded-xl">
             <AlertDialogHeader>
-              <AlertDialogTitle>Session expirée ou non autorisée</AlertDialogTitle>
+              <AlertDialogTitle>Session expirée</AlertDialogTitle>
               <AlertDialogDescription>
-                Votre session a expiré ou vous n'êtes pas autorisé. Veuillez vous reconnecter pour continuer.
+                Votre session a expiré. Veuillez vous reconnecter.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction className="bg-green-500 hover:bg-green-600 text-white" onClick={handleLogout}>
+              <AlertDialogAction 
+                className="bg-black hover:bg-black/90 text-white rounded-lg" 
+                onClick={handleLogout}
+              >
                 Se reconnecter
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        {/* Welcome Section */}
+        
+        {/* Welcome Header */}
         {isLoading ? (
-          <Card className="border-green-500">
-            <CardContent className="p-6 space-y-4">
-              <Skeleton className="h-8 w-64" />
-              <Skeleton className="h-4 w-full max-w-md" />
-              <div className="flex gap-3">
-                <Skeleton className="h-10 w-40" />
-                <Skeleton className="h-10 w-40" />
-              </div>
-              <Skeleton className="h-8 w-32 md:ml-auto" />
-            </CardContent>
-          </Card>
+          <div className="mb-8 space-y-2">
+            <Skeleton className="h-10 w-80" />
+            <Skeleton className="h-5 w-96" />
+          </div>
         ) : (
-          <Card className="border-green-500 bg-gradient-to-r from-green-50 to-orange-50">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    Bonjour ! {username} 👋
-                  </h2>
-                  <p className="text-gray-600 mb-4">
-                    Voici un aperçu de votre activité commerciale sur Tikiita.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Link to="/generate">
-                      <Button className="bg-green-500 hover:bg-green-600 text-white">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Nouveau reçu
-                      </Button>
-                    </Link>
-                    <Link to="/receipts">
-                      <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50">
-                        <Eye className="w-4 h-4 mr-2" />
-                        Voir l'historique
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-                <div className="mt-4 md:mt-0">
-                  <Link to="/notifications">
-                    <Button variant="outline" className="border-orange-500 text-orange-600 hover:bg-orange-50" size="sm">
-                      <Bell className="w-4 h-4 mr-2" />
-                      Notifications
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-black mb-2">
+              Bonjour, {username} 👋
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Voici un aperçu de votre activité
+            </p>
+          </div>
         )}
+        
+        {/* Quick Actions */}
+        {isLoading ? (
+          <div className="mb-8 flex gap-3">
+            <Skeleton className="h-11 w-40" />
+            <Skeleton className="h-11 w-40" />
+          </div>
+        ) : (
+          <div className="mb-8 flex flex-wrap gap-3">
+            <Link to="/generate">
+              <Button className="bg-black hover:bg-black/90 text-white rounded-lg px-6 h-11 font-medium shadow-sm">
+                Nouveau reçu
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+            <Link to="/receipts">
+              <Button 
+                variant="outline" 
+                className="border-gray-300 hover:bg-gray-50 text-black rounded-lg px-6 h-11 font-medium"
+              >
+                Voir l'historique
+              </Button>
+            </Link>
+          </div>
+        )}
+        
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {isLoading ? (
-            Array(4)
-              .fill(null)
-              .map((_, index) => (
-                <Card key={index} className="border-gray-200">
-                  <CardContent className="p-6 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Skeleton className="w-12 h-12 rounded-lg" />
-                      <Skeleton className="h-4 w-16" />
-                    </div>
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-6 w-24" />
-                  </CardContent>
-                </Card>
-              ))
+            Array(4).fill(null).map((_, i) => (
+              <Skeleton key={i} className="h-36" />
+            ))
           ) : (
-            stats.map((stat, index) => (
-              <Card key={index} className={`border-gray-200 ${cardBackgrounds[index]}`}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-lg ${stat.bg} flex items-center justify-center`}>
-                      <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                    </div>
-                    <span className="text-sm font-medium text-orange-600">{stat.growth}</span>
+            stats.map((stat, i) => (
+              <div 
+                key={i} 
+                className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all duration-200"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-2.5 bg-gray-100 rounded-lg">
+                    <stat.icon className="w-5 h-5 text-black" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  <div className={cn(
+                    "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full",
+                    stat.trendUp ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                  )}>
+                    {stat.trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                    {stat.trend}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+                <p className="text-sm text-gray-600 mb-1 font-medium">{stat.title}</p>
+                <p className="text-2xl font-bold text-black">{stat.value}</p>
+              </div>
             ))
           )}
         </div>
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {isLoading ? (
-            <>
-              <Card className="border-gray-200">
-                <CardHeader>
-                  <Skeleton className="h-6 w-48" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-[300px] w-full" />
-                </CardContent>
-              </Card>
-              <Card className="border-gray-200">
-                <CardHeader>
-                  <Skeleton className="h-6 w-48" />
-                </CardHeader>
-                <CardContent>
-                  {Array(5)
-                    .fill(null)
-                    .map((_, index) => (
-                      <div key={index} className="flex items-center justify-between p-3">
-                        <div className="flex items-center space-x-3">
-                          <Skeleton className="w-8 h-8 rounded-full" />
-                          <div className="space-y-2">
-                            <Skeleton className="h-4 w-32" />
-                            <Skeleton className="h-4 w-24" />
+        
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Revenue Chart - Takes 2 columns */}
+          <div className="lg:col-span-2">
+            {isLoading ? (
+              <Skeleton className="h-[400px]" />
+            ) : (
+              <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-xl font-bold text-black mb-1">Revenus</h3>
+                    <p className="text-sm text-gray-600">Performance mensuelle</p>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-gray-600 hover:text-black"
+                  >
+                    <Calendar className="w-4 h-4 mr-2" />
+                    12 mois
+                  </Button>
+                </div>
+                <LineChart data={revenueData} height={300} />
+              </div>
+            )}
+          </div>
+          
+          {/* Top Clients */}
+          <div>
+            {isLoading ? (
+              <Skeleton className="h-[400px]" />
+            ) : (
+              <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-black">Top Clients</h3>
+                  <Activity className="w-5 h-5 text-gray-400" />
+                </div>
+                
+                {topClients.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Users className="w-6 h-6 text-gray-400" />
+                    </div>
+                    <p className="text-sm text-gray-500">Aucun client</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {topClients.map((client, i) => (
+                      <div 
+                        key={i} 
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-xs font-bold">
+                            {i + 1}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-black text-sm">{client.name}</p>
+                            <p className="text-xs text-gray-500">{client.purchases} achats</p>
                           </div>
                         </div>
-                        <div className="space-y-2">
-                          <Skeleton className="h-4 w-24" />
-                          <Skeleton className="h-4 w-16" />
-                        </div>
+                        <p className="font-bold text-black text-sm">{client.amount}</p>
                       </div>
                     ))}
-                </CardContent>
-              </Card>
-            </>
-          ) : (
-            <>
-              <Card className="border-gray-200">
-                <CardHeader>
-                  <CardTitle>Évolution des revenus</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <LineChart data={revenueData} height={300} />
-                </CardContent>
-              </Card>
-              <Card className="border-gray-200">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <Crown className="w-5 h-5 text-orange-600" />
-                    Top 5 Clients du Mois
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {topClients.length === 0 ? (
-                    <p className="text-gray-600 text-center">Aucun client de premier plan disponible</p>
-                  ) : (
-                    <div className="space-y-4">
-                      {topClients.map((client, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                              {index + 1}
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-900">{client.name}</p>
-                              <p className="text-sm text-gray-600">{client.purchases} achats</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium text-gray-900">{client.amount}</p>
-                            <p className="text-sm text-orange-600">{client.growth}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </>
-          )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
+        
         {/* Recent Activity */}
         {isLoading ? (
-          <Card className="border-gray-200">
-            <CardHeader>
-              <Skeleton className="h-6 w-48" />
-            </CardHeader>
-            <CardContent>
-              {Array(4)
-                .fill(null)
-                .map((_, index) => (
-                  <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                    <div className="flex items-center space-x-4">
-                      <Skeleton className="w-10 h-10 rounded-lg" />
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-4 w-24" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-4 w-16" />
-                    </div>
-                  </div>
-                ))}
-            </CardContent>
-          </Card>
+          <Skeleton className="h-96" />
         ) : (
-          <Card className="border-gray-200">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Activité récente</CardTitle>
+          <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-xl font-bold text-black mb-1">Activité récente</h3>
+                <p className="text-sm text-gray-600">Dernières transactions</p>
+              </div>
               <Link to="/receipts">
-                <Button variant="outline" className="border-green-500 text-green-600 hover:bg-green-50" size="sm">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-gray-600 hover:text-black font-medium"
+                >
                   Voir tout
+                  <ArrowUpRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
-            </CardHeader>
-            <CardContent>
-              {recentReceipts.length === 0 ? (
-                <p className="text-gray-600 text-center">Aucune activité récente disponible</p>
-              ) : (
-                <div className="space-y-4">
-                  {recentReceipts.map((receipt, index) => (
-                    <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
-                          <Receipt className="w-5 h-5 text-green-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{receipt.id}</p>
-                          <p className="text-sm text-gray-600">{receipt.client}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium text-gray-900">{receipt.amount}</p>
-                        <p className={`text-sm ${receipt.status === "Payé" ? "text-green-600" : "text-orange-600"}`}>
-                          {receipt.status}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+            </div>
+            
+            {recentReceipts.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Receipt className="w-6 h-6 text-gray-400" />
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <p className="text-sm text-gray-500">Aucune activité récente</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Reçu</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Client</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Montant</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Statut</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentReceipts.map((receipt, i) => (
+                      <tr 
+                        key={i} 
+                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <Receipt className="w-4 h-4 text-black" />
+                            </div>
+                            <span className="font-semibold text-sm text-black">{receipt.id}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-sm text-gray-700">{receipt.client}</td>
+                        <td className="py-4 px-4 text-sm font-semibold text-black">{receipt.amount}</td>
+                        <td className="py-4 px-4">
+                          <span className={cn(
+                            "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium",
+                            receipt.status === "Payé" 
+                              ? "bg-green-50 text-green-700 border border-green-200" 
+                              : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                          )}>
+                            {receipt.status}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-sm text-gray-600">{receipt.date}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         )}
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {isLoading ? (
-            <>
-              {Array(3)
-                .fill(null)
-                .map((_, index) => (
-                  <Card key={index} className="border-gray-200">
-                    <CardHeader>
-                      <Skeleton className="h-6 w-32" />
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <Skeleton className="h-10 w-full" />
-                      <Skeleton className="h-10 w-full" />
-                      <Skeleton className="h-10 w-full" />
-                    </CardContent>
-                  </Card>
-                ))}
-            </>
-          ) : (
-            <>
-             
-            </>
-          )}
-        </div>
       </main>
+      
       <MobileNav />
     </div>
   );

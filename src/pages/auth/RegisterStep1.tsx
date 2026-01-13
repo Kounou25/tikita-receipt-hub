@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { countryPhoneCodes } from "@/utils/countries"; // ← Tableau d'objets
+import { countryPhoneCodes } from "@/utils/countries";
 import {
   Select,
   SelectContent,
@@ -19,12 +19,10 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
-
-// Librairie pour les drapeaux (SVG de qualité, fonctionne partout)
 import ReactCountryFlag from "react-country-flag";
 
 const RegisterStep1 = () => {
@@ -38,20 +36,18 @@ const RegisterStep1 = () => {
     fullName: "",
     email: "",
     user_phone: "",
-    country: "", // ← Maintenant le code ISO (ex: "ne")
+    country: "",
     password: "",
     confirmPassword: "",
   });
 
   const navigate = useNavigate();
 
-  // Trier les pays par nom
   const sortedCountries = [...countryPhoneCodes].sort((a, b) =>
     a.name.localeCompare(b.name)
   );
 
   const handleCountryChange = (value: string) => {
-    // value = code ISO (ex: "ne")
     const selected = countryPhoneCodes.find((c) => c.code === value);
     if (!selected) return;
 
@@ -109,7 +105,7 @@ const RegisterStep1 = () => {
       full_name: formData.fullName,
       email: formData.email,
       user_phone: formData.user_phone,
-      country: formData.country, // ← Envoie le code ISO (ex: "ne")
+      country: formData.country,
       password: formData.password,
     };
 
@@ -153,73 +149,85 @@ const RegisterStep1 = () => {
     }
   };
 
-  // Trouver le pays sélectionné pour l'affichage
   const selectedCountry = countryPhoneCodes.find((c) => c.code === formData.country);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center px-4 sm:px-6 lg:px-8">
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-md flex items-center justify-center z-50">
-          <div className="flex flex-col items-center gap-3">
-            <Loader2 className="w-10 h-10 text-green-500 animate-spin" />
-            <p className="text-white font-semibold">Inscription en cours...</p>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-10 h-10 text-gray-800 animate-spin" />
+            <p className="text-white font-medium">Inscription en cours...</p>
           </div>
         </div>
       )}
 
-      {/* Background effets */}
-      <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid slice" viewBox="0 0 100 100">
-        <motion.circle cx="50" cy="50" r="20" fill="none" stroke="#14b8a6" strokeWidth="0.5" strokeOpacity="0.2"
-          animate={{ r: [20, 40, 20], opacity: [0.2, 0.4, 0.2] }}
-          transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-        />
-        <motion.circle cx="50" cy="50" r="25" fill="none" stroke="#f97316" strokeWidth="0.5" strokeOpacity="0.15"
-          animate={{ r: [25, 45, 25], opacity: [0.15, 0.3, 0.15] }}
-          transition={{ repeat: Infinity, duration: 8, ease: "easeInOut", delay: 1 }}
-        />
-      </svg>
-
-      {[...Array(6)].map((_, i) => (
+      <div className="w-full max-w-md mx-auto">
+        {/* Header */}
         <motion.div
-          key={i}
-          className={`absolute w-2 h-2 rounded-full ${i % 2 === 0 ? "bg-green-400" : "bg-orange-400"}`}
-          style={{ left: `${10 + i * 15}%`, top: `${20 + i * 10}%` }}
-          animate={{ y: [0, -20, 0], opacity: [0.2, 0.5, 0.2], scale: [1, 1.2, 1] }}
-          transition={{ repeat: Infinity, duration: 4 + i * 0.4, delay: i * 0.3 }}
-        />
-      ))}
-
-      <div className="w-full max-w-md space-y-6 relative z-10">
-        <motion.div className="text-center space-y-3" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-          <h1 className="text-3xl font-extrabold text-green-700">Tikiita</h1>
-          <p className="text-gray-600 text-sm">Simplifiez vos reçus numériques avec style</p>
+          className="text-center mb-8 sm:mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+            Tikiita
+          </h1>
+          <p className="mt-2 text-sm sm:text-base text-gray-600">
+            Créez votre compte en quelques étapes
+          </p>
         </motion.div>
 
-        <motion.div className="flex justify-center items-center space-x-2 mb-4" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}>
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold">1</div>
-            <span className="text-gray-700 font-medium">Informations personnelles</span>
-          </div>
-          <div className="w-12 h-1 bg-gray-200 rounded-full"></div>
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-semibold">2</div>
-            <span className="text-gray-500">Configuration</span>
-          </div>
-        </motion.div>
+        {/* Progress Indicator - Horizontale, adaptée mobile */}
+        <div className="mb-8 sm:mb-10 flex items-center justify-center">
+          <div className="flex items-center gap-3 sm:gap-6">
+            {/* Étape 1 */}
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-900 text-white flex items-center justify-center font-semibold text-base sm:text-lg">
+                1
+              </div>
+              <span className="mt-2 text-xs sm:text-sm text-gray-900 font-medium hidden sm:block">
+                Informations
+              </span>
+            </div>
 
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.2 }}>
-          <Card className="border-none shadow-xl bg-white/95 backdrop-blur-md rounded-2xl">
-            <CardHeader className="text-center pb-4">
-              <CardTitle className="text-xl font-semibold text-gray-800">Créer un compte</CardTitle>
-              <p className="text-gray-600 text-sm">Entrez vos informations personnelles</p>
+            {/* Ligne de connexion */}
+            <div className="w-16 sm:w-24 h-px bg-gray-300" />
+
+            {/* Étape 2 */}
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-semibold text-base sm:text-lg">
+                2
+              </div>
+              <span className="mt-2 text-xs sm:text-sm text-gray-500 hidden sm:block">
+                Configuration
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Form Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
+            <CardHeader className="text-center pb-6 pt-8 px-6">
+              <CardTitle className="text-2xl sm:text-3xl font-semibold text-gray-900">
+                Créer un compte
+              </CardTitle>
+              <p className="mt-2 text-gray-600">Étape 1 : Vos informations personnelles</p>
             </CardHeader>
 
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <CardContent className="px-6 pb-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Nom complet */}
                 <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-gray-700 font-medium text-sm">Nom complet</Label>
+                  <Label htmlFor="fullName" className="text-gray-700 font-medium text-sm sm:text-base">
+                    Nom complet
+                  </Label>
                   <Input
                     id="fullName"
                     type="text"
@@ -227,14 +235,16 @@ const RegisterStep1 = () => {
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     required
-                    className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white h-11 rounded-lg transition-all duration-200"
                     disabled={isLoading}
+                    className="h-12 sm:h-14 rounded-xl border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 text-base transition-all"
                   />
                 </div>
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-700 font-medium text-sm">Adresse email</Label>
+                  <Label htmlFor="email" className="text-gray-700 font-medium text-sm sm:text-base">
+                    Adresse email
+                  </Label>
                   <Input
                     id="email"
                     type="email"
@@ -242,19 +252,21 @@ const RegisterStep1 = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
-                    className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white h-11 rounded-lg transition-all duration-200"
                     disabled={isLoading}
+                    className="h-12 sm:h-14 rounded-xl border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 text-base transition-all"
                   />
                 </div>
 
-                {/* Pays avec drapeau */}
+                {/* Pays */}
                 <div className="space-y-2">
-                  <Label htmlFor="country" className="text-gray-700 font-medium text-sm">Pays</Label>
+                  <Label htmlFor="country" className="text-gray-700 font-medium text-sm sm:text-base">
+                    Pays
+                  </Label>
                   <Select onValueChange={handleCountryChange} value={formData.country} disabled={isLoading}>
-                    <SelectTrigger className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white h-11 rounded-lg">
+                    <SelectTrigger className="h-12 sm:h-14 rounded-xl border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20">
                       <SelectValue placeholder="Sélectionnez votre pays">
                         {selectedCountry && (
-                          <span className="flex items-center gap-3">
+                          <div className="flex items-center gap-3">
                             <ReactCountryFlag
                               countryCode={selectedCountry.code.toUpperCase()}
                               svg
@@ -262,23 +274,25 @@ const RegisterStep1 = () => {
                               className="rounded-sm shadow-sm"
                             />
                             <span>{selectedCountry.name}</span>
-                          </span>
+                          </div>
                         )}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent className="bg-white border-gray-200 max-h-60 overflow-y-auto">
+                    <SelectContent className="max-h-60">
                       {sortedCountries.map((country) => (
                         <SelectItem key={country.code} value={country.code}>
-                          <span className="flex items-center gap-3">
-                            <ReactCountryFlag
-                              countryCode={country.code.toUpperCase()}
-                              svg
-                              style={{ width: "24px", height: "18px" }}
-                              className="rounded-sm shadow-sm"
-                            />
-                            <span>{country.name}</span>
-                            <span className="text-gray-500 text-sm ml-auto">{country.phone}</span>
-                          </span>
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center gap-3">
+                              <ReactCountryFlag
+                                countryCode={country.code.toUpperCase()}
+                                svg
+                                style={{ width: "24px", height: "18px" }}
+                                className="rounded-sm shadow-sm"
+                              />
+                              <span>{country.name}</span>
+                            </div>
+                            <span className="text-gray-500 text-sm">{country.phone}</span>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -287,7 +301,9 @@ const RegisterStep1 = () => {
 
                 {/* Téléphone */}
                 <div className="space-y-2">
-                  <Label htmlFor="user_phone" className="text-gray-700 font-medium text-sm">Numéro de téléphone</Label>
+                  <Label htmlFor="user_phone" className="text-gray-700 font-medium text-sm sm:text-base">
+                    Numéro de téléphone
+                  </Label>
                   <Input
                     id="user_phone"
                     type="tel"
@@ -295,87 +311,114 @@ const RegisterStep1 = () => {
                     value={formData.user_phone}
                     onChange={handlePhoneChange}
                     required
-                    className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white h-11 rounded-lg transition-all duration-200"
                     disabled={isLoading}
+                    className="h-12 sm:h-14 rounded-xl border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 text-base transition-all"
                   />
                 </div>
 
-                {/* Mot de passe & confirmation (inchangés) */}
+                {/* Mot de passe */}
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-gray-700 font-medium text-sm">Mot de passe</Label>
+                  <Label htmlFor="password" className="text-gray-700 font-medium text-sm sm:text-base">
+                    Mot de passe
+                  </Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Choisissez un mot de passe"
+                      placeholder="••••••••"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       required
-                      className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white h-11 rounded-lg pr-10 transition-all duration-200"
                       disabled={isLoading}
+                      className="h-12 sm:h-14 rounded-xl border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 pr-14 text-base transition-all"
                     />
-                    <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
-                      onClick={() => setShowPassword(!showPassword)} disabled={isLoading}>
-                      {showPassword ? <EyeOff className="w-4 h-4 text-gray-500" /> : <Eye className="w-4 h-4 text-gray-500" />}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-gray-100 h-10 w-10"
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={isLoading}
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5 text-gray-500" /> : <Eye className="w-5 h-5 text-gray-500" />}
                     </Button>
                   </div>
                 </div>
 
+                {/* Confirmation mot de passe */}
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-gray-700 font-medium text-sm">Confirmer le mot de passe</Label>
+                  <Label htmlFor="confirmPassword" className="text-gray-700 font-medium text-sm sm:text-base">
+                    Confirmer le mot de passe
+                  </Label>
                   <div className="relative">
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirmez votre mot de passe"
+                      placeholder="••••••••"
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                       required
-                      className="border-gray-200 focus:border-green-500 focus:ring-green-500 bg-white h-11 rounded-lg pr-10 transition-all duration-200"
                       disabled={isLoading}
+                      className="h-12 sm:h-14 rounded-xl border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20 pr-14 text-base transition-all"
                     />
-                    <Button type="button" variant="ghost" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)} disabled={isLoading}>
-                      {showConfirmPassword ? <EyeOff className="w-4 h-4 text-gray-500" /> : <Eye className="w-4 h-4 text-gray-500" />}
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-gray-100 h-10 w-10"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={isLoading}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-5 h-5 text-gray-500" />
+                      ) : (
+                        <Eye className="w-5 h-5 text-gray-500" />
+                      )}
                     </Button>
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 h-11 rounded-lg font-semibold text-white shadow-md hover:shadow-lg transition-all duration-300" disabled={isLoading}>
+                <Button
+                  type="submit"
+                  className="w-full h-12 sm:h-14 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-base"
+                  disabled={isLoading}
+                >
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Chargement...
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Inscription...
                     </span>
                   ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      S'inscrire
-                      <ArrowRight className="w-4 h-4" />
-                    </span>
+                    "Continuer"
                   )}
                 </Button>
               </form>
 
-              <div className="mt-6 text-center text-sm">
-                <p className="text-gray-600">
-                  Déjà un compte ?{" "}
-                  <Link to="/login" className="text-green-600 hover:text-green-700 font-medium hover:underline">
-                    Se connecter
-                  </Link>
-                </p>
+              <div className="mt-8 text-center text-sm sm:text-base text-gray-600">
+                Déjà un compte ?{" "}
+                <Link to="/login" className="font-medium text-gray-900 hover:underline transition">
+                  Se connecter
+                </Link>
               </div>
             </CardContent>
           </Card>
         </motion.div>
 
+        {/* Dialog d'erreur */}
         <Dialog open={showErrorPopup} onOpenChange={setShowErrorPopup}>
-          <DialogContent className="sm:max-w-[425px] bg-white/95 backdrop-blur-md border-none shadow-xl rounded-2xl">
+          <DialogContent className="sm:max-w-md rounded-2xl">
             <DialogHeader>
-              <DialogTitle className="text-gray-800">Erreur d'inscription</DialogTitle>
-              <DialogDescription className="text-gray-600">{errorMessage}</DialogDescription>
+              <DialogTitle className="text-gray-900">Erreur</DialogTitle>
+              <DialogDescription className="text-gray-600 mt-2">
+                {errorMessage}
+              </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50" onClick={() => setShowErrorPopup(false)}>
+            <DialogFooter className="mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowErrorPopup(false)}
+                className="w-full sm:w-auto"
+              >
                 Fermer
               </Button>
             </DialogFooter>

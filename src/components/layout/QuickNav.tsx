@@ -1,6 +1,4 @@
-
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { 
   Home, 
   FileText, 
@@ -11,7 +9,8 @@ import {
   UserCheck,
   DollarSign,
   Key,
-  CreditCard
+  CreditCard,
+  HeadphonesIcon
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -35,13 +34,13 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
     { icon: Home, label: "Dashboard", path: "/partner/dashboard" },
     { icon: FileText, label: "Mes reçus", path: "/partner/receipts" },
     { icon: User, label: "Profil", path: "/partner/profile" },
-    { icon: Key, label: "API", path: "/partner/profile" },
+    { icon: Key, label: "Clé API", path: "/partner/api" },
   ];
 
   const adminNavItems = [
     { icon: Home, label: "Dashboard", path: "/admin/dashboard" },
     { icon: Users, label: "Utilisateurs", path: "/admin/users" },
-    { icon: DollarSign, label: "Payements", path: "/admin/payements" },
+    { icon: DollarSign, label: "Paiements", path: "/admin/payments" },
     { icon: UserCheck, label: "Partenaires", path: "/admin/partners" },
     { icon: Settings, label: "Paramètres", path: "/admin/settings" },
   ];
@@ -61,52 +60,64 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
 
   return (
     <>
-      {/* Desktop Navigation */}
-      <Card className="border-gray-200 mb-6 hidden md:block">
-        <CardContent className="p-4">
-          <div className="flex flex-wrap gap-2">
-            {navItems.map((item) => (
-              <Link key={item.path} to={item.path}>
-                <Button
-                  variant={location.pathname === item.path ? "default" : "outline"}
-                  size="sm"
-                  className={cn(
-                    "flex items-center gap-2",
-                    location.pathname === item.path
-                      ? "bg-primary text-white"
-                      : "text-gray-600 hover:text-primary"
-                  )}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.label}</span>
-                </Button>
-              </Link>
-            ))}
-            
-            {/* Liens additionnels */}
-            <div className="flex gap-2 ml-auto">
+      {/* Desktop Quick Navigation */}
+      <div className="hidden md:block mb-8">
+        <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Navigation principale */}
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + "/");
+
+              return (
+                <Link key={item.path} to={item.path}>
+                  <Button
+                    variant={isActive ? "default" : "ghost"}
+                    className={cn(
+                      "h-11 px-5 rounded-xl font-medium transition-all",
+                      "flex items-center gap-2.5",
+                      isActive
+                        ? "bg-black hover:bg-black/90 text-white shadow-sm"
+                        : "text-gray-700 hover:text-black hover:bg-gray-100"
+                    )}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+
+            {/* Séparateur visuel subtil */}
+            <div className="h-8 w-px bg-gray-200 mx-2" />
+
+            {/* Liens secondaires à droite */}
+            <div className="flex items-center gap-3">
               <Link to="/subscription">
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary">
+                <Button
+                  variant="ghost"
+                  className="h-11 px-5 rounded-xl font-medium text-gray-700 hover:text-black hover:bg-gray-100 transition-all flex items-center gap-2.5"
+                >
                   <CreditCard className="w-4 h-4" />
-                  <span className="ml-2">Abonnement</span>
+                  Abonnement
                 </Button>
               </Link>
+
               <Link to="/support">
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-primary">
-                  <Settings className="w-4 h-4" />
-                  <span className="ml-2">Support</span>
+                <Button
+                  variant="ghost"
+                  className="h-11 px-5 rounded-xl font-medium text-gray-700 hover:text-black hover:bg-gray-100 transition-all flex items-center gap-2.5"
+                >
+                  <HeadphonesIcon className="w-4 h-4" />
+                  Support
                 </Button>
               </Link>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Mobile Navigation - Affiche uniquement la barre en bas */}
-      <div className="md:hidden">
-        {/* Espacement pour éviter que le contenu soit masqué par la barre de navigation fixe */}
-        <div className="h-4"></div>
+        </div>
       </div>
+
+      {/* Mobile : juste un espacement pour ne pas chevaucher MobileNav */}
+      <div className="h-20 md:hidden" />
     </>
   );
 };
