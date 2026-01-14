@@ -3,16 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter
+  DialogFooter,
 } from "@/components/ui/dialog";
-import { ArrowLeft, ArrowRight, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft,ArrowRight, Plus, Trash2, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
@@ -23,60 +29,56 @@ import axios from "axios";
 const GenerateReceiptStep2 = () => {
   const navigate = useNavigate();
   const [clientInfo, setClientInfo] = useState({
-    client_id: null,
+    client_id: null as number | null,
     full_name: "",
     email: "",
     phone_number: "",
-    address: ""
+    address: "",
   });
   const [items, setItems] = useState([
-    { id: 1, description: "", quantity: 1, unit_price: 0 }
+    { id: 1, description: "", quantity: 1, unit_price: 0 },
   ]);
   const [receiptInfo, setReceiptInfo] = useState({
     tva_rate: 0,
     payment_status: "",
-    payment_method: ""
+    payment_method: "",
   });
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [showSubscriptionPopup, setShowSubscriptionPopup] = useState(false);
   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
+
   const companyId = localStorage.getItem("company_id");
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("user_id") || "1";
 
   useEffect(() => {
     const fetchClients = async () => {
-      if (!companyId) {
-        toast.error("Company ID is missing. Please log in again.");
-        return;
-      }
-      if (!token) {
-        toast.error("Authentication token is missing. Please log in again.");
+      if (!companyId || !token) {
+        toast.error("Informations de session manquantes.");
         return;
       }
       try {
         setLoading(true);
-        const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/clients/${companyId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_API_URL}/user/clients/${companyId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
-        if (!response.ok) {
-          if (response.status === 401) throw new Error("Unauthorized access. Please log in.");
-          if (response.status === 403) throw new Error("Access forbidden.");
-          if (response.status === 404) throw new Error("Clients not found.");
-          throw new Error(`Failed to fetch clients: ${response.status}`);
-        }
+        );
+
+        if (!response.ok) throw new Error("Impossible de charger les clients");
         const data = await response.json();
         setClients(data);
       } catch (error) {
-        console.error("Error fetching clients:", error);
-        toast.error(error.message || "Failed to load clients. Please try again.");
+        toast.error("Erreur lors du chargement des clients");
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -85,46 +87,45 @@ const GenerateReceiptStep2 = () => {
   }, [companyId, token]);
 
   const addItem = () => {
-    const newItem = {
-      id: Date.now(),
-      description: "",
-      quantity: 1,
-      unit_price: 0
-    };
-    setItems([...items, newItem]);
+    setItems([
+      ...items,
+      { id: Date.now(), description: "", quantity: 1, unit_price: 0 },
+    ]);
   };
 
-  const removeItem = (id) => {
+  const removeItem = (id: number) => {
     if (items.length > 1) {
-      setItems(items.filter(item => item.id !== id));
+      setItems(items.filter((item) => item.id !== id));
     }
   };
 
-  const updateItem = (id, field, value) => {
-    setItems(items.map(item =>
-      item.id === id
-        ? {
-            ...item,
-            [field]:
-              field === "quantity"
-                ? Math.max(1, parseInt(value) || 1)
-                : field === "unit_price"
-                ? Math.max(0, parseFloat(value.replace(/^0+/, '') || '0'))
-                : value
-          }
-        : item
-    ));
+  const updateItem = (id: number, field: string, value: string) => {
+    setItems(
+      items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              [field]:
+                field === "quantity"
+                  ? Math.max(1, parseInt(value) || 1)
+                  : field === "unit_price"
+                  ? Math.max(0, parseFloat(value.replace(/^0+/, "") || "0"))
+                  : value,
+            }
+          : item
+      )
+    );
   };
 
-  const handleClientSelect = (clientId) => {
-    const selectedClient = clients.find(client => client.client_id.toString() === clientId);
-    if (selectedClient) {
+  const handleClientSelect = (clientId: string) => {
+    const selected = clients.find((c: any) => c.client_id.toString() === clientId);
+    if (selected) {
       setClientInfo({
-        client_id: selectedClient.client_id,
-        full_name: selectedClient.client_name,
-        email: selectedClient.client_email || "",
-        phone_number: selectedClient.client_phone || "",
-        address: selectedClient.client_address || ""
+        client_id: selected.client_id,
+        full_name: selected.client_name,
+        email: selected.client_email || "",
+        phone_number: selected.client_phone || "",
+        address: selected.client_address || "",
       });
     } else {
       setClientInfo({
@@ -132,59 +133,48 @@ const GenerateReceiptStep2 = () => {
         full_name: "",
         email: "",
         phone_number: "",
-        address: ""
+        address: "",
       });
     }
   };
 
-  const subtotal = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
-  const tvaAmount = (subtotal * Math.max(0, receiptInfo.tva_rate)) / 100;
+  const subtotal = items.reduce(
+    (sum, item) => sum + item.unit_price * item.quantity,
+    0
+  );
+  const tvaAmount = (subtotal * receiptInfo.tva_rate) / 100;
   const total = subtotal + tvaAmount;
 
   const handleGenerateReceipt = async () => {
-    if (!companyId || isNaN(parseInt(companyId))) {
-      toast.error("Invalid company ID. Please log in again.");
-      return;
-    }
-    if (!userId) {
-      toast.error("Invalid user ID. Please log in again.");
-      return;
-    }
-    if (!token) {
-      toast.error("Authentication token is missing. Please log in again.");
-      return;
-    }
     if (
       !clientInfo.full_name ||
-      items.some(item => !item.description || item.unit_price <= 0 || isNaN(item.unit_price) || isNaN(item.quantity)) ||
+      items.some((i) => !i.description || i.unit_price <= 0 || i.quantity < 1) ||
       !receiptInfo.payment_method ||
       !receiptInfo.payment_status
     ) {
-      toast.error("Please fill all required fields correctly (client name, item descriptions, valid prices, payment method, and status).");
+      toast.error("Veuillez remplir tous les champs obligatoires correctement.");
       return;
     }
 
-    const clientInfoPayload = {
-      full_name: clientInfo.full_name,
-      ...(clientInfo.email && { email: clientInfo.email }),
-      ...(clientInfo.phone_number && { phone_number: clientInfo.phone_number }),
-      ...(clientInfo.address && { address: clientInfo.address })
-    };
-
     const payload = {
-      company_id: parseInt(companyId),
+      company_id: parseInt(companyId!),
       user_id: userId,
       ...(clientInfo.client_id && { client_id: clientInfo.client_id }),
-      client_info: clientInfoPayload,
-      items: items.map(item => ({
-        description: item.description,
-        quantity: item.quantity,
-        unit_price: item.unit_price
+      client_info: {
+        full_name: clientInfo.full_name,
+        ...(clientInfo.email && { email: clientInfo.email }),
+        ...(clientInfo.phone_number && { phone_number: clientInfo.phone_number }),
+        ...(clientInfo.address && { address: clientInfo.address }),
+      },
+      items: items.map((i) => ({
+        description: i.description,
+        quantity: i.quantity,
+        unit_price: i.unit_price,
       })),
       tva_rate: receiptInfo.tva_rate,
       receipt_model: localStorage.getItem("selectedTemplate") || "classic",
       payment_status: receiptInfo.payment_status,
-      payment_method: receiptInfo.payment_method
+      payment_method: receiptInfo.payment_method,
     };
 
     try {
@@ -192,103 +182,67 @@ const GenerateReceiptStep2 = () => {
       setIsDownloading(true);
       setDownloadProgress(0);
 
-      const simulateProgress = () => {
-        return new Promise((resolve) => {
-          let progress = 0;
-          const interval = setInterval(() => {
-            progress += 10;
-            setDownloadProgress(Math.min(progress, 50));
-            if (progress >= 50) {
-              clearInterval(interval);
-              resolve(null);
-            }
-          }, 200);
-        });
-      };
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_API_URL}/receipts/receipt/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token!}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
-      console.log("Sending payload to /receipts/receipt/:", JSON.stringify(payload, null, 2));
-      await simulateProgress();
-      const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/receipts/receipt/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      console.log("Receipt creation response status:", response.status);
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error("Error response body:", errorData);
-        if (errorData.error === "Aucun abonnement actif trouvé.") {
+        if (errorData.error?.includes("abonnement")) {
           setShowSubscriptionPopup(true);
-          throw new Error("No active subscription found.");
         }
-        if (errorData.error === "Quota mensuel de reçus atteint.") {
+        if (errorData.error?.includes("Quota")) {
           setShowQuotaPopup(true);
-          throw new Error("Monthly receipt quota reached.");
         }
-        if (response.status === 400) throw new Error(errorData.message || "Invalid receipt data.");
-        if (response.status === 401) throw new Error("Unauthorized access. Please log in.");
-        if (response.status === 403) throw new Error("Access forbidden.");
-        if (response.status === 500) throw new Error(`Server error: ${errorData.message || "Unknown server issue"}`);
-        throw new Error(`Failed to create receipt: ${response.status}`);
+        throw new Error(errorData.message || "Erreur lors de la création du reçu");
       }
 
       const result = await response.json();
-      console.log("Receipt creation result:", result);
-      if (!result.receipt_id || !result.receipt_number) {
-        throw new Error("Missing receipt ID or receipt number from server.");
-      }
 
-      console.log(`Generating receipt with ID: ${result.receipt_id}, Number: ${result.receipt_number}`);
-      const generateResponse = await axios.get(`${import.meta.env.VITE_BASE_API_URL}/receipt/generate/${result.receipt_id}`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        },
-        responseType: "blob",
-        onDownloadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = 50 + Math.round((progressEvent.loaded * 50) / progressEvent.total);
-            setDownloadProgress(percentCompleted);
-          }
+      const generateResponse = await axios.get(
+        `${import.meta.env.VITE_BASE_API_URL}/receipt/generate/${result.receipt_id}`,
+        {
+          headers: { Authorization: `Bearer ${token!}` },
+          responseType: "blob",
+          onDownloadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const percent = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              setDownloadProgress(percent);
+            }
+          },
         }
-      });
+      );
 
-      const contentType = generateResponse.headers["content-type"];
-      if (!contentType || !contentType.includes("application/pdf")) {
-        throw new Error("Invalid response format: Expected a PDF file.");
-      }
-
-      const sanitizedReceiptNumber = result.receipt_number.replace(/[\/\\:*?"<>|]/g, "_");
-      let filename = `receipt_${sanitizedReceiptNumber}.pdf`;
-      const contentDisposition = generateResponse.headers["content-disposition"];
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-        if (filenameMatch && filenameMatch[1]) {
-          filename = filenameMatch[1];
-        }
-      }
-
-      console.log(`Downloading file as: ${filename}`);
       const blob = generateResponse.data;
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = filename;
+      let safeNumber = result.receipt_number || String(Date.now());
+      const unsafeChars = ['/', '\\', ':', '*', '?', '"', '<', '>', '|'];
+      unsafeChars.forEach((ch) => {
+        safeNumber = safeNumber.split(ch).join("_");
+      });
+      link.download = `reçu_${safeNumber}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      console.log("Receipt generation and download successful");
-      toast.success("Receipt created and downloaded successfully!");
+      toast.success("Reçu généré et téléchargé avec succès !");
       navigate("/receipts");
-    } catch (error) {
-      console.error("Error generating receipt:", error);
-      if (error.message !== "No active subscription found." && error.message !== "Monthly receipt quota reached.") {
-        toast.error(error.message || "Failed to generate receipt. Please try again.");
+    } catch (error: any) {
+      if (!showSubscriptionPopup && !showQuotaPopup) {
+        toast.error(error.message || "Erreur lors de la génération du reçu");
       }
     } finally {
       setLoading(false);
@@ -298,156 +252,179 @@ const GenerateReceiptStep2 = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 mobile-nav-padding">
+    <div className="min-h-screen bg-gray-50">
       <Header title="Générer un reçu" />
 
-      <main className="p-4 sm:p-6 space-y-6">
+      <main className="pt-20 px-4 sm:px-6 lg:px-12 xl:px-24 2xl:px-32 pb-24">
         <QuickNav userType="user" />
 
-        <div className="flex items-center justify-center space-x-4 mb-8">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 font-medium">
-              1
+        {/* Progress Indicator */}
+        <div className="max-w-4xl mx-auto mb-12">
+          <div className="flex items-center justify-center gap-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center font-bold text-lg">
+                1
+              </div>
+              <span className="text-lg font-medium text-gray-500">Modèle</span>
             </div>
-            <span className="ml-2 text-sm text-gray-500">Modèle</span>
-          </div>
-          <div className="w-12 h-0.5 bg-primary"></div>
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-medium">
-              2
+            <div className="w-32 h-1 bg-gray-900 rounded-full hidden sm:block" />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-lg">
+                2
+              </div>
+              <span className="text-lg font-medium text-gray-900">Remplir les détails</span>
             </div>
-            <span className="ml-2 text-sm font-medium text-primary">Détails</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="border-gray-200">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold">Informations client</CardTitle>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-16 max-w-7xl mx-auto">
+          {/* Formulaire principal */}
+          <div className="xl:col-span-2 space-y-10">
+            {/* Client */}
+            <Card className="shadow-lg bg-white rounded-3xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  Informations du client
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="clientSelect" className="text-sm font-medium">Sélectionner un client</Label>
-                  <Select onValueChange={handleClientSelect} disabled={loading || isDownloading}>
-                    <SelectTrigger id="clientSelect" className="border-gray-300 text-sm h-12">
-                      <SelectValue placeholder={loading || isDownloading ? "Chargement..." : "Choisir un client"} />
+              <CardContent className="space-y-6">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Client existant (optionnel)
+                  </Label>
+                  <Select onValueChange={handleClientSelect} disabled={loading}>
+                    <SelectTrigger className="h-12 text-base rounded-xl border-gray-300">
+                      <SelectValue placeholder="Sélectionner ou saisir manuellement" />
                     </SelectTrigger>
                     <SelectContent>
-                      {clients.map(client => (
-                        <SelectItem key={client.client_id} value={client.client_id.toString()}>
-                          {client.client_name}
+                      {clients.map((c: any) => (
+                        <SelectItem key={c.client_id} value={c.client_id.toString()}>
+                          {c.client_name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="clientName" className="text-sm font-medium">Nom complet *</Label>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2">
+                      Nom complet *
+                    </Label>
                     <Input
-                      id="clientName"
                       value={clientInfo.full_name}
                       onChange={(e) => setClientInfo({ ...clientInfo, full_name: e.target.value })}
                       placeholder="Nom du client"
-                      className="border-gray-300 text-sm h-12 px-4"
-                      disabled={loading || isDownloading}
+                      className="h-12 text-base rounded-xl"
+                      disabled={loading}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="clientEmail" className="text-sm font-medium">Email</Label>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2">
+                      Email
+                    </Label>
                     <Input
-                      id="clientEmail"
                       type="email"
                       value={clientInfo.email}
                       onChange={(e) => setClientInfo({ ...clientInfo, email: e.target.value })}
                       placeholder="email@exemple.com"
-                      className="border-gray-300 text-sm h-12 px-4"
-                      disabled={loading || isDownloading}
+                      className="h-12 text-base rounded-xl"
+                      disabled={loading}
                     />
                   </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="clientPhone" className="text-sm font-medium">Téléphone</Label>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2">
+                      Téléphone
+                    </Label>
                     <Input
-                      id="clientPhone"
                       value={clientInfo.phone_number}
                       onChange={(e) => setClientInfo({ ...clientInfo, phone_number: e.target.value })}
                       placeholder="+227 XX XX XX XX"
-                      className="border-gray-300 text-sm h-12 px-4"
-                      disabled={loading || isDownloading}
+                      className="h-12 text-base rounded-xl"
+                      disabled={loading}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="clientAddress" className="text-sm font-medium">Adresse</Label>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2">
+                      Adresse
+                    </Label>
                     <Input
-                      id="clientAddress"
                       value={clientInfo.address}
                       onChange={(e) => setClientInfo({ ...clientInfo, address: e.target.value })}
-                      placeholder="Adresse du client"
-                      className="border-gray-300 text-sm h-12 px-4"
-                      disabled={loading || isDownloading}
+                      placeholder="Adresse complète"
+                      className="h-12 text-base rounded-xl"
+                      disabled={loading}
                     />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-gray-200">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-xl font-bold">Articles</CardTitle>
-                <Button onClick={addItem} size="sm" className="bg-orange-600 hover:bg-orange-700 h-10 px-4" disabled={loading || isDownloading}>
+            {/* Articles */}
+            <Card className="shadow-lg bg-white rounded-3xl">
+              <CardHeader className="flex items-center justify-between pb-4">
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  Articles
+                </CardTitle>
+                <Button
+                  onClick={addItem}
+                  className="h-10 px-6 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-sm rounded-xl shadow-lg"
+                  disabled={loading}
+                >
                   <Plus className="w-5 h-5 mr-2" />
-                  Ajouter
+                  Ajouter un article
                 </Button>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {items.map((item, index) => (
-                  <div key={item.id} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
-                    <div className="sm:col-span-5 space-y-2">
-                      <Label className="text-sm font-medium">Article {index + 1}</Label>
+              <CardContent className="space-y-6">
+                {items.map((item) => (
+                  <div key={item.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                    <div className="md:col-span-6">
+                      <Label className="text-sm font-medium text-gray-700 mb-2">
+                        Description *
+                      </Label>
                       <Input
                         value={item.description}
-                        onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                        onChange={(e) => updateItem(item.id, "description", e.target.value)}
                         placeholder="Description de l'article"
-                        className="border-gray-300 text-sm h-12 px-4"
-                        disabled={loading || isDownloading}
+                        className="h-12 text-base rounded-xl"
+                        disabled={loading}
                       />
                     </div>
-                    <div className="sm:col-span-2 space-y-2">
-                      <Label className="text-sm font-medium">Quantité</Label>
+                    <div className="md:col-span-2">
+                      <Label className="text-sm font-medium text-gray-700 mb-2">
+                        Quantité
+                      </Label>
                       <Input
                         type="number"
-                        placeholder="1"
-                      
+                        min="1"
                         value={item.quantity}
-                        onChange={(e) => updateItem(item.id, 'quantity', e.target.value)}
-                        className="border-gray-300 text-sm h-12 px-4"
-                        disabled={loading || isDownloading}
+                        onChange={(e) => updateItem(item.id, "quantity", e.target.value)}
+                        className="h-12 text-base rounded-xl"
+                        disabled={loading}
                       />
                     </div>
-                    <div className="sm:col-span-3 space-y-2">
-                      <Label className="text-sm font-medium">Prix unitaire</Label>
+                    <div className="md:col-span-3">
+                      <Label className="text-sm font-medium text-gray-700 mb-2">
+                        Prix unitaire (FCFA)
+                      </Label>
                       <Input
                         type="number"
                         min="0"
-                        step="0.01"
-                        value={item.unit_price === 0 ? '' : item.unit_price} // Hide 0 in the input field
-                        onChange={(e) => updateItem(item.id, 'unit_price', e.target.value.replace(/^0+(?=\d)/, ''))}
+                        value={item.unit_price || ""}
+                        onChange={(e) => updateItem(item.id, "unit_price", e.target.value)}
                         placeholder="0"
-                        className="border-gray-300 text-sm h-12 px-4"
-                        disabled={loading || isDownloading}
+                        className="h-12 text-base rounded-xl"
+                        disabled={loading}
                       />
                     </div>
-                    <div className="sm:col-span-2 flex justify-end mt-4 sm:mt-0">
+                    <div className="md:col-span-1">
                       {items.length > 1 && (
                         <Button
-                          variant="outline"
-                          size="sm"
+                          variant="ghost"
+                          size="icon"
                           onClick={() => removeItem(item.id)}
-                          className="text-red-600 border-red-300 hover:bg-red-50 h-10 w-10"
-                          disabled={loading || isDownloading}
+                          className="h-12 w-12 text-red-600 hover:bg-red-50 rounded-xl"
+                          disabled={loading}
                         >
                           <Trash2 className="w-5 h-5" />
                         </Button>
@@ -458,58 +435,64 @@ const GenerateReceiptStep2 = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-gray-200">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold">Paramètres additionnels</CardTitle>
+            {/* Paramètres */}
+            <Card className="shadow-lg bg-white rounded-3xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-2xl font-bold text-gray-900">
+                  Paramètres du reçu
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="tva" className="text-sm font-medium">TVA (%)</Label>
-                    <Input
-                      id="tva"
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.1"
-                      value={receiptInfo.tva_rate === 0 ? '' : receiptInfo.tva_rate} // Hide 0 in TVA input for consistency
-                      onChange={(e) =>
-                        setReceiptInfo({
-                          ...receiptInfo,
-                          tva_rate: Math.max(0, parseFloat(e.target.value.replace(/^0+(?=\d)/, '') || '0'))
-                        })
-                      }
-                      placeholder="0"
-                      className="border-gray-300 text-sm h-12 px-4"
-                      disabled={loading || isDownloading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="paymentMethod" className="text-sm font-medium">Méthode de paiement</Label>
-                    <Select
-                      onValueChange={(value) => setReceiptInfo({ ...receiptInfo, payment_method: value })}
-                      disabled={loading || isDownloading}
-                    >
-                      <SelectTrigger id="paymentMethod" className="border-gray-300 text-sm h-12">
-                        <SelectValue placeholder="Choisir une méthode" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="My Nita">My Nita</SelectItem>
-                        <SelectItem value="Cash">Espèces</SelectItem>
-                        <SelectItem value="Bank Transfer">Virement bancaire</SelectItem>
-                        <SelectItem value="Mobile Money">Mobile Money</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2">
+                    TVA (%)
+                  </Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={receiptInfo.tva_rate || ""}
+                    onChange={(e) =>
+                      setReceiptInfo({
+                        ...receiptInfo,
+                        tva_rate: parseFloat(e.target.value) || 0,
+                      })
+                    }
+                    placeholder="0"
+                    className="h-12 text-base rounded-xl"
+                    disabled={loading}
+                  />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="paymentStatus" className="text-sm font-medium">Statut de paiement</Label>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2">
+                    Méthode de paiement *
+                  </Label>
                   <Select
-                    onValueChange={(value) => setReceiptInfo({ ...receiptInfo, payment_status: value })}
-                    disabled={loading || isDownloading}
+                    onValueChange={(v) => setReceiptInfo({ ...receiptInfo, payment_method: v })}
+                    disabled={loading}
                   >
-                    <SelectTrigger id="paymentStatus" className="border-gray-300 text-sm h-12">
-                      <SelectValue placeholder="Choisir un statut" />
+                    <SelectTrigger className="h-12 text-base rounded-xl">
+                      <SelectValue placeholder="Choisir" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="My Nita">My Nita</SelectItem>
+                      <SelectItem value="Cash">Espèces</SelectItem>
+                      <SelectItem value="Bank Transfer">Virement bancaire</SelectItem>
+                      <SelectItem value="Mobile Money">Mobile Money</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2">
+                    Statut de paiement *
+                  </Label>
+                  <Select
+                    onValueChange={(v) => setReceiptInfo({ ...receiptInfo, payment_status: v })}
+                    disabled={loading}
+                  >
+                    <SelectTrigger className="h-12 text-base rounded-xl">
+                      <SelectValue placeholder="Choisir" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="paid">Payé</SelectItem>
@@ -521,130 +504,160 @@ const GenerateReceiptStep2 = () => {
             </Card>
           </div>
 
-          <div className="lg:col-span-1">
-            <Card className="border-gray-200 sticky top-6">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold">Résumé</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Sous-total</span>
-                    <span className="font-medium">{subtotal.toLocaleString()} FCFA</span>
-                  </div>
-                  {receiptInfo.tva_rate > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">TVA ({receiptInfo.tva_rate}%)</span>
-                      <span className="font-medium">+{tvaAmount.toLocaleString()} FCFA</span>
+          {/* Résumé sticky */}
+          <div className="xl:col-span-1">
+            <div className="sticky top-24">
+              <Card className="shadow-2xl bg-white rounded-3xl">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-2xl font-bold text-gray-900">
+                    Résumé du reçu
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex justify-between text-lg">
+                      <span className="text-gray-600">Sous-total</span>
+                      <span className="font-bold">{subtotal.toLocaleString()} FCFA</span>
                     </div>
-                  )}
-                  <div className="border-t pt-2">
-                    <div className="flex justify-between">
-                      <span className="font-bold text-lg">Total</span>
-                      <span className="font-bold text-lg text-primary">{total.toLocaleString()} FCFA</span>
+                    {receiptInfo.tva_rate > 0 && (
+                      <div className="flex justify-between text-lg">
+                        <span className="text-gray-600">TVA ({receiptInfo.tva_rate}%)</span>
+                        <span className="font-bold">+{tvaAmount.toLocaleString()} FCFA</span>
+                      </div>
+                    )}
+                    <div className="border-t-2 border-gray-200 pt-4">
+                      <div className="flex justify-between">
+                        <span className="text-2xl font-black text-gray-900">Total</span>
+                        <span className="text-3xl font-black text-gray-900">
+                          {total.toLocaleString()} FCFA
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="space-y-3 pt-4">
-                  <Button
-                    onClick={() => navigate('/generate')}
-                    variant="outline"
-                    className="w-full h-12 text-sm"
-                    disabled={loading || isDownloading}
-                  >
-                    <ArrowLeft className="w-5 h-5 mr-2" />
-                    Retour
-                  </Button>
-                  <Button
-                    onClick={handleGenerateReceipt}
-                    className="w-full bg-primary hover:bg-primary/90 h-12 text-sm"
-                    disabled={
-                      loading ||
-                      isDownloading ||
-                      !clientInfo.full_name ||
-                      items.some(item => !item.description || item.unit_price <= 0) ||
-                      !receiptInfo.payment_method ||
-                      !receiptInfo.payment_status
-                    }
-                  >
-                    {loading || isDownloading ? "Chargement..." : "Générer le reçu"}
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="space-y-4 pt-6">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-full h-14 rounded-2xl border-2 text-lg"
+                      onClick={() => navigate("/generate")}
+                      disabled={loading || isDownloading}
+                    >
+                      <ArrowLeft className="w-6 h-6 mr-3" />
+                      Retour
+                    </Button>
+                    <Button
+                      size="lg"
+                      className="w-full h-16 bg-gray-900 hover:bg-gray-800 text-white font-bold text-xl rounded-2xl shadow-2xl flex items-center justify-center gap-4"
+                      onClick={handleGenerateReceipt}
+                      disabled={
+                        loading ||
+                        isDownloading ||
+                        !clientInfo.full_name ||
+                        items.some((i) => !i.description || i.unit_price <= 0 || i.quantity < 1) ||
+                        !receiptInfo.payment_method ||
+                        !receiptInfo.payment_status
+                      }
+                    >
+                      {isDownloading ? (
+                        <>
+                          <Loader2 className="w-7 h-7 animate-spin" />
+                          Génération...
+                        </>
+                      ) : (
+                        <>
+                          Générer le reçu
+                          <ArrowRight className="w-7 h-7" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
 
+        {/* Popups */}
         <Dialog open={showSubscriptionPopup} onOpenChange={setShowSubscriptionPopup}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="rounded-3xl max-w-lg">
             <DialogHeader>
-              <DialogTitle>Aucun abonnement actif</DialogTitle>
-              <DialogDescription>
-                Aucun abonnement actif trouvé. Votre abonnement a peut-être expiré. Veuillez souscrire pour continuer.
+              <DialogTitle className="text-3xl font-bold">Abonnement requis</DialogTitle>
+              <DialogDescription className="text-xl">
+                Votre abonnement est inactif. Souscrivez pour continuer à générer des reçus.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setShowSubscriptionPopup(false)}
-                className="h-10 text-sm"
-              >
-                Fermer
+            <DialogFooter className="flex gap-6 mt-8">
+              <Button variant="outline" onClick={() => setShowSubscriptionPopup(false)} className="h-16 px-10 text-xl rounded-3xl">
+                Annuler
               </Button>
-              <Button
-                onClick={() => navigate('/subscription/')}
-                className="bg-primary hover:bg-primary/90 h-10 text-sm"
-              >
-                Souscrire maintenant
+              <Button onClick={() => navigate("/subscription")} className="h-16 px-10 text-xl rounded-3xl bg-gray-900 hover:bg-gray-800">
+                Voir les abonnements
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
         <Dialog open={showQuotaPopup} onOpenChange={setShowQuotaPopup}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="rounded-3xl max-w-lg">
             <DialogHeader>
-              <DialogTitle>Quota mensuel atteint</DialogTitle>
-              <DialogDescription>
-                Votre quota mensuel de reçus est atteint. Veuillez mettre à jour votre abonnement pour continuer.
+              <DialogTitle className="text-3xl font-bold">Quota atteint</DialogTitle>
+              <DialogDescription className="text-xl">
+                Vous avez atteint votre limite mensuelle. Passez à un plan supérieur.
               </DialogDescription>
             </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setShowQuotaPopup(false)}
-                className="h-10 text-sm"
-              >
-                Fermer
+            <DialogFooter className="flex gap-6 mt-8">
+              <Button variant="outline" onClick={() => setShowQuotaPopup(false)} className="h-16 px-10 text-xl rounded-3xl">
+                Annuler
               </Button>
-              <Button
-                onClick={() => navigate('/subscription/')}
-                className="bg-primary hover:bg-primary/90 h-10 text-sm"
-              >
-                Mettre à jour l'abonnement
+              <Button onClick={() => navigate("/subscription")} className="h-16 px-10 text-xl rounded-3xl bg-gray-900 hover:bg-gray-800">
+                Mettre à jour
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
+        {/* Progress overlay */}
         {isDownloading && (
-          <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-            <div className="w-3/4 sm:w-1/2 max-w-md space-y-2">
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div
-                  className="bg-primary h-2.5 rounded-full transition-all duration-300"
-                  style={{ width: `${downloadProgress}%` }}
-                ></div>
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-white rounded-3xl p-16 shadow-3xl max-w-2xl w-full mx-4 text-center space-y-12">
+              <Loader2 className="w-24 h-24 text-gray-900 animate-spin mx-auto" />
+              <div>
+                <p className="text-4xl font-black text-gray-900 mb-6">
+                  Génération du reçu en cours
+                </p>
+                <p className="text-7xl font-black text-gray-900">{downloadProgress}%</p>
               </div>
-              <div className="text-center text-white text-lg font-medium">{downloadProgress}%</div>
+              <div className="w-full bg-gray-200 rounded-full h-8">
+                <div
+                  className="bg-gray-900 h-8 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${downloadProgress}%` }}
+                />
+              </div>
             </div>
           </div>
         )}
-      </main>
 
-      <MobileNav />
+        {/* Bouton flottant mobile */}
+        <div className="fixed bottom-24 right-6 z-40 md:hidden">
+          <Button
+            onClick={handleGenerateReceipt}
+            disabled={
+              loading ||
+              isDownloading ||
+              !clientInfo.full_name ||
+              items.some((i) => !i.description || i.unit_price <= 0 || i.quantity < 1) ||
+              !receiptInfo.payment_method ||
+              !receiptInfo.payment_status
+            }
+            className="w-20 h-20 bg-gray-900 hover:bg-gray-800 text-white rounded-full shadow-3xl flex items-center justify-center"
+          >
+            <ArrowRight className="w-12 h-12" />
+          </Button>
+        </div>
+
+        <MobileNav />
+      </main>
     </div>
   );
 };

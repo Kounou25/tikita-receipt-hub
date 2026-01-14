@@ -6,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
+import { cn } from "@/lib/utils"; // ← Import ajouté
+import TemplateCard from '@/components/user/TemplateCard';
 
 const GenerateReceiptStep1 = () => {
   const [selectedTemplate, setSelectedTemplate] = useState("");
-  const [filteredTemplates, setFilteredTemplates] = useState([]);
+  const [filteredTemplates, setFilteredTemplates] = useState<any[]>([]);
   const navigate = useNavigate();
 
   const allTemplates = [
@@ -49,7 +51,7 @@ const GenerateReceiptStep1 = () => {
         const companyId = localStorage.getItem("company_id");
         if (!companyId) {
           console.error("No company ID found in localStorage");
-          setFilteredTemplates([allTemplates[0]]); // Default to first template
+          setFilteredTemplates([allTemplates[0]]);
           return;
         }
 
@@ -59,7 +61,6 @@ const GenerateReceiptStep1 = () => {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              // Add any necessary authentication headers
             },
           }
         );
@@ -71,22 +72,21 @@ const GenerateReceiptStep1 = () => {
         const data = await response.json();
         const planName = data.plan_name;
 
-        // Filter templates based on plan
         let availableTemplates = [];
         if (planName === "Gratuit") {
-          availableTemplates = [allTemplates[0]]; // Only first template
+          availableTemplates = [allTemplates[0]];
         } else if (planName === "Tikiita plus") {
-          availableTemplates = allTemplates.slice(0, 3); // First 3 templates
+          availableTemplates = allTemplates.slice(0, 3);
         } else if (planName === "Tikiita pro") {
-          availableTemplates = allTemplates; // All templates
+          availableTemplates = allTemplates;
         } else {
-          availableTemplates = [allTemplates[0]]; // Default fallback
+          availableTemplates = [allTemplates[0]];
         }
 
         setFilteredTemplates(availableTemplates);
       } catch (error) {
         console.error("Error fetching subscription:", error);
-        setFilteredTemplates([allTemplates[0]]); // Fallback to first template
+        setFilteredTemplates([allTemplates[0]]);
       }
     };
 
@@ -101,86 +101,73 @@ const GenerateReceiptStep1 = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 mobile-nav-padding">
+    <div className="min-h-screen bg-gray-50">
       <Header title="Générer un reçu" />
-      <main className="p-4 md:p-6 space-y-6">
+
+      <main className="pt-20 px-4 sm:px-6 lg:px-12 xl:px-24 2xl:px-32 pb-24">
         <QuickNav userType="user" />
-        {/* Progress indicator */}
-        <div className="flex items-center justify-center space-x-4 mb-8">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-medium">
-              1
+
+        {/* Progress Indicator */}
+        <div className="max-w-4xl mx-auto mb-12">
+          <div className="flex items-center justify-center gap-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-lg">
+                1
+              </div>
+              <span className="text-lg font-medium text-gray-900">Choisir un modèle</span>
             </div>
-            <span className="ml-2 text-sm font-medium text-primary">Modèle</span>
-          </div>
-          <div className="w-12 h-0.5 bg-gray-300"></div>
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-500 font-medium">
-              2
+            <div className="w-32 h-1 bg-gray-300 rounded-full hidden sm:block" />
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center font-bold text-lg">
+                2
+              </div>
+              <span className="text-lg font-medium text-gray-500">Remplir les détails</span>
             </div>
-            <span className="ml-2 text-sm text-gray-500">Détails</span>
           </div>
         </div>
 
-        <Card className="border-gray-200 shadow-sm">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              Choisissez un modèle de reçu
-            </CardTitle>
-            <p className="text-gray-600 mt-2">
-              Sélectionnez le design qui correspond le mieux à votre marque
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4">
+              Choisissez votre modèle de reçu
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Sélectionnez le design qui représente le mieux votre marque
             </p>
-          </CardHeader>
-          <CardContent className="px-6 pb-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {filteredTemplates.map((template) => (
-                <div
-                  key={template.id}
-                  className={`relative border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${
-                    selectedTemplate === template.id
-                      ? "border-primary bg-primary/5 shadow-md"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                  onClick={() => setSelectedTemplate(template.id)}
-                >
-                  {template.popular && (
-                    <div className="absolute -top-2 -right-2 bg-secondary text-white text-xs px-2 py-1 rounded-full font-medium z-10">
-                      Populaire
-                    </div>
-                  )}
-                  {selectedTemplate === template.id && (
-                    <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center z-10">
-                      <Check className="w-3 h-3 text-white" />
-                    </div>
-                  )}
-                  <div className="p-3">
-                    <div className="aspect-[3/4] bg-gray-100 rounded-lg mb-2 overflow-hidden">
-                      <img
-                        src={template.thumbnail}
-                        alt={template.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <h3 className="font-medium text-gray-900 text-sm mb-1">{template.name}</h3>
-                    <p className="text-xs text-gray-600 leading-relaxed">{template.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-8 flex justify-center">
-              <Button
-                onClick={handleContinue}
-                disabled={!selectedTemplate}
-                className="bg-primary hover:bg-primary/90 px-8 py-2 rounded-lg font-medium"
-                size="lg"
-              >
-                Continuer
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          {/* Templates Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {filteredTemplates.map((template) => (
+              <TemplateCard
+                key={template.id}
+                template={template}
+                selectedTemplate={selectedTemplate}
+                onSelect={setSelectedTemplate}
+              />
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div className="mt-16 flex justify-center">
+            <Button
+              onClick={handleContinue}
+              disabled={!selectedTemplate}
+              className={cn(
+                "h-16 px-12 text-xl font-bold rounded-2xl shadow-2xl flex items-center gap-4 transition-all",
+                selectedTemplate
+                  ? "bg-gray-900 hover:bg-gray-800 text-white shadow-3xl"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              )}
+            >
+              Continuer
+              <ArrowRight className="w-7 h-7" />
+            </Button>
+          </div>
+        </div>
       </main>
+
       <MobileNav />
     </div>
   );

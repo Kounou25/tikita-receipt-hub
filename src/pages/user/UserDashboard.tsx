@@ -62,10 +62,10 @@ const fetchDashboardData = async (companyId, token) => {
     if (statsResponse.status === 404) {
       return {
         stats: [
-          { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false },
-          { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false },
-          { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false },
-          { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false },
+          { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
+          { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
+          { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
+          { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
         ],
         revenueData: null,
         topClients: null,
@@ -123,19 +123,19 @@ const fetchDashboardData = async (companyId, token) => {
   ]);
 
   let stats = [
-    { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false },
-    { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false },
-    { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false },
-    { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false },
+    { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
+    { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
+    { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
+    { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
   ];
 
   if (Array.isArray(statsData) && statsData.length > 0) {
     const apiStats = statsData[0];
     stats = [
-      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, trend: "+12%", trendUp: true },
-      { title: "Articles", value: apiStats.total_items?.toString() || "0", icon: FileText, trend: "+8%", trendUp: true },
-      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, trend: "+23%", trendUp: true },
-      { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: Wallet, trend: "+15%", trendUp: true },
+      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, trend: "+12%", trendUp: true, color: "yellow" },
+      { title: "Articles", value: apiStats.total_items?.toString() || "0", icon: FileText, trend: "+8%", trendUp: true, color: "blue" },
+      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, trend: "+23%", trendUp: true, color: "green" },
+      { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: Wallet, trend: "+15%", trendUp: true, color: "purple" },
     ];
   }
 
@@ -185,6 +185,69 @@ const fetchDashboardData = async (companyId, token) => {
   return { stats, revenueData: revenueTransformed, topClients: clientsTransformed, recentReceipts: receiptsTransformed };
 };
 
+const StatCard = ({ stat, isLoading }) => {
+  const colorClasses = {
+    yellow: {
+      bg: "bg-gradient-to-br from-yellow-300 to-yellow-400",
+      iconBg: "bg-yellow-600/20",
+      iconColor: "text-yellow-800",
+    },
+    blue: {
+      bg: "bg-gradient-to-br from-blue-300 to-blue-400",
+      iconBg: "bg-blue-600/20",
+      iconColor: "text-blue-800",
+    },
+    green: {
+      bg: "bg-gradient-to-br from-green-300 to-green-400",
+      iconBg: "bg-green-600/20",
+      iconColor: "text-green-800",
+    },
+    purple: {
+      bg: "bg-gradient-to-br from-purple-300 to-purple-400",
+      iconBg: "bg-purple-600/20",
+      iconColor: "text-purple-800",
+    },
+  };
+
+  const colors = colorClasses[stat.color] || colorClasses.yellow;
+
+  if (isLoading) {
+    return <Skeleton className="h-44" />;
+  }
+
+  return (
+    <div className={cn(
+      "relative overflow-hidden rounded-2xl p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105",
+      colors.bg
+    )}>
+      <div className="relative z-10">
+        <h3 className="text-sm font-semibold text-black/80 mb-3">
+          {stat.title}
+        </h3>
+        <div className="flex items-baseline gap-2 mb-4">
+          <span className="text-4xl font-bold text-black">
+            {stat.value.split(' ')[0]}
+          </span>
+          {stat.value.includes('FCFA') && (
+            <span className="text-xl font-semibold text-black/70">FCFA</span>
+          )}
+        </div>
+        <p className="text-xs font-medium text-black/60">
+          {stat.value.includes('FCFA') ? `${stat.value} au total` : `${stat.value} au total`}
+        </p>
+      </div>
+      
+      {/* Icon décoratif */}
+      <div className={cn(
+        "absolute -right-4 -bottom-4 w-32 h-32 rounded-full flex items-center justify-center",
+        colors.iconBg
+      )}>
+        <stat.icon className={cn("w-20 h-20", colors.iconColor)} />
+      </div>
+    </div>
+  );
+};
+
 const UserDashboard = () => {
   const [show500Error, setShow500Error] = useState(false);
   const [showSessionExpired, setShowSessionExpired] = useState(false);
@@ -208,10 +271,10 @@ const UserDashboard = () => {
   });
 
   const stats = data?.stats || [
-    { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false },
-    { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false },
-    { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false },
-    { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false },
+    { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
+    { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
+    { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
+    { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
   ];
 
   const revenueData = data?.revenueData || [{
@@ -339,35 +402,11 @@ const UserDashboard = () => {
           </div>
         )}
         
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {isLoading ? (
-            Array(4).fill(null).map((_, i) => (
-              <Skeleton key={i} className="h-36" />
-            ))
-          ) : (
-            stats.map((stat, i) => (
-              <div 
-                key={i} 
-                className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all duration-200"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="p-2.5 bg-gray-100 rounded-lg">
-                    <stat.icon className="w-5 h-5 text-black" />
-                  </div>
-                  <div className={cn(
-                    "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full",
-                    stat.trendUp ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
-                  )}>
-                    {stat.trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                    {stat.trend}
-                  </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-1 font-medium">{stat.title}</p>
-                <p className="text-2xl font-bold text-black">{stat.value}</p>
-              </div>
-            ))
-          )}
+        {/* Stats Grid avec nouveau design */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stats.map((stat, i) => (
+            <StatCard key={i} stat={stat} isLoading={isLoading} />
+          ))}
         </div>
         
         {/* Main Content Grid */}

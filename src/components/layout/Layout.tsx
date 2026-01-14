@@ -12,6 +12,13 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       const height = header.offsetHeight;
       setHeaderHeight(height);
       main.style.paddingTop = `${height}px`;
+      // Desktop sidebar offset (keeps main content visible when QuickNav is fixed)
+      const SIDEBAR_WIDTH = 280;
+      if (window.innerWidth >= 768) {
+        main.style.marginLeft = `${SIDEBAR_WIDTH}px`;
+      } else {
+        main.style.marginLeft = "0";
+      }
     }
 
     const handleResize = () => {
@@ -21,6 +28,12 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         const height = header.offsetHeight;
         setHeaderHeight(height);
         main.style.paddingTop = `${height}px`;
+        const SIDEBAR_WIDTH = 280;
+        if (window.innerWidth >= 768) {
+          main.style.marginLeft = `${SIDEBAR_WIDTH}px`;
+        } else {
+          main.style.marginLeft = "0";
+        }
       }
     };
 
