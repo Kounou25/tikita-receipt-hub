@@ -9,24 +9,25 @@ import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { getCookie } from "@/lib/cookies";
 
 const Skeleton = ({ className }) => (
-  <div className={cn("animate-pulse bg-gray-100 rounded-lg", className)} />
+  <div className={cn("animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg", className)} />
 );
 
 const ErrorPopup = ({ message, onClose, actionButton }) => createPortal(
   <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10000]">
-    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
       <div className="flex items-start gap-4">
-        <AlertCircle className="w-8 h-8 text-red-600 flex-shrink-0" />
+        <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400 flex-shrink-0" />
         <div className="flex-1">
-          <h3 className="text-xl font-bold text-black mb-2">Erreur</h3>
-          <p className="text-gray-600 mb-6">{message}</p>
+          <h3 className="text-xl font-bold text-black dark:text-white mb-2">Erreur</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{message}</p>
           <div className="flex justify-end gap-3">
             {actionButton}
             <Button 
               variant="outline" 
-              className="rounded-lg border-gray-300 hover:bg-gray-50"
+              className="rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-black dark:text-white"
               onClick={onClose}
             >
               Fermer
@@ -113,10 +114,10 @@ const downloadPDF = async ({ id, token }) => {
 
 const ReceiptHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [downloadProgress, setDownloadProgress] = useState({});
+  const [downloadProgress, setDownloadProgress] = useState<Record<string | number, number>>({});
   const [downloadError, setDownloadError] = useState(null);
-  const companyId = localStorage.getItem("company_id") || null;
-  const token = localStorage.getItem("token") || null;
+  const companyId = getCookie("company_id") || null;
+  const token = getCookie("token") || null;
   const navigate = useNavigate();
 
   const { data: receipts = [], isLoading, error } = useQuery({
@@ -182,7 +183,7 @@ const ReceiptHistory = () => {
   const totalRevenue = receipts.reduce((sum, receipt) => sum + receipt.raw_amount, 0);
 
   return (
-    <div className="min-h-screen bg-[#fafafa] mobile-nav-padding">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
       <Header title="Historique des reçus" showMenu={true} />
 
       <main className="pt-6 px-4 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
@@ -190,10 +191,10 @@ const ReceiptHistory = () => {
 
         {/* Global Loading Overlay */}
         {isLoading && createPortal(
-          <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
+          <div className="fixed inset-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="flex flex-col items-center gap-4">
-              <Loader2 className="w-10 h-10 animate-spin text-black" />
-              <p className="text-lg font-medium text-gray-700">Chargement des reçus...</p>
+              <Loader2 className="w-10 h-10 animate-spin text-black dark:text-white" />
+              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Chargement des reçus...</p>
             </div>
           </div>,
           document.body
@@ -206,7 +207,7 @@ const ReceiptHistory = () => {
             onClose={() => {}}
             actionButton={
               <Button 
-                className="bg-black hover:bg-black/90 text-white rounded-lg"
+                className="bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-gray-100 text-white dark:text-black rounded-lg"
                 onClick={() => window.location.reload()}
               >
                 Réessayer
@@ -221,7 +222,7 @@ const ReceiptHistory = () => {
             onClose={() => navigate("/login")}
             actionButton={
               <Button 
-                className="bg-black hover:bg-black/90 text-white rounded-lg"
+                className="bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-gray-100 text-white dark:text-black rounded-lg"
                 onClick={() => navigate("/login")}
               >
                 Se reconnecter
@@ -240,14 +241,14 @@ const ReceiptHistory = () => {
 
         {/* Empty State */}
         {errorType === "not_found" && !isLoading && (
-          <div className="bg-white border border-gray-200 rounded-xl p-12 text-center hover:shadow-md transition-shadow">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center hover:shadow-md transition-shadow">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
               <FileText className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-black mb-2">Aucun reçu</h3>
-            <p className="text-gray-600 mb-6">Vous n'avez pas encore généré de reçu.</p>
+            <h3 className="text-xl font-semibold text-black dark:text-white mb-2">Aucun reçu</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">Vous n'avez pas encore généré de reçu.</p>
             <Link to="/generate">
-              <Button className="bg-black hover:bg-black/90 text-white rounded-lg px-6 h-11 font-medium">
+              <Button className="bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-gray-100 text-white dark:text-black rounded-lg px-6 h-11 font-medium">
                 Créer mon premier reçu
               </Button>
             </Link>
@@ -257,16 +258,16 @@ const ReceiptHistory = () => {
         {/* PDF Download Progress */}
         {Object.keys(downloadProgress).length > 0 && createPortal(
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10000]">
-            <div className="bg-white rounded-xl p-8 shadow-xl flex flex-col items-center gap-6 max-w-sm w-full mx-4">
-              <Loader2 className="w-12 h-12 animate-spin text-black" />
-              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-xl p-8 shadow-xl flex flex-col items-center gap-6 max-w-sm w-full mx-4">
+              <Loader2 className="w-12 h-12 animate-spin text-black dark:text-white" />
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                 <div
-                  className="h-full bg-black transition-all duration-300"
+                  className="h-full bg-black dark:bg-white transition-all duration-300"
                   style={{ width: `${Object.values(downloadProgress)[0]}%` }}
                 />
               </div>
-              <p className="text-lg font-semibold text-black">
-                Préparation du PDF... {Object.values(downloadProgress)[0]}%
+              <p className="text-lg font-semibold text-black dark:text-white">
+                Préparation du PDF... {Object.values(downloadProgress)[0] as number}%
               </p>
             </div>
           </div>,
@@ -274,23 +275,23 @@ const ReceiptHistory = () => {
         )}
 
         {/* Search & Filters */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow mb-6">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-shadow mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 dark:text-gray-400" />
               <Input
                 placeholder="Rechercher par client ou numéro de reçu..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 rounded-xl border-gray-300 focus:border-black"
+                className="pl-12 h-12 rounded-xl border-gray-300 dark:border-gray-600 focus:border-black dark:focus:border-white bg-white dark:bg-gray-800 text-black dark:text-white"
               />
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" className="h-12 px-6 rounded-xl border-gray-300 hover:bg-gray-50">
+              <Button variant="outline" className="h-12 px-6 rounded-xl border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-black dark:text-white">
                 <Filter className="w-5 h-5 mr-2" />
                 Filtrer
               </Button>
-              <Button variant="outline" className="h-12 px-6 rounded-xl border-gray-300 hover:bg-gray-50">
+              <Button variant="outline" className="h-12 px-6 rounded-xl border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-black dark:text-white">
                 <Calendar className="w-5 h-5 mr-2" />
                 Période
               </Button>
@@ -300,14 +301,14 @@ const ReceiptHistory = () => {
 
         {/* Receipts List */}
         {!isLoading && errorType !== "not_found" && (
-          <div className="bg-white border border-gray-200 rounded-xl hover:shadow-md transition-shadow overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-md transition-shadow overflow-hidden">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <h2 className="text-2xl font-bold text-black">
+                <h2 className="text-2xl font-bold text-black dark:text-white">
                   Mes reçus ({filteredReceipts.length})
                 </h2>
-                <p className="text-lg font-medium text-gray-600">
-                  Total généré : <span className="text-black font-bold">{totalRevenue.toLocaleString('fr-FR')} FCFA</span>
+                <p className="text-lg font-medium text-gray-600 dark:text-gray-400">
+                  Total généré : <span className="text-black dark:text-white font-bold">{totalRevenue.toLocaleString('fr-FR')} FCFA</span>
                 </p>
               </div>
             </div>
@@ -316,15 +317,15 @@ const ReceiptHistory = () => {
             <div className="md:hidden">
               {filteredReceipts.length === 0 ? (
                 <div className="p-12 text-center">
-                  <p className="text-gray-500">Aucun résultat pour cette recherche.</p>
+                  <p className="text-gray-500 dark:text-gray-400">Aucun résultat pour cette recherche.</p>
                 </div>
               ) : (
                 filteredReceipts.map((receipt) => (
-                  <div key={receipt.id} className="border-b border-gray-100 p-5 hover:bg-gray-50 transition-colors">
+                  <div key={receipt.id} className="border-b border-gray-100 dark:border-gray-800 p-5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <p className="font-bold text-black text-lg">{receipt.receipt_number}</p>
-                        <p className="text-gray-700 mt-1">{receipt.client}</p>
+                        <p className="font-bold text-black dark:text-white text-lg">{receipt.receipt_number}</p>
+                        <p className="text-gray-700 dark:text-gray-300 mt-1">{receipt.client}</p>
                       </div>
                       <span className={cn(
                         "px-3 py-1.5 rounded-full text-sm font-medium",
@@ -337,19 +338,19 @@ const ReceiptHistory = () => {
                     </div>
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-2xl font-bold text-black">{receipt.amount}</p>
-                        <p className="text-sm text-gray-600 mt-1">{receipt.date} • {receipt.items} article{receipt.items > 1 ? 's' : ''}</p>
+                        <p className="text-2xl font-bold text-black dark:text-white">{receipt.amount}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{receipt.date} • {receipt.items} article{receipt.items > 1 ? 's' : ''}</p>
                       </div>
                       <div className="flex gap-3">
                         <Link to={`/receipts/${receipt.id}`}>
-                          <Button variant="outline" size="icon" className="h-11 w-11 rounded-xl border-gray-300 hover:bg-gray-100">
+                          <Button variant="outline" size="icon" className="h-11 w-11 rounded-xl border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-black dark:text-white">
                             <Eye className="w-5 h-5" />
                           </Button>
                         </Link>
                         <Button
                           variant="outline"
                           size="icon"
-                          className="h-11 w-11 rounded-xl border-gray-300 hover:bg-gray-100"
+                          className="h-11 w-11 rounded-xl border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-black dark:text-white"
                           onClick={() => downloadMutation.mutate({ id: receipt.id, token })}
                           disabled={downloadProgress[receipt.id] !== undefined}
                         >
@@ -369,36 +370,36 @@ const ReceiptHistory = () => {
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Reçu</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Client</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Montant</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Articles</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Statut</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Reçu</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Client</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Montant</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Articles</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Statut</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {filteredReceipts.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                      <td colSpan={7} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                         Aucun résultat pour cette recherche.
                       </td>
                     </tr>
                   ) : (
                     filteredReceipts.map((receipt) => (
-                      <tr key={receipt.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={receipt.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                         <td className="px-6 py-5">
-                          <p className="font-semibold text-black">{receipt.receipt_number}</p>
+                          <p className="font-semibold text-black dark:text-white">{receipt.receipt_number}</p>
                         </td>
-                        <td className="px-6 py-5 text-gray-700">{receipt.client}</td>
+                        <td className="px-6 py-5 text-gray-700 dark:text-gray-300">{receipt.client}</td>
                         <td className="px-6 py-5">
-                          <p className="font-bold text-black">{receipt.amount}</p>
+                          <p className="font-bold text-black dark:text-white">{receipt.amount}</p>
                         </td>
-                        <td className="px-6 py-5 text-gray-600">{receipt.date}</td>
-                        <td className="px-6 py-5 text-gray-600">{receipt.items}</td>
+                        <td className="px-6 py-5 text-gray-600 dark:text-gray-400">{receipt.date}</td>
+                        <td className="px-6 py-5 text-gray-600 dark:text-gray-400">{receipt.items}</td>
                         <td className="px-6 py-5">
                           <span className={cn(
                             "inline-flex px-3 py-1.5 rounded-full text-sm font-medium",
@@ -412,14 +413,14 @@ const ReceiptHistory = () => {
                         <td className="px-6 py-5">
                           <div className="flex gap-3">
                             <Link to={`/receipts/${receipt.id}`}>
-                              <Button variant="outline" className="rounded-xl h-10 px-4 border-gray-300 hover:bg-gray-100">
+                              <Button variant="outline" className="rounded-xl h-10 px-4 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-black dark:text-white">
                                 <Eye className="w-4 h-4 mr-2" />
                                 Voir
                               </Button>
                             </Link>
                             <Button
                               variant="outline"
-                              className="rounded-xl h-10 px-4 border-gray-300 hover:bg-gray-100"
+                              className="rounded-xl h-10 px-4 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 text-black dark:text-white"
                               onClick={() => downloadMutation.mutate({ id: receipt.id, token })}
                               disabled={downloadProgress[receipt.id] !== undefined}
                             >

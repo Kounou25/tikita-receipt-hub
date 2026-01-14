@@ -18,9 +18,10 @@ import SubscriptionCard from '@/components/user/SubscriptionCard';
 import toast, { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import { getCookie, setCookie } from "@/lib/cookies";
 
 const Skeleton = ({ className }) => (
-  <div className={cn("animate-pulse bg-gray-100 rounded-lg", className)} />
+  <div className={cn("animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg", className)} />
 );
 
 const fetchProfileData = async (companyId, token) => {
@@ -47,9 +48,13 @@ const fetchProfileData = async (companyId, token) => {
     if (profileResponse.status === 500) {
       throw new Error("Erreur serveur lors de la récupération des informations");
     } else if (profileResponse.status === 409 || profileResponse.status === 403) {
-      throw new Error("Session expirée", { cause: "auth" });
+      const error: any = new Error("Session expirée");
+      error.cause = "auth";
+      throw error;
     } else if (profileResponse.status === 404) {
-      throw new Error("Aucune donnée trouvée", { cause: "not_found" });
+      const error: any = new Error("Aucune donnée trouvée");
+      error.cause = "not_found";
+      throw error;
     } else {
       throw new Error(`Échec de la récupération des données du profil: ${profileResponse.status} ${profileResponse.statusText}`);
     }
@@ -81,7 +86,9 @@ const fetchProfileData = async (companyId, token) => {
   } else if (subscriptionResponse.status === 500) {
     console.warn("Erreur serveur lors de la récupération de l'abonnement");
   } else if (subscriptionResponse.status === 409 || subscriptionResponse.status === 403) {
-    throw new Error("Session expirée", { cause: "auth" });
+    const error: any = new Error("Session expirée");
+    error.cause = "auth";
+    throw error;
   }
 
   return {
@@ -130,7 +137,9 @@ const saveProfileData = async ({ companyId, token, profileData }) => {
     if (response.status === 500) {
       throw new Error("Erreur lors de la sauvegarde des modifications");
     } else if (response.status === 409 || response.status === 403) {
-      throw new Error("Session expirée", { cause: "auth" });
+      const error: any = new Error("Session expirée");
+      error.cause = "auth";
+      throw error;
     } else {
       throw new Error(`Échec de la sauvegarde des modifications: ${response.status} ${response.statusText}`);
     }
@@ -141,17 +150,19 @@ const saveProfileData = async ({ companyId, token, profileData }) => {
 
 const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const companyId = localStorage.getItem("company_id") || null;
-  const token = localStorage.getItem("token") || null;
+  const companyId = getCookie("company_id") || null;
+  const token = getCookie("token") || null;
   const queryClient = useQueryClient();
 
-  const { data: profileData = {}, isLoading, error } = useQuery({
+  const { data: profileData = {} as any, isLoading, error } = useQuery({
     queryKey: ['profile', companyId],
     queryFn: () => fetchProfileData(companyId, token),
     enabled: !!companyId,
     staleTime: 5 * 60 * 1000,
   });
-  localStorage.setItem("user_avatar", profileData.avatar || ""); // Met à jour l'avatar dans le stockage local
+  if (profileData.avatar) {
+    setCookie("user_avatar", profileData.avatar); // Met à jour l'avatar dans le stockage via cookies
+  }
 
   const [profileState, setProfileState] = useState<any>(profileData || {});
 
@@ -195,7 +206,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] mobile-nav-padding">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
       <Toaster position="top-right" />
 
       <Header title="Mon Profil" showMenu={true} />
@@ -205,10 +216,10 @@ const UserProfile = () => {
 
         {/* Loading Overlay */}
         {isLoading && createPortal(
-          <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
+          <div className="fixed inset-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="flex flex-col items-center gap-4">
-              <Loader2 className="w-10 h-10 animate-spin text-black" />
-              <p className="text-lg font-medium text-gray-700">Chargement du profil...</p>
+              <Loader2 className="w-10 h-10 animate-spin text-black dark:text-white" />
+              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Chargement du profil...</p>
             </div>
           </div>,
           document.body
@@ -217,25 +228,25 @@ const UserProfile = () => {
         {/* Error Popup */}
         {error && createPortal(
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10000]">
-            <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-xl max-w-md w-full mx-4 text-center">
-              <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-black mb-3">Erreur</h3>
-              <p className="text-gray-600 mb-6">
-                {error.cause === "auth"
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8 shadow-xl max-w-md w-full mx-4 text-center">
+              <AlertCircle className="w-12 h-12 text-red-600 dark:text-red-400 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-black dark:text-white mb-3">Erreur</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                {(error as any)?.cause === "auth"
                   ? "Votre session a expirée. Veuillez vous reconnecter."
-                  : error.cause === "not_found"
+                  : (error as any)?.cause === "not_found"
                   ? "Aucune donnée de profil trouvée."
                   : error.message || "Une erreur est survenue lors du chargement des données."}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                {error.cause === "auth" && (
+                {(error as any)?.cause === "auth" && (
                   <Link to="/login">
-                    <Button className="bg-black hover:bg-black/90 text-white rounded-lg">
+                    <Button className="bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-gray-100 text-white dark:text-black rounded-lg">
                       Se connecter
                     </Button>
                   </Link>
                 )}
-                <Button variant="outline" className="rounded-lg border-gray-300 hover:bg-gray-50" onClick={() => queryClient.invalidateQueries(['profile', companyId])}>
+                <Button variant="outline" className="rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-black dark:text-white" onClick={() => queryClient.invalidateQueries({ queryKey: ['profile', companyId] })}>
                   Réessayer
                 </Button>
               </div>

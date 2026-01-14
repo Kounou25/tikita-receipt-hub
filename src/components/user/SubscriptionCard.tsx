@@ -2,7 +2,7 @@ import React from 'react';
 
 const SubscriptionCard = ({ displayedProfile, usagePercentage, getStatusColor }: any) => {
   return (
-    <div className="bg-black text-white rounded-xl p-8 shadow-xl">
+    <div className="bg-black dark:bg-white text-white dark:text-black rounded-xl p-8 shadow-xl">
       <h2 className="text-2xl font-bold mb-8 flex items-center justify-between">
         <span>État de l'abonnement</span>
         <div className="flex items-center">
@@ -15,20 +15,20 @@ const SubscriptionCard = ({ displayedProfile, usagePercentage, getStatusColor }:
       <div className="space-y-8">
         <div>
           <p className="text-4xl font-bold">Plan {displayedProfile.subscription?.plan}</p>
-          <p className="text-white/80 mt-2 text-lg">Actif jusqu'au {displayedProfile.subscription?.endDate}</p>
+          <p className="text-white/80 dark:text-black/70 mt-2 text-lg">Actif jusqu'au {displayedProfile.subscription?.endDate}</p>
         </div>
         <div className="space-y-4">
           <div className="flex justify-between text-xl">
             <span>Utilisation des documents</span>
             <span className="font-bold">{displayedProfile.subscription?.docsUsed} / {displayedProfile.subscription?.docsTotal}</span>
           </div>
-          <div className="h-5 bg-white/20 rounded-full overflow-hidden">
+          <div className="h-5 bg-white/20 dark:bg-black/20 rounded-full overflow-hidden">
             <div
-              className="h-full bg-white rounded-full transition-all duration-500"
+              className="h-full bg-white dark:bg-black rounded-full transition-all duration-500"
               style={{ width: `${usagePercentage}%` }}
             />
           </div>
-          <p className="text-white/80 text-center text-lg">{ (displayedProfile.subscription?.docsTotal ?? 0) - (displayedProfile.subscription?.docsUsed ?? 0) } documents restants ce mois</p>
+          <p className="text-white/80 dark:text-black/70 text-center text-lg">{ (displayedProfile.subscription?.docsTotal ?? 0) - (displayedProfile.subscription?.docsUsed ?? 0) } documents restants ce mois</p>
         </div>
       </div>
     </div>

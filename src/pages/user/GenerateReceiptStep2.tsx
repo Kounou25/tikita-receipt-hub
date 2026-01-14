@@ -25,6 +25,7 @@ import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { getCookie } from "@/lib/cookies";
 
 const GenerateReceiptStep2 = () => {
   const navigate = useNavigate();
@@ -50,9 +51,9 @@ const GenerateReceiptStep2 = () => {
   const [showSubscriptionPopup, setShowSubscriptionPopup] = useState(false);
   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
 
-  const companyId = localStorage.getItem("company_id");
-  const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("user_id") || "1";
+  const companyId = getCookie("company_id");
+  const token = getCookie("token");
+  const userId = getCookie("user_id") || "1";
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -172,7 +173,7 @@ const GenerateReceiptStep2 = () => {
         unit_price: i.unit_price,
       })),
       tva_rate: receiptInfo.tva_rate,
-      receipt_model: localStorage.getItem("selectedTemplate") || "classic",
+      receipt_model: getCookie("selectedTemplate") || "classic",
       payment_status: receiptInfo.payment_status,
       payment_method: receiptInfo.payment_method,
     };
@@ -252,7 +253,7 @@ const GenerateReceiptStep2 = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <Header title="Générer un reçu" />
 
       <main className="pt-20 px-4 sm:px-6 lg:px-12 xl:px-24 2xl:px-32 pb-24">
@@ -262,17 +263,17 @@ const GenerateReceiptStep2 = () => {
         <div className="max-w-4xl mx-auto mb-12">
           <div className="flex items-center justify-center gap-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gray-300 text-gray-500 rounded-full flex items-center justify-center font-bold text-lg">
+              <div className="w-12 h-12 bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full flex items-center justify-center font-bold text-lg">
                 1
               </div>
-              <span className="text-lg font-medium text-gray-500">Modèle</span>
+              <span className="text-lg font-medium text-gray-500 dark:text-gray-400">Modèle</span>
             </div>
-            <div className="w-32 h-1 bg-gray-900 rounded-full hidden sm:block" />
+            <div className="w-32 h-1 bg-gray-900 dark:bg-white rounded-full hidden sm:block" />
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-lg">
+              <div className="w-12 h-12 bg-gray-900 dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center font-bold text-lg">
                 2
               </div>
-              <span className="text-lg font-medium text-gray-900">Remplir les détails</span>
+              <span className="text-lg font-medium text-gray-900 dark:text-white">Remplir les détails</span>
             </div>
           </div>
         </div>
@@ -281,19 +282,19 @@ const GenerateReceiptStep2 = () => {
           {/* Formulaire principal */}
           <div className="xl:col-span-2 space-y-10">
             {/* Client */}
-            <Card className="shadow-lg bg-white rounded-3xl">
+            <Card className="shadow-lg bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-3xl">
               <CardHeader className="pb-4">
-                <CardTitle className="text-2xl font-bold text-gray-900">
+                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
                   Informations du client
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                     Client existant (optionnel)
                   </Label>
                   <Select onValueChange={handleClientSelect} disabled={loading}>
-                    <SelectTrigger className="h-12 text-base rounded-xl border-gray-300">
+                    <SelectTrigger className="h-12 text-base rounded-xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-black dark:text-white">
                       <SelectValue placeholder="Sélectionner ou saisir manuellement" />
                     </SelectTrigger>
                     <SelectContent>
@@ -308,19 +309,19 @@ const GenerateReceiptStep2 = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2">
+                    <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Nom complet *
                     </Label>
                     <Input
                       value={clientInfo.full_name}
                       onChange={(e) => setClientInfo({ ...clientInfo, full_name: e.target.value })}
                       placeholder="Nom du client"
-                      className="h-12 text-base rounded-xl"
+                      className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                       disabled={loading}
                     />
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2">
+                    <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Email
                     </Label>
                     <Input
@@ -328,31 +329,31 @@ const GenerateReceiptStep2 = () => {
                       value={clientInfo.email}
                       onChange={(e) => setClientInfo({ ...clientInfo, email: e.target.value })}
                       placeholder="email@exemple.com"
-                      className="h-12 text-base rounded-xl"
+                      className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                       disabled={loading}
                     />
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2">
+                    <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Téléphone
                     </Label>
                     <Input
                       value={clientInfo.phone_number}
                       onChange={(e) => setClientInfo({ ...clientInfo, phone_number: e.target.value })}
                       placeholder="+227 XX XX XX XX"
-                      className="h-12 text-base rounded-xl"
+                      className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                       disabled={loading}
                     />
                   </div>
                   <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2">
+                    <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Adresse
                     </Label>
                     <Input
                       value={clientInfo.address}
                       onChange={(e) => setClientInfo({ ...clientInfo, address: e.target.value })}
                       placeholder="Adresse complète"
-                      className="h-12 text-base rounded-xl"
+                      className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                       disabled={loading}
                     />
                   </div>
@@ -361,14 +362,14 @@ const GenerateReceiptStep2 = () => {
             </Card>
 
             {/* Articles */}
-            <Card className="shadow-lg bg-white rounded-3xl">
+            <Card className="shadow-lg bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-3xl">
               <CardHeader className="flex items-center justify-between pb-4">
-                <CardTitle className="text-2xl font-bold text-gray-900">
+                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
                   Articles
                 </CardTitle>
                 <Button
                   onClick={addItem}
-                  className="h-10 px-6 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-sm rounded-xl shadow-lg"
+                  className="h-10 px-6 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-black font-semibold text-sm rounded-xl shadow-lg"
                   disabled={loading}
                 >
                   <Plus className="w-5 h-5 mr-2" />
@@ -379,19 +380,19 @@ const GenerateReceiptStep2 = () => {
                 {items.map((item) => (
                   <div key={item.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <div className="md:col-span-6">
-                      <Label className="text-sm font-medium text-gray-700 mb-2">
+                      <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Description *
                       </Label>
                       <Input
                         value={item.description}
                         onChange={(e) => updateItem(item.id, "description", e.target.value)}
                         placeholder="Description de l'article"
-                        className="h-12 text-base rounded-xl"
+                        className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                         disabled={loading}
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <Label className="text-sm font-medium text-gray-700 mb-2">
+                      <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Quantité
                       </Label>
                       <Input
@@ -399,12 +400,12 @@ const GenerateReceiptStep2 = () => {
                         min="1"
                         value={item.quantity}
                         onChange={(e) => updateItem(item.id, "quantity", e.target.value)}
-                        className="h-12 text-base rounded-xl"
+                        className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                         disabled={loading}
                       />
                     </div>
                     <div className="md:col-span-3">
-                      <Label className="text-sm font-medium text-gray-700 mb-2">
+                      <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Prix unitaire (FCFA)
                       </Label>
                       <Input
@@ -413,7 +414,7 @@ const GenerateReceiptStep2 = () => {
                         value={item.unit_price || ""}
                         onChange={(e) => updateItem(item.id, "unit_price", e.target.value)}
                         placeholder="0"
-                        className="h-12 text-base rounded-xl"
+                        className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                         disabled={loading}
                       />
                     </div>
@@ -423,7 +424,7 @@ const GenerateReceiptStep2 = () => {
                           variant="ghost"
                           size="icon"
                           onClick={() => removeItem(item.id)}
-                          className="h-12 w-12 text-red-600 hover:bg-red-50 rounded-xl"
+                          className="h-12 w-12 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl"
                           disabled={loading}
                         >
                           <Trash2 className="w-5 h-5" />
@@ -436,15 +437,15 @@ const GenerateReceiptStep2 = () => {
             </Card>
 
             {/* Paramètres */}
-            <Card className="shadow-lg bg-white rounded-3xl">
+            <Card className="shadow-lg bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-3xl">
               <CardHeader className="pb-4">
-                <CardTitle className="text-2xl font-bold text-gray-900">
+                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
                   Paramètres du reçu
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2">
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     TVA (%)
                   </Label>
                   <Input
@@ -460,19 +461,19 @@ const GenerateReceiptStep2 = () => {
                       })
                     }
                     placeholder="0"
-                    className="h-12 text-base rounded-xl"
+                    className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                     disabled={loading}
                   />
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2">
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Méthode de paiement *
                   </Label>
                   <Select
                     onValueChange={(v) => setReceiptInfo({ ...receiptInfo, payment_method: v })}
                     disabled={loading}
                   >
-                    <SelectTrigger className="h-12 text-base rounded-xl">
+                    <SelectTrigger className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white">
                       <SelectValue placeholder="Choisir" />
                     </SelectTrigger>
                     <SelectContent>
@@ -484,14 +485,14 @@ const GenerateReceiptStep2 = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2">
+                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Statut de paiement *
                   </Label>
                   <Select
                     onValueChange={(v) => setReceiptInfo({ ...receiptInfo, payment_status: v })}
                     disabled={loading}
                   >
-                    <SelectTrigger className="h-12 text-base rounded-xl">
+                    <SelectTrigger className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white">
                       <SelectValue placeholder="Choisir" />
                     </SelectTrigger>
                     <SelectContent>
@@ -507,28 +508,28 @@ const GenerateReceiptStep2 = () => {
           {/* Résumé sticky */}
           <div className="xl:col-span-1">
             <div className="sticky top-24">
-              <Card className="shadow-2xl bg-white rounded-3xl">
+              <Card className="shadow-2xl bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-3xl">
                 <CardHeader className="pb-6">
-                  <CardTitle className="text-2xl font-bold text-gray-900">
+                  <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
                     Résumé du reçu
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-4">
                     <div className="flex justify-between text-lg">
-                      <span className="text-gray-600">Sous-total</span>
-                      <span className="font-bold">{subtotal.toLocaleString()} FCFA</span>
+                      <span className="text-gray-600 dark:text-gray-400">Sous-total</span>
+                      <span className="font-bold text-black dark:text-white">{subtotal.toLocaleString()} FCFA</span>
                     </div>
                     {receiptInfo.tva_rate > 0 && (
                       <div className="flex justify-between text-lg">
-                        <span className="text-gray-600">TVA ({receiptInfo.tva_rate}%)</span>
-                        <span className="font-bold">+{tvaAmount.toLocaleString()} FCFA</span>
+                        <span className="text-gray-600 dark:text-gray-400">TVA ({receiptInfo.tva_rate}%)</span>
+                        <span className="font-bold text-black dark:text-white">+{tvaAmount.toLocaleString()} FCFA</span>
                       </div>
                     )}
-                    <div className="border-t-2 border-gray-200 pt-4">
+                    <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-4">
                       <div className="flex justify-between">
-                        <span className="text-2xl font-black text-gray-900">Total</span>
-                        <span className="text-3xl font-black text-gray-900">
+                        <span className="text-2xl font-black text-gray-900 dark:text-white">Total</span>
+                        <span className="text-3xl font-black text-gray-900 dark:text-white">
                           {total.toLocaleString()} FCFA
                         </span>
                       </div>
@@ -539,7 +540,7 @@ const GenerateReceiptStep2 = () => {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="w-full h-14 rounded-2xl border-2 text-lg"
+                      className="w-full h-14 rounded-2xl border-2 text-lg border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-black dark:text-white"
                       onClick={() => navigate("/generate")}
                       disabled={loading || isDownloading}
                     >
@@ -548,7 +549,7 @@ const GenerateReceiptStep2 = () => {
                     </Button>
                     <Button
                       size="lg"
-                      className="w-full h-16 bg-gray-900 hover:bg-gray-800 text-white font-bold text-xl rounded-2xl shadow-2xl flex items-center justify-center gap-4"
+                      className="w-full h-16 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-black font-bold text-xl rounded-2xl shadow-2xl flex items-center justify-center gap-4"
                       onClick={handleGenerateReceipt}
                       disabled={
                         loading ||
@@ -580,18 +581,18 @@ const GenerateReceiptStep2 = () => {
 
         {/* Popups */}
         <Dialog open={showSubscriptionPopup} onOpenChange={setShowSubscriptionPopup}>
-          <DialogContent className="rounded-3xl max-w-lg">
+          <DialogContent className="rounded-3xl max-w-lg dark:bg-gray-900 dark:border-gray-700">
             <DialogHeader>
-              <DialogTitle className="text-3xl font-bold">Abonnement requis</DialogTitle>
-              <DialogDescription className="text-xl">
+              <DialogTitle className="text-3xl font-bold dark:text-white">Abonnement requis</DialogTitle>
+              <DialogDescription className="text-xl dark:text-gray-400">
                 Votre abonnement est inactif. Souscrivez pour continuer à générer des reçus.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex gap-6 mt-8">
-              <Button variant="outline" onClick={() => setShowSubscriptionPopup(false)} className="h-16 px-10 text-xl rounded-3xl">
+              <Button variant="outline" onClick={() => setShowSubscriptionPopup(false)} className="h-16 px-10 text-xl rounded-3xl dark:border-gray-600 dark:text-white dark:hover:bg-gray-800">
                 Annuler
               </Button>
-              <Button onClick={() => navigate("/subscription")} className="h-16 px-10 text-xl rounded-3xl bg-gray-900 hover:bg-gray-800">
+              <Button onClick={() => navigate("/subscription")} className="h-16 px-10 text-xl rounded-3xl bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-black">
                 Voir les abonnements
               </Button>
             </DialogFooter>
@@ -599,18 +600,18 @@ const GenerateReceiptStep2 = () => {
         </Dialog>
 
         <Dialog open={showQuotaPopup} onOpenChange={setShowQuotaPopup}>
-          <DialogContent className="rounded-3xl max-w-lg">
+          <DialogContent className="rounded-3xl max-w-lg dark:bg-gray-900 dark:border-gray-700">
             <DialogHeader>
-              <DialogTitle className="text-3xl font-bold">Quota atteint</DialogTitle>
-              <DialogDescription className="text-xl">
+              <DialogTitle className="text-3xl font-bold dark:text-white">Quota atteint</DialogTitle>
+              <DialogDescription className="text-xl dark:text-gray-400">
                 Vous avez atteint votre limite mensuelle. Passez à un plan supérieur.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex gap-6 mt-8">
-              <Button variant="outline" onClick={() => setShowQuotaPopup(false)} className="h-16 px-10 text-xl rounded-3xl">
+              <Button variant="outline" onClick={() => setShowQuotaPopup(false)} className="h-16 px-10 text-xl rounded-3xl dark:border-gray-600 dark:text-white dark:hover:bg-gray-800">
                 Annuler
               </Button>
-              <Button onClick={() => navigate("/subscription")} className="h-16 px-10 text-xl rounded-3xl bg-gray-900 hover:bg-gray-800">
+              <Button onClick={() => navigate("/subscription")} className="h-16 px-10 text-xl rounded-3xl bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-black">
                 Mettre à jour
               </Button>
             </DialogFooter>
@@ -620,17 +621,17 @@ const GenerateReceiptStep2 = () => {
         {/* Progress overlay */}
         {isDownloading && (
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-            <div className="bg-white rounded-3xl p-16 shadow-3xl max-w-2xl w-full mx-4 text-center space-y-12">
-              <Loader2 className="w-24 h-24 text-gray-900 animate-spin mx-auto" />
+            <div className="bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-3xl p-16 shadow-3xl max-w-2xl w-full mx-4 text-center space-y-12">
+              <Loader2 className="w-24 h-24 text-gray-900 dark:text-white animate-spin mx-auto" />
               <div>
-                <p className="text-4xl font-black text-gray-900 mb-6">
+                <p className="text-4xl font-black text-gray-900 dark:text-white mb-6">
                   Génération du reçu en cours
                 </p>
-                <p className="text-7xl font-black text-gray-900">{downloadProgress}%</p>
+                <p className="text-7xl font-black text-gray-900 dark:text-white">{downloadProgress}%</p>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-8">
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-8">
                 <div
-                  className="bg-gray-900 h-8 rounded-full transition-all duration-500 ease-out"
+                  className="bg-gray-900 dark:bg-white h-8 rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${downloadProgress}%` }}
                 />
               </div>
@@ -650,7 +651,7 @@ const GenerateReceiptStep2 = () => {
               !receiptInfo.payment_method ||
               !receiptInfo.payment_status
             }
-            className="w-20 h-20 bg-gray-900 hover:bg-gray-800 text-white rounded-full shadow-3xl flex items-center justify-center"
+            className="w-20 h-20 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-black rounded-full shadow-3xl flex items-center justify-center"
           >
             <ArrowRight className="w-12 h-12" />
           </Button>

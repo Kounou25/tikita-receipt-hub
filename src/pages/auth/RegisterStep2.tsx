@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { getCookie, setCookie } from "@/lib/cookies";
 
 const RegisterStep2 = () => {
   const [formData, setFormData] = useState({
@@ -89,7 +90,7 @@ const RegisterStep2 = () => {
   const countries = Object.keys(countryPhoneCodes).sort();
 
   useEffect(() => {
-    const userId = localStorage.getItem("user_id") || "";
+    const userId = getCookie("user_id") || "";
     if (!userId) {
       setErrorMessage("Identifiant utilisateur manquant. Veuillez recommencer le processus d'inscription.");
       setShowErrorPopup(true);
@@ -189,7 +190,7 @@ const RegisterStep2 = () => {
         return;
       }
 
-      localStorage.setItem("company_id", result.company.company_id);
+      setCookie("company_id", result.company.company_id);
 
       const subscriptionPayload = {
         companyId: result.company.company_id,

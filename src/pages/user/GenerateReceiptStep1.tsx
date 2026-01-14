@@ -8,6 +8,7 @@ import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { cn } from "@/lib/utils"; // ← Import ajouté
 import TemplateCard from '@/components/user/TemplateCard';
+import { getCookie, setCookie } from '@/lib/cookies';
 
 const GenerateReceiptStep1 = () => {
   const [selectedTemplate, setSelectedTemplate] = useState("");
@@ -48,9 +49,9 @@ const GenerateReceiptStep1 = () => {
   useEffect(() => {
     const fetchSubscription = async () => {
       try {
-        const companyId = localStorage.getItem("company_id");
+        const companyId = getCookie("company_id");
         if (!companyId) {
-          console.error("No company ID found in localStorage");
+          console.error("No company ID found in cookies");
           setFilteredTemplates([allTemplates[0]]);
           return;
         }
@@ -95,13 +96,13 @@ const GenerateReceiptStep1 = () => {
 
   const handleContinue = () => {
     if (selectedTemplate) {
-      localStorage.setItem("selectedTemplate", selectedTemplate);
+      setCookie("selectedTemplate", selectedTemplate);
       navigate("/generate/step2");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <Header title="Générer un reçu" />
 
       <main className="pt-20 px-4 sm:px-6 lg:px-12 xl:px-24 2xl:px-32 pb-24">
@@ -111,17 +112,17 @@ const GenerateReceiptStep1 = () => {
         <div className="max-w-4xl mx-auto mb-12">
           <div className="flex items-center justify-center gap-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gray-900 text-white rounded-full flex items-center justify-center font-bold text-lg">
+              <div className="w-12 h-12 bg-gray-900 dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center font-bold text-lg">
                 1
               </div>
-              <span className="text-lg font-medium text-gray-900">Choisir un modèle</span>
+              <span className="text-lg font-medium text-gray-900 dark:text-white">Choisir un modèle</span>
             </div>
-            <div className="w-32 h-1 bg-gray-300 rounded-full hidden sm:block" />
+            <div className="w-32 h-1 bg-gray-300 dark:bg-gray-700 rounded-full hidden sm:block" />
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center font-bold text-lg">
+              <div className="w-12 h-12 bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-full flex items-center justify-center font-bold text-lg">
                 2
               </div>
-              <span className="text-lg font-medium text-gray-500">Remplir les détails</span>
+              <span className="text-lg font-medium text-gray-500 dark:text-gray-400">Remplir les détails</span>
             </div>
           </div>
         </div>
@@ -129,10 +130,10 @@ const GenerateReceiptStep1 = () => {
         {/* Main Content */}
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4">
+            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white mb-4">
               Choisissez votre modèle de reçu
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Sélectionnez le design qui représente le mieux votre marque
             </p>
           </div>
@@ -157,8 +158,8 @@ const GenerateReceiptStep1 = () => {
               className={cn(
                 "h-16 px-12 text-xl font-bold rounded-2xl shadow-2xl flex items-center gap-4 transition-all",
                 selectedTemplate
-                  ? "bg-gray-900 hover:bg-gray-800 text-white shadow-3xl"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  ? "bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-black shadow-3xl"
+                  : "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
               )}
             >
               Continuer

@@ -45,7 +45,7 @@ const MobileNav = ({ userType = "user" }: MobileNavProps) => {
   const navItems = getNavItems();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg md:hidden z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg md:hidden z-50">
       <div className="flex items-stretch justify-around h-20 px-2"> {/* Hauteur plus généreuse */}
         {navItems.map(({ icon: Icon, label, path }) => {
           const isActive = location.pathname === path || location.pathname.startsWith(path + "/");
@@ -58,13 +58,13 @@ const MobileNav = ({ userType = "user" }: MobileNavProps) => {
                 "flex flex-col items-center justify-center flex-1 rounded-xl transition-all duration-200",
                 "gap-1.5 group relative",
                 isActive
-                  ? "text-black"
-                  : "text-gray-500 hover:text-black"
+                  ? "text-black dark:text-white"
+                  : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white"
               )}
             >
               {/* Indicateur actif subtil */}
               {isActive && (
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-10 h-1 bg-black rounded-full" />
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-10 h-1 bg-black dark:bg-white rounded-full" />
               )}
 
               {/* Icône avec fond noir si actif */}
@@ -72,8 +72,8 @@ const MobileNav = ({ userType = "user" }: MobileNavProps) => {
                 className={cn(
                   "p-3 rounded-xl transition-all duration-200",
                   isActive
-                    ? "bg-black text-white shadow-md"
-                    : "bg-transparent group-hover:bg-gray-100"
+                    ? "bg-black dark:bg-white text-white dark:text-black shadow-md"
+                    : "bg-transparent group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
                 )}
               >
                 <Icon className="w-5 h-5" />
@@ -82,7 +82,7 @@ const MobileNav = ({ userType = "user" }: MobileNavProps) => {
               <span
                 className={cn(
                   "text-xs font-semibold transition-colors",
-                  isActive ? "text-black" : "text-gray-500 group-hover:text-black"
+                  isActive ? "text-black dark:text-white" : "text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white"
                 )}
               >
                 {label}

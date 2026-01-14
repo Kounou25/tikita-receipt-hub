@@ -9,9 +9,10 @@ import { Bell, AlertCircle, FileText, CreditCard, Users, TrendingUp, Settings, L
 import toast, { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import { getCookie } from "@/lib/cookies";
 
 const Skeleton = ({ className }) => (
-  <div className={cn("animate-pulse bg-gray-100 rounded-lg", className)} />
+  <div className={cn("animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg", className)} />
 );
 
 const formatRelativeTime = (createdAt) => {
@@ -40,7 +41,9 @@ const notificationStyles = {
 
 const fetchNotifications = async (companyId, token) => {
   if (!companyId) {
-    throw new Error("ID de l'entreprise non défini. Veuillez vous reconnecter.", { cause: "auth" });
+    const error: any = new Error("ID de l'entreprise non défini. Veuillez vous reconnecter.");
+    error.cause = "auth";
+    throw error;
   }
 
   const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/notifications/${companyId}`, {
@@ -55,7 +58,9 @@ const fetchNotifications = async (companyId, token) => {
     if (response.status === 500) {
       throw new Error("Erreur serveur lors de la récupération des notifications");
     } else if (response.status === 409 || response.status === 403) {
-      throw new Error("Session expirée", { cause: "auth" });
+      const error: any = new Error("Session expirée");
+      error.cause = "auth";
+      throw error;
     } else {
       throw new Error(`Échec de la récupération des notifications: ${response.status} ${response.statusText}`);
     }
@@ -75,17 +80,14 @@ const fetchNotifications = async (companyId, token) => {
 };
 
 const Notifications = () => {
-  const companyId = localStorage.getItem("company_id") || null;
-  const token = localStorage.getItem("token") || null;
+  const companyId = getCookie("company_id") || null;
+  const token = getCookie("token") || null;
 
-  const { data: notifications = [], isLoading, error } = useQuery({
+  const { data: notifications = [], isLoading, error } = useQuery<any[]>({
     queryKey: ['notifications', companyId],
     queryFn: () => fetchNotifications(companyId, token),
     enabled: !!companyId,
     staleTime: 5 * 60 * 1000,
-    onError: (err) => {
-      toast.error(err.message || "Une erreur est survenue lors du chargement des notifications.", { duration: 5000 });
-    },
   });
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -107,7 +109,7 @@ const Notifications = () => {
   const { today, yesterday, older } = getNotificationsByDate();
 
   return (
-    <div className="min-h-screen bg-[#fafafa] mobile-nav-padding">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
       <Toaster position="top-right" />
 
       <Header title="Notifications" showMenu={true} />
@@ -117,10 +119,10 @@ const Notifications = () => {
 
         {/* Global Loading */}
         {isLoading && createPortal(
-          <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
+          <div className="fixed inset-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="flex flex-col items-center gap-4">
-              <Loader2 className="w-10 h-10 animate-spin text-black" />
-              <p className="text-lg font-medium text-gray-700">Chargement des notifications...</p>
+              <Loader2 className="w-10 h-10 animate-spin text-black dark:text-white" />
+              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Chargement des notifications...</p>
             </div>
           </div>,
           document.body
@@ -129,25 +131,25 @@ const Notifications = () => {
         {/* Error Overlay */}
         {error && createPortal(
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10000]">
-            <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-xl max-w-md w-full mx-4 text-center">
-              <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-black mb-3">Erreur de chargement</h3>
-              <p className="text-gray-600 mb-6">
-                {error.cause === "auth"
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8 shadow-xl max-w-md w-full mx-4 text-center">
+              <AlertCircle className="w-12 h-12 text-red-600 dark:text-red-400 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-black dark:text-white mb-3">Erreur de chargement</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                {(error as any)?.cause === "auth"
                   ? "Votre session a expiré. Veuillez vous reconnecter."
                   : error.message || "Impossible de charger les notifications."}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                {error.cause === "auth" && (
+                {(error as any)?.cause === "auth" && (
                   <Link to="/login">
-                    <Button className="bg-black hover:bg-black/90 text-white rounded-lg w-full sm:w-auto">
+                    <Button className="bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-gray-100 text-white dark:text-black rounded-lg w-full sm:w-auto">
                       Se reconnecter
                     </Button>
                   </Link>
                 )}
                 <Button 
                   variant="outline" 
-                  className="rounded-lg border-gray-300 hover:bg-gray-50"
+                  className="rounded-lg border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-black dark:text-white"
                   onClick={() => window.location.reload()}
                 >
                   Réessayer
@@ -190,11 +192,11 @@ const Notifications = () => {
               {/* Aujourd'hui */}
               {(isLoading || today.length > 0) && (
                 <section>
-                  <h2 className="text-xl font-bold text-black mb-4">Aujourd'hui</h2>
+                  <h2 className="text-xl font-bold text-black dark:text-white mb-4">Aujourd'hui</h2>
                   <div className="space-y-4">
                     {isLoading ? (
                       [...Array(3)].map((_, i) => (
-                        <div key={i} className="bg-white border border-gray-200 rounded-xl p-6">
+                        <div key={i} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
                           <div className="flex items-start gap-4">
                             <Skeleton className="w-12 h-12 rounded-full" />
                             <div className="flex-1 space-y-3">
@@ -210,8 +212,8 @@ const Notifications = () => {
                         <div
                           key={n.id}
                           className={cn(
-                            "bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all duration-200",
-                            !n.read && "border-l-4 border-l-black"
+                            "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-all duration-200",
+                            !n.read && "border-l-4 border-l-black dark:border-l-white"
                           )}
                         >
                           <div className="flex items-start gap-4">
@@ -220,13 +222,13 @@ const Notifications = () => {
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <h3 className={cn("font-semibold text-black", !n.read && "font-bold")}>
+                                <h3 className={cn("font-semibold text-black dark:text-white", !n.read && "font-bold")}>
                                   {n.title}
                                 </h3>
-                                {!n.read && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
+                                {!n.read && <div className="w-2.5 h-2.5 bg-black dark:bg-white rounded-full" />}
                               </div>
-                              <p className="text-gray-700 mb-2">{n.message}</p>
-                              <p className="text-sm text-gray-500">{n.time}</p>
+                              <p className="text-gray-700 dark:text-gray-300 mb-2">{n.message}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{n.time}</p>
                             </div>
                           </div>
                         </div>
@@ -239,14 +241,14 @@ const Notifications = () => {
               {/* Hier */}
               {yesterday.length > 0 && (
                 <section>
-                  <h2 className="text-xl font-bold text-black mb-4">Hier</h2>
+                  <h2 className="text-xl font-bold text-black dark:text-white mb-4">Hier</h2>
                   <div className="space-y-4">
                     {yesterday.map((n) => (
                       <div
                         key={n.id}
                         className={cn(
-                          "bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all",
-                          !n.read && "border-l-4 border-l-black"
+                          "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-all",
+                          !n.read && "border-l-4 border-l-black dark:border-l-white"
                         )}
                       >
                         <div className="flex items-start gap-4">
@@ -254,9 +256,9 @@ const Notifications = () => {
                             <n.icon className="w-6 h-6" />
                           </div>
                           <div className="flex-1">
-                            <h3 className={cn("font-semibold text-black", !n.read && "font-bold")}>{n.title}</h3>
-                            <p className="text-gray-700 mt-1 mb-2">{n.message}</p>
-                            <p className="text-sm text-gray-500">{n.time}</p>
+                            <h3 className={cn("font-semibold text-black dark:text-white", !n.read && "font-bold")}>{n.title}</h3>
+                            <p className="text-gray-700 dark:text-gray-300 mt-1 mb-2">{n.message}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{n.time}</p>
                           </div>
                         </div>
                       </div>
@@ -268,14 +270,14 @@ const Notifications = () => {
               {/* Plus ancien */}
               {older.length > 0 && (
                 <section>
-                  <h2 className="text-xl font-bold text-black mb-4">Plus ancien</h2>
+                  <h2 className="text-xl font-bold text-black dark:text-white mb-4">Plus ancien</h2>
                   <div className="space-y-4">
                     {older.map((n) => (
                       <div
                         key={n.id}
                         className={cn(
-                          "bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all",
-                          !n.read && "border-l-4 border-l-black"
+                          "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-all",
+                          !n.read && "border-l-4 border-l-black dark:border-l-white"
                         )}
                       >
                         <div className="flex items-start gap-4">
@@ -283,9 +285,9 @@ const Notifications = () => {
                             <n.icon className="w-6 h-6" />
                           </div>
                           <div className="flex-1">
-                            <h3 className={cn("font-semibold text-black", !n.read && "font-bold")}>{n.title}</h3>
-                            <p className="text-gray-700 mt-1 mb-2">{n.message}</p>
-                            <p className="text-sm text-gray-500">{n.time}</p>
+                            <h3 className={cn("font-semibold text-black dark:text-white", !n.read && "font-bold")}>{n.title}</h3>
+                            <p className="text-gray-700 dark:text-gray-300 mt-1 mb-2">{n.message}</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">{n.time}</p>
                           </div>
                         </div>
                       </div>
@@ -296,12 +298,12 @@ const Notifications = () => {
 
               {/* Empty State */}
               {notifications.length === 0 && !isLoading && (
-                <div className="bg-white border border-gray-200 rounded-xl p-16 text-center hover:shadow-md transition-shadow">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-16 text-center hover:shadow-md transition-shadow">
+                  <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Bell className="w-10 h-10 text-gray-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-black mb-3">Aucune notification</h3>
-                  <p className="text-lg text-gray-600">Vous êtes parfaitement à jour !</p>
+                  <h3 className="text-2xl font-bold text-black dark:text-white mb-3">Aucune notification</h3>
+                  <p className="text-lg text-gray-600 dark:text-gray-400">Vous êtes parfaitement à jour !</p>
                 </div>
               )}
             </div>

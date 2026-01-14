@@ -6,15 +6,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 const GRStep2ClientInfo = ({ clients, loading, clientInfo, setClientInfo, handleClientSelect }: any) => {
   return (
-    <Card className="shadow-lg bg-white">
+    <Card className="shadow-lg bg-white dark:bg-gray-900 dark:border-gray-700">
       <CardHeader className="pb-6">
-        <CardTitle className="text-2xl font-bold text-gray-900">Informations client</CardTitle>
+        <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">Informations client</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <Label className="text-base font-medium text-gray-700 mb-3">Sélectionner un client existant</Label>
+          <Label className="text-base font-medium text-gray-700 dark:text-gray-200 mb-3">Sélectionner un client existant</Label>
           <Select onValueChange={handleClientSelect} disabled={loading}>
-            <SelectTrigger className="h-14 text-base">
+            <SelectTrigger className="h-14 text-base dark:bg-gray-800 dark:border-gray-700 dark:text-white">
               <SelectValue placeholder="Choisir un client ou saisir manuellement" />
             </SelectTrigger>
             <SelectContent>
@@ -29,43 +29,43 @@ const GRStep2ClientInfo = ({ clients, loading, clientInfo, setClientInfo, handle
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <Label className="text-base font-medium text-gray-700 mb-3">Nom complet *</Label>
+            <Label className="text-base font-medium text-gray-700 dark:text-gray-200 mb-3">Nom complet *</Label>
             <Input
               value={clientInfo.full_name}
               onChange={(e) => setClientInfo({ ...clientInfo, full_name: e.target.value })}
               placeholder="Nom du client"
-              className="h-14 text-base"
+              className="h-14 text-base dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               disabled={loading}
             />
           </div>
           <div>
-            <Label className="text-base font-medium text-gray-700 mb-3">Email</Label>
+            <Label className="text-base font-medium text-gray-700 dark:text-gray-200 mb-3">Email</Label>
             <Input
               type="email"
               value={clientInfo.email}
               onChange={(e) => setClientInfo({ ...clientInfo, email: e.target.value })}
               placeholder="email@exemple.com"
-              className="h-14 text-base"
+              className="h-14 text-base dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               disabled={loading}
             />
           </div>
           <div>
-            <Label className="text-base font-medium text-gray-700 mb-3">Téléphone</Label>
+            <Label className="text-base font-medium text-gray-700 dark:text-gray-200 mb-3">Téléphone</Label>
             <Input
               value={clientInfo.phone_number}
               onChange={(e) => setClientInfo({ ...clientInfo, phone_number: e.target.value })}
               placeholder="+227 XX XX XX XX"
-              className="h-14 text-base"
+              className="h-14 text-base dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               disabled={loading}
             />
           </div>
           <div>
-            <Label className="text-base font-medium text-gray-700 mb-3">Adresse</Label>
+            <Label className="text-base font-medium text-gray-700 dark:text-gray-200 mb-3">Adresse</Label>
             <Input
               value={clientInfo.address}
               onChange={(e) => setClientInfo({ ...clientInfo, address: e.target.value })}
               placeholder="Adresse complète"
-              className="h-14 text-base"
+              className="h-14 text-base dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               disabled={loading}
             />
           </div>

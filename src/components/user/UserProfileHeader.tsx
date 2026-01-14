@@ -4,7 +4,7 @@ import { BadgeCheck, Upload, Loader2, Save } from 'lucide-react';
 
 const UserProfileHeader = ({ displayedProfile, isEditing, setIsEditing, saveMutation, handleSave }: any) => {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-md transition-shadow mb-8">
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8 hover:shadow-md transition-shadow mb-8">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
         <div className="flex items-center gap-6">
           <div className="relative">
@@ -12,16 +12,16 @@ const UserProfileHeader = ({ displayedProfile, isEditing, setIsEditing, saveMuta
               <img
                 src={displayedProfile.avatar}
                 alt={displayedProfile.fullName}
-                className="w-32 h-32 rounded-xl object-cover border-4 border-gray-200"
+                className="w-32 h-32 rounded-xl object-cover border-4 border-gray-200 dark:border-gray-700"
               />
             ) : (
-              <div className="w-32 h-32 bg-black text-white rounded-xl flex items-center justify-center text-5xl font-bold">
+              <div className="w-32 h-32 bg-black dark:bg-white text-white dark:text-black rounded-xl flex items-center justify-center text-5xl font-bold">
                 {displayedProfile.fullName?.charAt(0).toUpperCase() || 'U'}
               </div>
             )}
             {isEditing && (
-              <div className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center">
-                <Button variant="secondary" size="sm" className="bg-white text-black hover:bg-gray-100">
+              <div className="absolute inset-0 bg-black/40 dark:bg-white/40 rounded-xl flex items-center justify-center">
+                <Button variant="secondary" size="sm" className="bg-white text-black hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-900">
                   <Upload className="w-5 h-5 mr-2" />
                   Modifier
                 </Button>
@@ -30,11 +30,11 @@ const UserProfileHeader = ({ displayedProfile, isEditing, setIsEditing, saveMuta
           </div>
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h2 className="text-4xl font-bold text-black">{displayedProfile.fullName}</h2>
-              <BadgeCheck className="w-9 h-9 text-black" />
+              <h2 className="text-4xl font-bold text-black dark:text-white">{displayedProfile.fullName}</h2>
+              <BadgeCheck className="w-9 h-9 text-black dark:text-white" />
             </div>
-            <p className="text-2xl text-gray-700">{displayedProfile.email}</p>
-            <p className="text-base text-gray-500 mt-1">ID: {displayedProfile.userNumber}</p>
+            <p className="text-2xl text-gray-700 dark:text-gray-300">{displayedProfile.email}</p>
+            <p className="text-base text-gray-500 dark:text-gray-400 mt-1">ID: {displayedProfile.userNumber}</p>
           </div>
         </div>
         {/* Bouton édition géré par la page */}

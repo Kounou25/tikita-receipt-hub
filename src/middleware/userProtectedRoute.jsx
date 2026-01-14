@@ -1,8 +1,9 @@
 import { Navigate } from "react-router-dom";
+import { getCookie } from '@/lib/cookies';
 
-const ProtectedRoute = ({ children }) => {
-  const userId = localStorage.getItem("user_id");
-  const role = localStorage.getItem("user_role");
+const UserProtectedRoute = ({ children }) => {
+  const userId = getCookie("user_id");
+  const role = getCookie("user_role");
 
   if (!userId || role !== "user") {
     // Redirige vers la page de login si non authentifié ou mauvais rôle
@@ -13,4 +14,4 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-export default ProtectedRoute;
+export default UserProtectedRoute;

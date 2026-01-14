@@ -19,9 +19,10 @@ import QuickNav from "@/components/layout/QuickNav";
 import { Check, Zap, Star, Briefcase } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import { getCookie } from "@/lib/cookies";
 
 const Skeleton = ({ className }) => (
-  <div className={cn("animate-pulse bg-gray-100 rounded-xl", className)} />
+  <div className={cn("animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl", className)} />
 );
 
 const Subscription = () => {
@@ -32,8 +33,8 @@ const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("");
   const [paymentCode, setPaymentCode] = useState("");
-  const companyId = localStorage.getItem("company_id");
-  const token = localStorage.getItem("token") || null;
+  const companyId = getCookie("company_id");
+  const token = getCookie("token") || null;
 
   // Map plan names to icons and colors
   const planStyles = {
@@ -355,7 +356,7 @@ const Subscription = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] mobile-nav-padding">
+    <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
       <Toaster position="top-right" />
 
       <Header title="Abonnement" showMenu={true} />
@@ -364,7 +365,7 @@ const Subscription = () => {
         <QuickNav userType="user" />
 
         {/* Current Plan Status */}
-        <div className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-md transition-shadow mb-12">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8 hover:shadow-md transition-shadow mb-12">
           {isLoading ? (
             <div className="space-y-6">
               <Skeleton className="h-10 w-96" />
@@ -375,24 +376,24 @@ const Subscription = () => {
             <>
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-8">
                 <div>
-                  <h2 className="text-4xl font-bold text-black mb-3">Plan actuel : {currentPlanData?.name || "Gratuit"}</h2>
-                  <p className="text-xl text-gray-600">Actif jusqu'au {currentPlanData?.endDate || "-"}</p>
+                  <h2 className="text-4xl font-bold text-black dark:text-white mb-3">Plan actuel : {currentPlanData?.name || "Gratuit"}</h2>
+                  <p className="text-xl text-gray-600 dark:text-gray-400">Actif jusqu'au {currentPlanData?.endDate || "-"}</p>
                 </div>
                 <div className="text-right">
                   <div className={cn("w-5 h-5 rounded-full inline-block mr-3 animate-pulse", getGaugeColor())} />
-                  <span className="text-2xl font-bold text-black">
+                  <span className="text-2xl font-bold text-black dark:text-white">
                     {currentPlanData?.status === "active" ? "Actif" : currentPlanData?.status === "inactive" ? "Inactif" : "Expiré"}
                   </span>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between text-xl">
-                  <span className="text-gray-700">Utilisation ce mois</span>
-                  <span className="font-bold text-black">
+                  <span className="text-gray-700 dark:text-gray-300">Utilisation ce mois</span>
+                  <span className="font-bold text-black dark:text-white">
                     {currentPlanData?.receiptsUsed || 0} / {currentPlanData?.receiptsTotal || 0}
                   </span>
                 </div>
-                <div className="h-6 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div
                     className={cn("h-full rounded-full transition-all duration-700", getGaugeColor())}
                     style={{ width: `${usagePercentage}%` }}
@@ -408,8 +409,8 @@ const Subscription = () => {
 
         {/* Plans Section */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-black mb-4">Choisissez votre plan</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h1 className="text-5xl font-bold text-black dark:text-white mb-4">Choisissez votre plan</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Boostez votre expérience avec l'abonnement parfait pour vos besoins professionnels.
           </p>
         </div>
@@ -417,7 +418,7 @@ const Subscription = () => {
         {plansLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white border border-gray-200 rounded-xl p-8">
+              <div key={i} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8">
                 <Skeleton className="h-16 w-16 mx-auto rounded-full mb-6" />
                 <Skeleton className="h-10 w-48 mx-auto mb-4" />
                 <Skeleton className="h-16 w-32 mx-auto mb-8" />
@@ -436,26 +437,26 @@ const Subscription = () => {
               <div
                 key={plan.plan_id}
                 className={cn(
-                  "relative bg-white border border-gray-200 rounded-xl p-8 hover:shadow-xl transition-all duration-300",
-                  plan.popular && "ring-4 ring-black/20 scale-105"
+                  "relative bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8 hover:shadow-xl transition-all duration-300",
+                  plan.popular && "ring-4 ring-black/20 dark:ring-white/20 scale-105"
                 )}
               >
                 {plan.popular && (
-                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-black dark:bg-white text-white dark:text-black px-6 py-2 rounded-full text-sm font-bold shadow-lg">
                     Recommandé
                   </div>
                 )}
 
                 <div className="text-center mb-8">
                   <div className={cn("w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6", plan.color)}>
-                    <plan.icon className="w-10 h-10 text-white" />
+                    <plan.icon className="w-10 h-10 text-white dark:text-black" />
                   </div>
-                  <h3 className="text-3xl font-bold text-black mb-2">{plan.name}</h3>
+                  <h3 className="text-3xl font-bold text-black dark:text-white mb-2">{plan.name}</h3>
                   <div className="my-6">
-                    <span className="text-5xl font-extrabold text-black">{plan.price}</span>
-                    <span className="text-xl text-gray-600"> FCFA/{plan.period}</span>
+                    <span className="text-5xl font-extrabold text-black dark:text-white">{plan.price}</span>
+                    <span className="text-xl text-gray-600 dark:text-gray-400"> FCFA/{plan.period}</span>
                   </div>
-                  <p className="text-lg text-gray-600">{plan.description}</p>
+                  <p className="text-lg text-gray-600 dark:text-gray-400">{plan.description}</p>
                 </div>
 
                 <ul className="space-y-4 mb-10">

@@ -106,7 +106,7 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
     <>
       {/* Desktop Quick Navigation (becomes fixed sidebar on desktop) */}
       <aside id="quick-nav" style={style} className="hidden md:block mb-8">
-        <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex flex-col gap-3">
             {/* Navigation principale */}
             {navItems.map((item) => {
@@ -120,8 +120,8 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
                       "h-11 px-5 rounded-xl font-medium transition-all",
                       "flex items-center gap-2.5",
                       isActive
-                        ? "bg-black hover:bg-black/90 text-white shadow-sm"
-                        : "text-gray-700 hover:text-black hover:bg-gray-100"
+                        ? "bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-gray-100 text-white dark:text-black shadow-sm"
+                        : "text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                     )}
                   >
                     <item.icon className="w-4 h-4" />
@@ -132,11 +132,11 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
             })}
 
             {/* Liens secondaires */}
-            <div className="mt-2 flex flex-col gap-2 pt-2 border-t border-gray-100">
+            <div className="mt-2 flex flex-col gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
               <Link to="/subscription">
                 <Button
                   variant="ghost"
-                  className="h-11 justify-start px-4 rounded-xl font-medium text-gray-700 hover:text-black hover:bg-gray-100 transition-all flex items-center gap-2.5"
+                  className="h-11 justify-start px-4 rounded-xl font-medium text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center gap-2.5"
                 >
                   <CreditCard className="w-4 h-4" />
                   Abonnement
@@ -146,7 +146,7 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
               <Link to="/support">
                 <Button
                   variant="ghost"
-                  className="h-11 justify-start px-4 rounded-xl font-medium text-gray-700 hover:text-black hover:bg-gray-100 transition-all flex items-center gap-2.5"
+                  className="h-11 justify-start px-4 rounded-xl font-medium text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center gap-2.5"
                 >
                   <HeadphonesIcon className="w-4 h-4" />
                   Support

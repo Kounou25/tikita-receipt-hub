@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { setCookie } from "@/lib/cookies";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -45,11 +46,11 @@ const Login = () => {
       console.log("Réponse de connexion:", { user, company_id, token });
 
       if (user && token) {
-        localStorage.setItem("user_id", user.user_id);
-        localStorage.setItem("token", token);
-        localStorage.setItem("user_role", user.role);
-        localStorage.setItem("user_name", user.full_name || user.email);
-        localStorage.setItem("company_id", company_id);
+        setCookie("user_id", user.user_id);
+        setCookie("token", token);
+        setCookie("user_role", user.role);
+        setCookie("user_name", user.full_name || user.email);
+        setCookie("company_id", company_id);
 
         if (user.role === "user") {
           navigate("/dashboard");

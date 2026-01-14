@@ -30,56 +30,56 @@ const Support = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 mobile-nav-padding">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 mobile-nav-padding">
       <Header title="Support" />
       
       <main className="p-4 md:p-6 space-y-6">
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Centre d'aide</h2>
-          <p className="text-gray-600">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Centre d'aide</h2>
+          <p className="text-gray-600 dark:text-gray-400">
             Nous sommes là pour vous aider à utiliser Tikiita au mieux
           </p>
         </div>
 
         {/* Quick Help Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                <FileText className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-950/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="font-medium text-gray-900 mb-1">Guide d'utilisation</h3>
-              <p className="text-sm text-gray-600">Apprenez à utiliser toutes les fonctionnalités</p>
+              <h3 className="font-medium text-gray-900 dark:text-white mb-1">Guide d'utilisation</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Apprenez à utiliser toutes les fonctionnalités</p>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                <MessageSquare className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-green-50 dark:bg-green-950/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                <MessageSquare className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
-              <h3 className="font-medium text-gray-900 mb-1">Chat en direct</h3>
-              <p className="text-sm text-gray-600">Assistance immédiate par chat</p>
+              <h3 className="font-medium text-gray-900 dark:text-white mb-1">Chat en direct</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Assistance immédiate par chat</p>
             </CardContent>
           </Card>
 
-          <Card className="border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
+          <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:shadow-md transition-shadow cursor-pointer">
             <CardContent className="p-6 text-center">
-              <div className="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Mail className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-purple-50 dark:bg-purple-950/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Mail className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
-              <h3 className="font-medium text-gray-900 mb-1">Support par email</h3>
-              <p className="text-sm text-gray-600">Contactez-nous par email</p>
+              <h3 className="font-medium text-gray-900 dark:text-white mb-1">Support par email</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Contactez-nous par email</p>
             </CardContent>
           </Card>
         </div>
 
         {/* FAQ Section */}
-        <Card className="border-gray-200">
+        <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <HelpCircle className="w-5 h-5 text-primary" />
+            <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
+              <HelpCircle className="w-5 h-5 text-primary dark:text-blue-400" />
               Questions fréquentes
             </CardTitle>
           </CardHeader>
@@ -87,10 +87,10 @@ const Support = () => {
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((faq, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="text-left">
+                  <AccordionTrigger className="text-left text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-300">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-600">
+                  <AccordionContent className="text-gray-600 dark:text-gray-400">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -100,20 +100,20 @@ const Support = () => {
         </Card>
 
         {/* Contact Info */}
-        <Card className="border-gray-200 bg-primary/5">
+        <Card className="border-gray-200 dark:border-gray-700 bg-primary/5 dark:bg-gray-900">
           <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-medium text-gray-900 mb-2">Autres moyens de contact</h3>
-                <div className="space-y-2 text-sm text-gray-600">
+                <h3 className="font-medium text-gray-900 dark:text-white mb-2">Autres moyens de contact</h3>
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <p><strong>Email :</strong> contact.tikiita@gmail.com</p>
                   <p><strong>Téléphone :</strong>+227 98362116</p>
                   <p><strong>Horaires :</strong> Lun-Ven 8h-18h </p>
                 </div>
               </div>
               <div>
-                <h3 className="font-medium text-gray-900 mb-2">Temps de réponse</h3>
-                <div className="space-y-2 text-sm text-gray-600">
+                <h3 className="font-medium text-gray-900 dark:text-white mb-2">Temps de réponse</h3>
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <p><strong>Chat en direct :</strong> Immédiat</p>
                   <p><strong>Email :</strong> 2-4 heures</p>
                   <p><strong>Problèmes critiques :</strong> 1 heure</p>

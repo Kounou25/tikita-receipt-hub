@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../src/middleware/userProtectedRoute"
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 // Layout
 import MainLayout from "./components/layout/Layout";
@@ -48,16 +49,17 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Public / Auth Pages - sans header */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<RegisterStep1 />} />
-          <Route path="/register/step2" element={<RegisterStep2 />} />
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Public / Auth Pages - sans header */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<RegisterStep1 />} />
+            <Route path="/register/step2" element={<RegisterStep2 />} />
 
           {/* Pages avec layout (Header fixe) */}
           <Route
@@ -273,6 +275,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+  </ThemeProvider>
   </QueryClientProvider>
 );
 

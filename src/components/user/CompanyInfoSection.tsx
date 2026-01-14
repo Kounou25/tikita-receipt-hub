@@ -6,61 +6,61 @@ import { Textarea } from '@/components/ui/textarea';
 
 const CompanyInfoSection = ({ displayedProfile, isEditing, setProfileState }: any) => {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-md transition-shadow">
-      <h2 className="text-2xl font-bold text-black mb-6 flex items-center gap-3">
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8 hover:shadow-md transition-shadow">
+      <h2 className="text-2xl font-bold text-black dark:text-white mb-6 flex items-center gap-3">
         <Building2 className="w-8 h-8" />
         Informations entreprise
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="companyName">Nom de l'entreprise</Label>
+          <Label htmlFor="companyName" className="dark:text-gray-200">Nom de l'entreprise</Label>
           <Input
             id="companyName"
             value={displayedProfile.companyName || ''}
             onChange={(e) => setProfileState((p: any) => ({ ...p, companyName: e.target.value }))}
             disabled={!isEditing}
-            className="h-12 text-base rounded-xl border-gray-300"
+            className="h-12 text-base rounded-xl border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:disabled:bg-gray-800 dark:disabled:text-gray-400"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="slogan">Slogan</Label>
+          <Label htmlFor="slogan" className="dark:text-gray-200">Slogan</Label>
           <Input
             id="slogan"
             value={displayedProfile.slogan || ''}
             onChange={(e) => setProfileState((p: any) => ({ ...p, slogan: e.target.value }))}
             disabled={!isEditing}
-            className="h-12 text-base rounded-xl border-gray-300"
+            className="h-12 text-base rounded-xl border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:disabled:bg-gray-800 dark:disabled:text-gray-400"
           />
         </div>
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="address">Adresse</Label>
+          <Label htmlFor="address" className="dark:text-gray-200">Adresse</Label>
           <Textarea
             id="address"
             value={displayedProfile.address || ''}
             onChange={(e) => setProfileState((p: any) => ({ ...p, address: e.target.value }))}
             disabled={!isEditing}
-            className="text-base rounded-xl border-gray-300"
+            className="text-base rounded-xl border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:disabled:bg-gray-800 dark:disabled:text-gray-400"
             rows={3}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="nif">NIF</Label>
+          <Label htmlFor="nif" className="dark:text-gray-200">NIF</Label>
           <Input
             id="nif"
             value={displayedProfile.nif || ''}
             onChange={(e) => setProfileState((p: any) => ({ ...p, nif: e.target.value }))}
             disabled={!isEditing}
-            className="h-12 text-base rounded-xl border-gray-300"
+            className="h-12 text-base rounded-xl border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:disabled:bg-gray-800 dark:disabled:text-gray-400"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="rccm">RCCM</Label>
+          <Label htmlFor="rccm" className="dark:text-gray-200">RCCM</Label>
           <Input
             id="rccm"
             value={displayedProfile.rccm || ''}
             onChange={(e) => setProfileState((p: any) => ({ ...p, rccm: e.target.value }))}
             disabled={!isEditing}
-            className="h-12 text-base rounded-xl border-gray-300"
+            className="h-12 text-base rounded-xl border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:disabled:bg-gray-800 dark:disabled:text-gray-400"
           />
         </div>
       </div>

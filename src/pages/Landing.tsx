@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 overflow-hidden">
       {/* Navbar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex items-center justify-between">
           <Link to="/" className="flex items-center">
             <motion.div
@@ -27,7 +27,7 @@ const Landing = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 text-gray-700 font-medium hover:text-gray-900 transition"
+                className="px-6 py-3 text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white transition"
               >
                 Connexion
               </motion.button>
@@ -36,7 +36,7 @@ const Landing = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-3.5 bg-gray-900 text-white font-semibold rounded-2xl shadow-xl hover:bg-gray-800 transition flex items-center gap-3"
+                className="px-8 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-2xl shadow-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition flex items-center gap-3"
               >
                 Inscription gratuite
                 <ArrowRight className="w-5 h-5" />
@@ -50,7 +50,7 @@ const Landing = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full px-5 py-3 text-base font-medium text-gray-700 border border-gray-300 rounded-2xl"
+                className="w-full px-5 py-3 text-base font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-2xl"
               >
                 Connexion
               </motion.button>
@@ -59,7 +59,7 @@ const Landing = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full px-5 py-3 text-base font-semibold bg-gray-900 text-white rounded-2xl shadow-lg"
+                className="w-full px-5 py-3 text-base font-semibold bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl shadow-lg"
               >
                 S'inscrire
               </motion.button>
@@ -88,17 +88,17 @@ const Landing = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.7 }}
-              className="inline-flex items-center bg-gray-900 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-full text-sm sm:text-base font-semibold shadow-2xl"
+              className="inline-flex items-center bg-gray-900 dark:bg-white text-white dark:text-black px-6 py-3 sm:px-8 sm:py-4 rounded-full text-sm sm:text-base font-semibold shadow-2xl"
             >
               La gestion de reçus réinventée
             </motion.div>
 
             {/* Titre responsive */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-none">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 dark:text-white leading-none">
               Reçus pro.
               <br />
               <motion.span
-                className="inline-block bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent"
+                className="inline-block bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
@@ -112,7 +112,7 @@ const Landing = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.8 }}
-              className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-light px-4"
+              className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed font-light px-4"
             >
               Créez des reçus numériques personnalisés et conformes en quelques secondes.
               Idéal pour les commerçants, freelances et entrepreneurs.
@@ -137,7 +137,7 @@ const Landing = () => {
                     ],
                   }}
                   transition={{ boxShadow: { repeat: Infinity, duration: 4 } }}
-                  className="group relative w-full sm:w-auto px-10 sm:px-12 py-5 sm:py-6 bg-gray-900 text-white text-lg sm:text-xl font-bold rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center gap-4"
+                  className="group relative w-full sm:w-auto px-10 sm:px-12 py-5 sm:py-6 bg-gray-900 dark:bg-white text-white dark:text-black text-lg sm:text-xl font-bold rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center gap-4"
                 >
                   <ReceiptText className="w-7 h-7 sm:w-8 sm:h-8 group-hover:scale-110 transition" />
                   Commencer gratuitement
@@ -145,7 +145,7 @@ const Landing = () => {
 
                   {/* Brillance */}
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 dark:via-black/20 to-transparent -skew-x-12"
                     animate={{ x: ["-100%", "100%"] }}
                     transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
                   />
@@ -165,13 +165,13 @@ const Landing = () => {
                 <div className="absolute inset-x-4 sm:inset-x-0 inset-y-4 bg-gray-900/20 rounded-3xl blur-3xl -z-10 scale-95" />
 
                 {/* Mockup principal */}
-                <div className="bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-300 rounded-3xl w-full aspect-video sm:aspect-[21/9] shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-700">
+                <div className="bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border border-gray-300 dark:border-gray-700 rounded-3xl w-full aspect-video sm:aspect-[21/9] shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-700">
                   <div className="h-full flex flex-col items-center justify-center p-8 text-center">
-                    <ReceiptText className="w-20 h-20 sm:w-32 sm:h-32 text-gray-400 mb-6" />
-                    <p className="text-2xl sm:text-4xl font-bold text-gray-700">
+                    <ReceiptText className="w-20 h-20 sm:w-32 sm:h-32 text-gray-400 dark:text-gray-500 mb-6" />
+                    <p className="text-2xl sm:text-4xl font-bold text-gray-700 dark:text-gray-300">
                       Votre interface Tikiita
                     </p>
-                    <p className="text-lg sm:text-xl text-gray-500 mt-3">
+                    <p className="text-lg sm:text-xl text-gray-500 dark:text-gray-400 mt-3">
                       Simple. Moderne. Efficace.
                     </p>
                   </div>

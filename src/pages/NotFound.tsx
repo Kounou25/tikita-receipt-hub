@@ -8,30 +8,30 @@ const NotFound = () => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-secondary/10 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="text-center">
           <div className="flex items-center justify-center space-x-2 mb-8">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <FileText className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-black dark:bg-white rounded-lg flex items-center justify-center">
+              <FileText className="w-6 h-6 text-white dark:text-black" />
             </div>
-            <span className="text-3xl font-bold text-gray-900">Tikita</span>
+            <span className="text-3xl font-bold text-gray-900 dark:text-white">Tikita</span>
           </div>
         </div>
 
         {/* 404 Content */}
-        <Card className="border-gray-200 shadow-lg">
+        <Card className="border-gray-200 dark:border-gray-700 shadow-lg bg-white dark:bg-gray-900">
           <CardContent className="p-8 text-center">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-3xl font-bold text-gray-400">404</span>
+            <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-3xl font-bold text-gray-400 dark:text-gray-500">404</span>
             </div>
             
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Page introuvable
             </h1>
             
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
             </p>
             

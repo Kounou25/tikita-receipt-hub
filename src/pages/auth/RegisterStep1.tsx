@@ -23,6 +23,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { setCookie } from "@/lib/cookies";
 import ReactCountryFlag from "react-country-flag";
 
 const RegisterStep1 = () => {
@@ -133,7 +134,7 @@ const RegisterStep1 = () => {
 
       const result = await response.json();
       if (result.user?.user_id) {
-        localStorage.setItem("user_id", result.user.user_id);
+        setCookie("user_id", result.user.user_id);
       }
 
       toast.success("Inscription réussie ! Veuillez vous connecter.");
