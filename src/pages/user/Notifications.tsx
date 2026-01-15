@@ -114,7 +114,7 @@ const Notifications = () => {
 
       <Header title="Notifications" showMenu={true} />
 
-      <main className="pt-6 px-4 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
+      <main className="pt-6 px-1 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
         <QuickNav userType="user" />
 
         {/* Global Loading */}
