@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
+import QuickNav from "@/components/layout/QuickNav";
 import { MessageSquare, Mail, FileText, HelpCircle } from "lucide-react";
 
 const Support = () => {
@@ -124,6 +125,7 @@ const Support = () => {
         </Card>
       </main>
 
+      <QuickNav userType="user" />
       <MobileNav />
     </div>
   );

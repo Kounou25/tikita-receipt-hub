@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, AlertCircle, ArrowLeft, Download, Eye, Share2 } from "lucide-react";
 import Header from "@/components/layout/Header";
 import MobileNav from "@/components/layout/MobileNav";
+import QuickNav from "@/components/layout/QuickNav";
 import { Link, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { getCookie } from "@/lib/cookies";
@@ -217,7 +218,7 @@ const ReceiptDetails = () => {
     <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
       <Header title="Détails du reçu" showMenu={true} />
 
-      <main className="pt-6 px-4 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
+      <main className="pt-6 px-1 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
         {/* Message d'erreur temporaire (téléchargement) */}
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-center gap-3">
@@ -394,6 +395,7 @@ const ReceiptDetails = () => {
         </div>
       </main>
 
+      <QuickNav userType="user" />
       <MobileNav />
     </div>
   );
