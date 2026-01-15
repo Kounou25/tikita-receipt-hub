@@ -78,20 +78,10 @@ const Header = ({ title, showMenu = false, onMenuClick }: HeaderProps) => {
       id="main-header"
       className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm"
     >
-      <div className="max-w-[1400px] mx-auto px-4 md:px-6 lg:px-8">
+      <div className="max-w-[1400px] mx-auto px-1 md:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20"> {/* Hauteur fixe plus généreuse */}
-          {/* Gauche : Menu mobile + Titre */}
+          {/* Gauche : Titre */}
           <div className="flex items-center gap-5">
-            {showMenu && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
-                onClick={onMenuClick}
-              >
-                <Menu className="w-5 h-5 text-black dark:text-white" />
-              </Button>
-            )}
             <h1 className="text-2xl font-bold text-black dark:text-white tracking-tight">{title}</h1>
           </div>
 
