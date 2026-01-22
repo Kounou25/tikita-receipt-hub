@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Bell, Check, Trash2, Settings, Users, DollarSign, TrendingUp, FileText, AlertCircle } from "lucide-react";
@@ -78,9 +79,11 @@ const PartnerNotifications = () => {
     setNotifications(notifications.filter(n => n.id !== id));
   };
 
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
-      <Header title="Notifications Partenaire" />
+      <Header title={t('pages.partner_notifications')} />
       
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="partner" />

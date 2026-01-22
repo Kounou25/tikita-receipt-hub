@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import LineChart from "@/components/charts/LineChart";
@@ -52,9 +53,11 @@ const PartnerDashboard = () => {
     { id: 4, user: "Kofi Asante", action: "10 reçus générés", time: "Il y a 1h" }
   ];
 
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
-      <Header title="Dashboard Partenaire" />
+      <Header title={t('pages.partner_dashboard')} />
       
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="partner" />

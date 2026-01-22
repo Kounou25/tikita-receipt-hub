@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Edit, Save, Eye, EyeOff, Copy, RefreshCw } from "lucide-react";
@@ -24,6 +25,7 @@ const PartnerProfile = () => {
     partnerSince: "Janvier 2024"
   });
 
+  const { t } = useTranslation();
   const apiCredentials = {
     apiKey: "tk_live_AbCdEfGhIjKlMnOpQrStUvWxYz123456",
     secretKey: "sk_live_ZyXwVuTsRqPoNmLkJiHgFeDcBa987654",
