@@ -21,6 +21,7 @@ import {
 import { ArrowLeft,ArrowRight, Plus, Trash2, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { toast } from "react-toastify";
@@ -55,10 +56,12 @@ const GenerateReceiptStep2 = () => {
   const token = getCookie("token");
   const userId = getCookie("user_id") || "1";
 
+  const { t } = useTranslation();
+
   useEffect(() => {
     const fetchClients = async () => {
       if (!companyId || !token) {
-        toast.error("Informations de session manquantes.");
+        toast.error(t('generateReceipt.errorSessionMissing'));
         return;
       }
       try {
@@ -74,11 +77,11 @@ const GenerateReceiptStep2 = () => {
           }
         );
 
-        if (!response.ok) throw new Error("Impossible de charger les clients");
+        if (!response.ok) throw new Error(t('generateReceipt.errorFailedLoadClients'));
         const data = await response.json();
         setClients(data);
       } catch (error) {
-        toast.error("Erreur lors du chargement des clients");
+        toast.error(t('generateReceipt.errorLoadClients'));
         console.error(error);
       } finally {
         setLoading(false);
@@ -153,7 +156,7 @@ const GenerateReceiptStep2 = () => {
       !receiptInfo.payment_method ||
       !receiptInfo.payment_status
     ) {
-      toast.error("Veuillez remplir tous les champs obligatoires correctement.");
+      toast.error(t('generateReceipt.errorFillAllFields'));
       return;
     }
 
@@ -203,7 +206,7 @@ const GenerateReceiptStep2 = () => {
         if (errorData.error?.includes("Quota")) {
           setShowQuotaPopup(true);
         }
-        throw new Error(errorData.message || "Erreur lors de la création du reçu");
+        throw new Error(errorData.message || t('generateReceipt.errorCreatingReceipt'));
       }
 
       const result = await response.json();
@@ -239,11 +242,11 @@ const GenerateReceiptStep2 = () => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      toast.success("Reçu généré et téléchargé avec succès !");
+      toast.success(t('generateReceipt.successGenerated'));
       navigate("/receipts");
     } catch (error: any) {
       if (!showSubscriptionPopup && !showQuotaPopup) {
-        toast.error(error.message || "Erreur lors de la génération du reçu");
+        toast.error(error.message || t('generateReceipt.errorGeneratingReceipt'));
       }
     } finally {
       setLoading(false);
@@ -254,7 +257,7 @@ const GenerateReceiptStep2 = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <Header title="Générer un reçu" />
+      <Header title={t('pages.generate_receipt')} />
 
       <main className="pt-20 px-4 sm:px-6 lg:px-12 xl:px-24 2xl:px-32 pb-24">
         <QuickNav userType="user" />
@@ -266,14 +269,14 @@ const GenerateReceiptStep2 = () => {
               <div className="w-12 h-12 bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-full flex items-center justify-center font-bold text-lg">
                 1
               </div>
-              <span className="text-lg font-medium text-gray-500 dark:text-gray-400">Modèle</span>
+              <span className="text-lg font-medium text-gray-500 dark:text-gray-400">{t('generateReceipt.template')}</span>
             </div>
             <div className="w-32 h-1 bg-gray-900 dark:bg-white rounded-full hidden sm:block" />
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-gray-900 dark:bg-white text-white dark:text-black rounded-full flex items-center justify-center font-bold text-lg">
                 2
               </div>
-              <span className="text-lg font-medium text-gray-900 dark:text-white">Remplir les détails</span>
+              <span className="text-lg font-medium text-gray-900 dark:text-white">{t('generateReceipt.step2')}</span>
             </div>
           </div>
         </div>
@@ -285,17 +288,17 @@ const GenerateReceiptStep2 = () => {
             <Card className="shadow-lg bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-3xl">
               <CardHeader className="pb-4">
                 <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Informations du client
+                  {t('generateReceipt.clientInfo')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
                   <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                    Client existant (optionnel)
+                    {t('generateReceipt.existingClient')}
                   </Label>
                   <Select onValueChange={handleClientSelect} disabled={loading}>
                     <SelectTrigger className="h-12 text-base rounded-xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-black dark:text-white">
-                      <SelectValue placeholder="Sélectionner ou saisir manuellement" />
+                      <SelectValue placeholder={t('generateReceipt.selectClient')} />
                     </SelectTrigger>
                     <SelectContent>
                       {clients.map((c: any) => (
@@ -310,49 +313,49 @@ const GenerateReceiptStep2 = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Nom complet *
+                      {t('generateReceipt.fullNameRequired')}
                     </Label>
                     <Input
                       value={clientInfo.full_name}
                       onChange={(e) => setClientInfo({ ...clientInfo, full_name: e.target.value })}
-                      placeholder="Nom du client"
+                      placeholder={t('generateReceipt.clientName')}
                       className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                       disabled={loading}
                     />
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Email
+                      {t('generateReceipt.email')}
                     </Label>
                     <Input
                       type="email"
                       value={clientInfo.email}
                       onChange={(e) => setClientInfo({ ...clientInfo, email: e.target.value })}
-                      placeholder="email@exemple.com"
+                      placeholder={t('generateReceipt.clientEmail')}
                       className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                       disabled={loading}
                     />
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Téléphone
+                      {t('generateReceipt.phone')}
                     </Label>
                     <Input
                       value={clientInfo.phone_number}
                       onChange={(e) => setClientInfo({ ...clientInfo, phone_number: e.target.value })}
-                      placeholder="+227 XX XX XX XX"
+                      placeholder={t('generateReceipt.clientPhone')}
                       className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                       disabled={loading}
                     />
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Adresse
+                      {t('generateReceipt.address')}
                     </Label>
                     <Input
                       value={clientInfo.address}
                       onChange={(e) => setClientInfo({ ...clientInfo, address: e.target.value })}
-                      placeholder="Adresse complète"
+                      placeholder={t('generateReceipt.clientAddress')}
                       className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                       disabled={loading}
                     />
@@ -365,7 +368,7 @@ const GenerateReceiptStep2 = () => {
             <Card className="shadow-lg bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-3xl">
               <CardHeader className="flex items-center justify-between pb-4">
                 <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Articles
+                  {t('generateReceipt.articles')}
                 </CardTitle>
                 <Button
                   onClick={addItem}
@@ -373,7 +376,7 @@ const GenerateReceiptStep2 = () => {
                   disabled={loading}
                 >
                   <Plus className="w-5 h-5 mr-2" />
-                  Ajouter un article
+                  {t('generateReceipt.addArticle')}
                 </Button>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -381,19 +384,19 @@ const GenerateReceiptStep2 = () => {
                   <div key={item.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                     <div className="md:col-span-6">
                       <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Description *
+                        {t('generateReceipt.descriptionRequired')}
                       </Label>
                       <Input
                         value={item.description}
                         onChange={(e) => updateItem(item.id, "description", e.target.value)}
-                        placeholder="Description de l'article"
+                        placeholder={t('generateReceipt.itemDescription')}
                         className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white"
                         disabled={loading}
                       />
                     </div>
                     <div className="md:col-span-2">
                       <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Quantité
+                        {t('generateReceipt.quantityLabel')}
                       </Label>
                       <Input
                         type="number"
@@ -406,7 +409,7 @@ const GenerateReceiptStep2 = () => {
                     </div>
                     <div className="md:col-span-3">
                       <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Prix unitaire (FCFA)
+                        {t('generateReceipt.unitPrice')}
                       </Label>
                       <Input
                         type="number"
@@ -440,13 +443,13 @@ const GenerateReceiptStep2 = () => {
             <Card className="shadow-lg bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-3xl">
               <CardHeader className="pb-4">
                 <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Paramètres du reçu
+                  {t('generateReceipt.receiptSettings')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    TVA (%)
+                    {t('generateReceipt.vat')} (%)
                   </Label>
                   <Input
                     type="number"
@@ -467,37 +470,37 @@ const GenerateReceiptStep2 = () => {
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Méthode de paiement *
+                    {t('generateReceipt.paymentMethod')}
                   </Label>
                   <Select
                     onValueChange={(v) => setReceiptInfo({ ...receiptInfo, payment_method: v })}
                     disabled={loading}
                   >
                     <SelectTrigger className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white">
-                      <SelectValue placeholder="Choisir" />
+                      <SelectValue placeholder={t('generateReceipt.choose')} />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="My Nita">My Nita</SelectItem>
-                      <SelectItem value="Cash">Espèces</SelectItem>
-                      <SelectItem value="Bank Transfer">Virement bancaire</SelectItem>
-                      <SelectItem value="Mobile Money">Mobile Money</SelectItem>
+                      <SelectItem value="Cash">{t('generateReceipt.cash')}</SelectItem>
+                      <SelectItem value="Bank Transfer">{t('generateReceipt.bankTransfer')}</SelectItem>
+                      <SelectItem value="Mobile Money">{t('generateReceipt.mobileMoney')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Statut de paiement *
+                    {t('generateReceipt.paymentStatus')}
                   </Label>
                   <Select
                     onValueChange={(v) => setReceiptInfo({ ...receiptInfo, payment_status: v })}
                     disabled={loading}
                   >
                     <SelectTrigger className="h-12 text-base rounded-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-black dark:text-white">
-                      <SelectValue placeholder="Choisir" />
+                      <SelectValue placeholder={t('generateReceipt.choose')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="paid">Payé</SelectItem>
-                      <SelectItem value="unpaid">Non payé</SelectItem>
+                      <SelectItem value="paid">{t('generateReceipt.paid')}</SelectItem>
+                      <SelectItem value="unpaid">{t('generateReceipt.unpaid')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -511,24 +514,24 @@ const GenerateReceiptStep2 = () => {
               <Card className="shadow-2xl bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-3xl">
                 <CardHeader className="pb-6">
                   <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Résumé du reçu
+                    {t('generateReceipt.receiptSummary')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-4">
                     <div className="flex justify-between text-lg">
-                      <span className="text-gray-600 dark:text-gray-400">Sous-total</span>
+                      <span className="text-gray-600 dark:text-gray-400">{t('generateReceipt.subtotal')}</span>
                       <span className="font-bold text-black dark:text-white">{subtotal.toLocaleString()} FCFA</span>
                     </div>
                     {receiptInfo.tva_rate > 0 && (
                       <div className="flex justify-between text-lg">
-                        <span className="text-gray-600 dark:text-gray-400">TVA ({receiptInfo.tva_rate}%)</span>
+                        <span className="text-gray-600 dark:text-gray-400">{t('generateReceipt.vat')} ({receiptInfo.tva_rate}%)</span>
                         <span className="font-bold text-black dark:text-white">+{tvaAmount.toLocaleString()} FCFA</span>
                       </div>
                     )}
                     <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-4">
                       <div className="flex justify-between">
-                        <span className="text-2xl font-black text-gray-900 dark:text-white">Total</span>
+                        <span className="text-2xl font-black text-gray-900 dark:text-white">{t('generateReceipt.total')}</span>
                         <span className="text-3xl font-black text-gray-900 dark:text-white">
                           {total.toLocaleString()} FCFA
                         </span>
@@ -545,7 +548,7 @@ const GenerateReceiptStep2 = () => {
                       disabled={loading || isDownloading}
                     >
                       <ArrowLeft className="w-6 h-6 mr-3" />
-                      Retour
+                      {t('generateReceipt.back')}
                     </Button>
                     <Button
                       size="lg"
@@ -563,11 +566,11 @@ const GenerateReceiptStep2 = () => {
                       {isDownloading ? (
                         <>
                           <Loader2 className="w-7 h-7 animate-spin" />
-                          Génération...
+                          {t('generateReceipt.generating')}
                         </>
                       ) : (
                         <>
-                          Générer le reçu
+                          {t('generateReceipt.generate')}
                           <ArrowRight className="w-7 h-7" />
                         </>
                       )}
@@ -583,17 +586,17 @@ const GenerateReceiptStep2 = () => {
         <Dialog open={showSubscriptionPopup} onOpenChange={setShowSubscriptionPopup}>
           <DialogContent className="rounded-3xl max-w-lg dark:bg-gray-900 dark:border-gray-700">
             <DialogHeader>
-              <DialogTitle className="text-3xl font-bold dark:text-white">Abonnement requis</DialogTitle>
+              <DialogTitle className="text-3xl font-bold dark:text-white">{t('generateReceipt.subscriptionRequired')}</DialogTitle>
               <DialogDescription className="text-xl dark:text-gray-400">
-                Votre abonnement est inactif. Souscrivez pour continuer à générer des reçus.
+                {t('generateReceipt.subscriptionInactive')}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex gap-6 mt-8">
               <Button variant="outline" onClick={() => setShowSubscriptionPopup(false)} className="h-16 px-10 text-xl rounded-3xl dark:border-gray-600 dark:text-white dark:hover:bg-gray-800">
-                Annuler
+                {t('generateReceipt.cancel')}
               </Button>
               <Button onClick={() => navigate("/subscription")} className="h-16 px-10 text-xl rounded-3xl bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-black">
-                Voir les abonnements
+                {t('generateReceipt.viewSubscriptions')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -602,17 +605,17 @@ const GenerateReceiptStep2 = () => {
         <Dialog open={showQuotaPopup} onOpenChange={setShowQuotaPopup}>
           <DialogContent className="rounded-3xl max-w-lg dark:bg-gray-900 dark:border-gray-700">
             <DialogHeader>
-              <DialogTitle className="text-3xl font-bold dark:text-white">Quota atteint</DialogTitle>
+              <DialogTitle className="text-3xl font-bold dark:text-white">{t('generateReceipt.quotaReached')}</DialogTitle>
               <DialogDescription className="text-xl dark:text-gray-400">
-                Vous avez atteint votre limite mensuelle. Passez à un plan supérieur.
+                {t('generateReceipt.quotaReachedMessage')}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex gap-6 mt-8">
               <Button variant="outline" onClick={() => setShowQuotaPopup(false)} className="h-16 px-10 text-xl rounded-3xl dark:border-gray-600 dark:text-white dark:hover:bg-gray-800">
-                Annuler
+                {t('generateReceipt.cancel')}
               </Button>
               <Button onClick={() => navigate("/subscription")} className="h-16 px-10 text-xl rounded-3xl bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-black">
-                Mettre à jour
+                {t('generateReceipt.upgrade')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -625,7 +628,7 @@ const GenerateReceiptStep2 = () => {
               <Loader2 className="w-24 h-24 text-gray-900 dark:text-white animate-spin mx-auto" />
               <div>
                 <p className="text-4xl font-black text-gray-900 dark:text-white mb-6">
-                  Génération du reçu en cours
+                  {t('generateReceipt.generatingReceipt')}
                 </p>
                 <p className="text-7xl font-black text-gray-900 dark:text-white">{downloadProgress}%</p>
               </div>
