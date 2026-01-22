@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from '@tanstack/react-query';import { getCookie, removeCookie } from "@/lib/cookies";import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle, TrendingUp, TrendingDown, ArrowUpRight, ArrowRight, Receipt, FileText, Users, Wallet, Calendar, DollarSign, Activity } from "lucide-react";
 
 interface DashboardData {
   stats: Array<{
-    title: string;
+    titleKey: string;
     value: string;
     icon: any;
     trend: string;
@@ -26,11 +26,12 @@ interface DashboardData {
     client: string;
     amount: string;
     type: string;
-    status: string;
+    statusKey: string;
     date: string;
   }>;
 }
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import LineChart from "@/components/charts/LineChart";
@@ -51,7 +52,7 @@ const Skeleton = ({ className }) => (
 );
 
 // Fonction pour fetch toutes les données en parallèle
-const fetchDashboardData = async (companyId, token) => {
+const fetchDashboardData = async (companyId, token, t) => {
   const [statsResponse, revenueResponse, clientsResponse, receiptsResponse] = await Promise.all([
     fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/${companyId}`, {
       method: "GET",
@@ -84,29 +85,29 @@ const fetchDashboardData = async (companyId, token) => {
   ]);
 
   if (!statsResponse.ok) {
-    if (statsResponse.status === 500) throw new Error("500: Erreur serveur pour les statistiques");
+    if (statsResponse.status === 500) throw new Error(`500: ${t('dashboard.serverErrorStats')}`);
     if (statsResponse.status === 401 || statsResponse.status === 409 || statsResponse.status === 403)
-      throw new Error("401/403/409: Session expirée ou non autorisée");
+      throw new Error(`401/403/409: ${t('dashboard.sessionExpiredAuth')}`);
     if (statsResponse.status === 404) {
       return {
         stats: [
-          { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
-          { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
-          { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
-          { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
+          { titleKey: "receiptsGenerated", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
+          { titleKey: "items", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
+          { titleKey: "activeClients", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
+          { titleKey: "totalRevenue", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
         ],
         revenueData: null,
         topClients: null,
         recentReceipts: null,
       };
     }
-    throw new Error(`Échec du chargement des statistiques: ${statsResponse.status} ${statsResponse.statusText}`);
+    throw new Error(`${t('dashboard.failedLoadStats')}: ${statsResponse.status} ${statsResponse.statusText}`);
   }
 
   if (!revenueResponse.ok) {
-    if (revenueResponse.status === 500) throw new Error("500: Erreur serveur pour les revenus");
+    if (revenueResponse.status === 500) throw new Error(`500: ${t('dashboard.serverErrorRevenue')}`);
     if (revenueResponse.status === 401 || revenueResponse.status === 409 || revenueResponse.status === 403)
-      throw new Error("401/403/409: Session expirée ou non autorisée");
+      throw new Error(`401/403/409: ${t('dashboard.sessionExpiredAuth')}`);
     if (revenueResponse.status === 404) {
       const months = Array.from({ length: 12 }, (_, i) => {
         const date = new Date();
@@ -124,23 +125,23 @@ const fetchDashboardData = async (companyId, token) => {
         recentReceipts: null,
       };
     }
-    throw new Error(`Échec du chargement des revenus: ${revenueResponse.status} ${revenueResponse.statusText}`);
+    throw new Error(`${t('dashboard.failedLoadRevenue')}: ${revenueResponse.status} ${revenueResponse.statusText}`);
   }
 
   if (!clientsResponse.ok) {
-    if (clientsResponse.status === 500) throw new Error("500: Erreur serveur pour les clients");
+    if (clientsResponse.status === 500) throw new Error(`500: ${t('dashboard.serverErrorClients')}`);
     if (clientsResponse.status === 401 || clientsResponse.status === 409 || clientsResponse.status === 403)
-      throw new Error("401/403/409: Session expirée ou non autorisée");
+      throw new Error(`401/403/409: ${t('dashboard.sessionExpiredAuth')}`);
     if (clientsResponse.status === 404) return { stats: null, revenueData: null, topClients: [], recentReceipts: null };
-    throw new Error(`Échec du chargement des clients: ${clientsResponse.status} ${clientsResponse.statusText}`);
+    throw new Error(`${t('dashboard.failedLoadClients')}: ${clientsResponse.status} ${clientsResponse.statusText}`);
   }
 
   if (!receiptsResponse.ok) {
-    if (receiptsResponse.status === 500) throw new Error("500: Erreur serveur pour les reçus");
+    if (receiptsResponse.status === 500) throw new Error(`500: ${t('dashboard.serverErrorReceipts')}`);
     if (receiptsResponse.status === 401 || receiptsResponse.status === 409 || receiptsResponse.status === 403)
-      throw new Error("401/403/409: Session expirée ou non autorisée");
+      throw new Error(`401/403/409: ${t('dashboard.sessionExpiredAuth')}`);
     if (receiptsResponse.status === 404) return { stats: null, revenueData: null, topClients: null, recentReceipts: [] };
-    throw new Error(`Échec du chargement des reçus récents: ${receiptsResponse.status} ${receiptsResponse.statusText}`);
+    throw new Error(`${t('dashboard.failedLoadReceipts')}: ${receiptsResponse.status} ${receiptsResponse.statusText}`);
   }
 
   const [statsData, revenueData, clientsData, receiptsData] = await Promise.all([
@@ -151,19 +152,19 @@ const fetchDashboardData = async (companyId, token) => {
   ]);
 
   let stats = [
-    { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
-    { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
-    { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
-    { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
+    { titleKey: "receiptsGenerated", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
+    { titleKey: "items", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
+    { titleKey: "activeClients", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
+    { titleKey: "totalRevenue", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
   ];
 
   if (Array.isArray(statsData) && statsData.length > 0) {
     const apiStats = statsData[0];
     stats = [
-      { title: "Reçus générés", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, trend: "+12%", trendUp: true, color: "yellow" },
-      { title: "Articles", value: apiStats.total_items?.toString() || "0", icon: FileText, trend: "+8%", trendUp: true, color: "blue" },
-      { title: "Clients actifs", value: apiStats.total_clients?.toString() || "0", icon: Users, trend: "+23%", trendUp: true, color: "green" },
-      { title: "Revenus totaux", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: Wallet, trend: "+15%", trendUp: true, color: "purple" },
+      { titleKey: "receiptsGenerated", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, trend: "+12%", trendUp: true, color: "yellow" },
+      { titleKey: "items", value: apiStats.total_items?.toString() || "0", icon: FileText, trend: "+8%", trendUp: true, color: "blue" },
+      { titleKey: "activeClients", value: apiStats.total_clients?.toString() || "0", icon: Users, trend: "+23%", trendUp: true, color: "green" },
+      { titleKey: "totalRevenue", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: Wallet, trend: "+15%", trendUp: true, color: "purple" },
     ];
   }
 
@@ -201,7 +202,7 @@ const fetchDashboardData = async (companyId, token) => {
       client: receipt.client_name,
       amount: `${receipt.total_amount.toLocaleString('fr-FR')} FCFA`,
       type: "Reçu",
-      status: receipt.payment_status === "paid" ? "Payé" : "En attente",
+      statusKey: receipt.payment_status === "paid" ? "paid" : "pending",
       date: new Date(receipt.receipt_date).toLocaleDateString('fr-FR', {
         day: '2-digit',
         month: 'short',
@@ -214,6 +215,7 @@ const fetchDashboardData = async (companyId, token) => {
 };
 
 const StatCard = ({ stat, isLoading }) => {
+  const { t } = useTranslation();
   const colorClasses = {
     yellow: {
       bg: "bg-gradient-to-br from-yellow-300 to-yellow-400",
@@ -250,7 +252,7 @@ const StatCard = ({ stat, isLoading }) => {
     )}>
       <div className="relative z-10">
         <h3 className="text-sm font-semibold text-black/80 mb-3">
-          {stat.title}
+          {t(`dashboard.${stat.titleKey}`)}
         </h3>
         <div className="flex items-baseline gap-2 mb-4">
           <span className="text-4xl font-bold text-black">
@@ -261,7 +263,7 @@ const StatCard = ({ stat, isLoading }) => {
           )}
         </div>
         <p className="text-xs font-medium text-black/60">
-          {stat.value.includes('FCFA') ? `${stat.value} au total` : `${stat.value} au total`}
+          {stat.value.includes('FCFA') ? `${stat.value} ${t('dashboard.total')}` : `${stat.value} ${t('dashboard.total')}`}
         </p>
       </div>
       
@@ -283,26 +285,31 @@ const UserDashboard = () => {
   const companyId = getCookie("company_id") || null;
   const token = getCookie("token") || null;
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { data, isLoading, error } = useQuery<DashboardData>({
     queryKey: ['dashboardData', companyId],
-    queryFn: () => fetchDashboardData(companyId, token),
+    queryFn: () => fetchDashboardData(companyId, token, t),
     enabled: !!companyId,
     staleTime: 5 * 60 * 1000,
-    onError: (err) => {
-      if (err.message.includes("500")) {
-        setShow500Error(true);
-      } else if (err.message.includes("401/403/409")) {
-        setShowSessionExpired(true);
-      }
-    },
   });
 
+  // Handle errors with useEffect
+  useEffect(() => {
+    if (error) {
+      if (error.message.includes("500")) {
+        setShow500Error(true);
+      } else if (error.message.includes("401/403/409")) {
+        setShowSessionExpired(true);
+      }
+    }
+  }, [error]);
+
   const stats = data?.stats || [
-    { title: "Reçus générés", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
-    { title: "Articles", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
-    { title: "Clients actifs", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
-    { title: "Revenus totaux", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
+    { titleKey: "receiptsGenerated", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
+    { titleKey: "items", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
+    { titleKey: "activeClients", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
+    { titleKey: "totalRevenue", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
   ];
 
   const revenueData = data?.revenueData || [{
@@ -332,12 +339,12 @@ const UserDashboard = () => {
         <div className="fixed inset-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="w-6 h-6 animate-spin text-black dark:text-white" />
-            <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">Chargement...</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">{t('dashboard.loading')}</span>
           </div>
         </div>
       )}
       
-      <Header title="Dashboard" />
+      <Header title={t('pages.dashboard')} />
       
       <main className="pt-6 px-1 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
         <QuickNav userType="user" />
@@ -346,16 +353,16 @@ const UserDashboard = () => {
         {error && !show500Error && !showSessionExpired && (
           <div className="mb-6 border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20 rounded-xl p-4 flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-700 dark:text-red-300">{error.message || "Une erreur est survenue."}</p>
+            <p className="text-sm text-red-700 dark:text-red-300">{error.message || t('dashboard.errorOccurred')}</p>
           </div>
         )}
         
         <AlertDialog open={show500Error} onOpenChange={setShow500Error}>
           <AlertDialogContent className="rounded-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-gray-900 dark:text-white">Erreur de connexion</AlertDialogTitle>
+              <AlertDialogTitle className="text-gray-900 dark:text-white">{t('dashboard.connectionError')}</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
-                Une erreur est survenue. Veuillez réessayer.
+                {t('dashboard.errorTryAgain')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -363,7 +370,7 @@ const UserDashboard = () => {
                 className="bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-gray-100 text-white dark:text-black rounded-lg" 
                 onClick={() => window.location.reload()}
               >
-                Réessayer
+                {t('dashboard.retry')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -372,9 +379,9 @@ const UserDashboard = () => {
         <AlertDialog open={showSessionExpired} onOpenChange={setShowSessionExpired}>
           <AlertDialogContent className="rounded-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-gray-900 dark:text-white">Session expirée</AlertDialogTitle>
+              <AlertDialogTitle className="text-gray-900 dark:text-white">{t('dashboard.sessionExpired')}</AlertDialogTitle>
               <AlertDialogDescription className="text-gray-600 dark:text-gray-400">
-                Votre session a expiré. Veuillez vous reconnecter.
+                {t('dashboard.sessionExpiredMessage')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -382,7 +389,7 @@ const UserDashboard = () => {
                 className="bg-black hover:bg-black/90 text-white rounded-lg" 
                 onClick={handleLogout}
               >
-                Se reconnecter
+                {t('dashboard.reconnect')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -397,13 +404,13 @@ const UserDashboard = () => {
         ) : (
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-black dark:text-white mb-2">
-              Bonjour, {username} 👋
+              {t('dashboard.hello')}, {username} 👋
             </h1>
             <p className="text-gray-600 dark:text-gray-400 text-lg">
-              Voici un aperçu de votre activité
+              {t('dashboard.activityOverview')}
             </p>
           </div>
-        )}
+        )}  
         
         {/* Quick Actions */}
         {isLoading ? (
@@ -415,7 +422,7 @@ const UserDashboard = () => {
           <div className="mb-8 flex flex-wrap gap-3">
             <Link to="/generate">
               <Button className="bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-gray-100 text-white dark:text-black rounded-lg px-6 h-11 font-medium shadow-sm">
-                Nouveau reçu
+                {t('dashboard.newReceipt')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
@@ -424,7 +431,7 @@ const UserDashboard = () => {
                 variant="outline" 
                 className="border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-black dark:text-white rounded-lg px-6 h-11 font-medium"
               >
-                Voir l'historique
+                {t('dashboard.viewHistory')}
               </Button>
             </Link>
           </div>
@@ -447,8 +454,8 @@ const UserDashboard = () => {
               <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="text-xl font-bold text-black dark:text-white mb-1">Revenus</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Performance mensuelle</p>
+                    <h3 className="text-xl font-bold text-black dark:text-white mb-1">{t('dashboard.revenue')}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.monthlyPerformance')}</p>
                   </div>
                   <Button 
                     variant="ghost" 
@@ -456,7 +463,7 @@ const UserDashboard = () => {
                     className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
                   >
                     <Calendar className="w-4 h-4 mr-2" />
-                    12 mois
+                    12 {t('dashboard.months')}
                   </Button>
                 </div>
                 <LineChart data={revenueData} height={300} />
@@ -471,7 +478,7 @@ const UserDashboard = () => {
             ) : (
               <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold text-black dark:text-white">Top Clients</h3>
+                  <h3 className="text-xl font-bold text-black dark:text-white">{t('dashboard.topClients')}</h3>
                   <Activity className="w-5 h-5 text-gray-400" />
                 </div>
                 
@@ -480,7 +487,7 @@ const UserDashboard = () => {
                     <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Users className="w-6 h-6 text-gray-400" />
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Aucun client</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.noClients')}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -495,7 +502,7 @@ const UserDashboard = () => {
                           </div>
                           <div>
                             <p className="font-semibold text-black dark:text-white text-sm">{client.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{client.purchases} achats</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{client.purchases} {t('dashboard.purchases')}</p>
                           </div>
                         </div>
                         <p className="font-bold text-black dark:text-white text-sm">{client.amount}</p>
@@ -515,8 +522,8 @@ const UserDashboard = () => {
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-xl font-bold text-black dark:text-white mb-1">Activité récente</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Dernières transactions</p>
+                <h3 className="text-xl font-bold text-black dark:text-white mb-1">{t('dashboard.recentActivity')}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('dashboard.recentTransactions')}</p>
               </div>
               <Link to="/receipts">
                 <Button 
@@ -524,7 +531,7 @@ const UserDashboard = () => {
                   size="sm"
                   className="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white font-medium"
                 >
-                  Voir tout
+                  {t('dashboard.viewAll')}
                   <ArrowUpRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
@@ -535,18 +542,18 @@ const UserDashboard = () => {
                 <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Receipt className="w-6 h-6 text-gray-400" />
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Aucune activité récente</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.noRecentActivity')}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200 dark:border-gray-700">
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Reçu</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Client</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Montant</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Statut</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('dashboard.receipt')}</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('dashboard.client')}</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('dashboard.amount')}</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('dashboard.status')}</th>
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('dashboard.date')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -568,11 +575,11 @@ const UserDashboard = () => {
                         <td className="py-4 px-4">
                           <span className={cn(
                             "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium",
-                            receipt.status === "Payé" 
+                            receipt.statusKey === "paid" 
                               ? "bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800" 
                               : "bg-yellow-50 dark:bg-yellow-950/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800"
                           )}>
-                            {receipt.status}
+                            {t(`dashboard.${receipt.statusKey}`)}
                           </span>
                         </td>
                         <td className="py-4 px-4 text-sm text-gray-600 dark:text-gray-400">{receipt.date}</td>
