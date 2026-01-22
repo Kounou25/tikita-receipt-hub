@@ -26,11 +26,11 @@ const PartnerProfile = () => {
   });
 
   const { t } = useTranslation();
-  const apiCredentials = {
-    apiKey: "tk_live_AbCdEfGhIjKlMnOpQrStUvWxYz123456",
-    secretKey: "sk_live_ZyXwVuTsRqPoNmLkJiHgFeDcBa987654",
-    webhookUrl: "https://api.techcorp.ci/webhooks/tikita"
-  };
+  // const apiCredentials = {
+  //   apiKey: "tk_live_AbCdEfGhIjKlMnOpQrStUvWxYz123456",
+  //   secretKey: "sk_live_ZyXwVuTsRqPoNmLkJiHgFeDcBa987654",
+  //   webhookUrl: "https://api.techcorp.ci/webhooks/tikita"
+  // };
 
   const handleSave = () => {
     setIsEditing(false);
@@ -179,14 +179,14 @@ const PartnerProfile = () => {
               <Label>Clé API publique</Label>
               <div className="flex items-center space-x-2">
                 <Input
-                  value={apiCredentials.apiKey}
+                  value={''}
                   readOnly
                   className="border-gray-300 bg-gray-50"
                 />
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => copyToClipboard(apiCredentials.apiKey)}
+                  onClick={() => copyToClipboard('')}
                 >
                   <Copy className="w-4 h-4" />
                 </Button>
@@ -198,7 +198,7 @@ const PartnerProfile = () => {
               <div className="flex items-center space-x-2">
                 <Input
                   type={showApiKey ? "text" : "password"}
-                  value={apiCredentials.secretKey}
+                  value={''}
                   readOnly
                   className="border-gray-300 bg-gray-50"
                 />
@@ -212,7 +212,7 @@ const PartnerProfile = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => copyToClipboard(apiCredentials.secretKey)}
+                  onClick={() => copyToClipboard('')}
                 >
                   <Copy className="w-4 h-4" />
                 </Button>
@@ -223,14 +223,14 @@ const PartnerProfile = () => {
               <Label>URL de webhook</Label>
               <div className="flex items-center space-x-2">
                 <Input
-                  value={apiCredentials.webhookUrl}
+                  value={''}
                   readOnly
                   className="border-gray-300 bg-gray-50"
                 />
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => copyToClipboard(apiCredentials.webhookUrl)}
+                  onClick={() => copyToClipboard('')}
                 >
                   <Copy className="w-4 h-4" />
                 </Button>
