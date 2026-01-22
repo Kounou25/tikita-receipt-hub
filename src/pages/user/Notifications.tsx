@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Bell, AlertCircle, FileText, CreditCard, Users, TrendingUp, Settings, Loader2 } from "lucide-react";
@@ -81,6 +82,7 @@ const fetchNotifications = async (companyId, token) => {
 
 const Notifications = () => {
   const companyId = getCookie("company_id") || null;
+  const { t } = useTranslation();
   const token = getCookie("token") || null;
 
   const { data: notifications = [], isLoading, error } = useQuery<any[]>({
@@ -112,7 +114,7 @@ const Notifications = () => {
     <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
       <Toaster position="top-right" />
 
-      <Header title="Notifications" showMenu={true} />
+      <Header title={t('pages.notifications')} showMenu={true} />
 
       <main className="pt-6 px-1 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
         <QuickNav userType="user" />
@@ -122,7 +124,7 @@ const Notifications = () => {
           <div className="fixed inset-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="w-10 h-10 animate-spin text-black dark:text-white" />
-              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Chargement des notifications...</p>
+              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">{t('notifications.loading')}</p>
             </div>
           </div>,
           document.body
@@ -133,7 +135,7 @@ const Notifications = () => {
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8 shadow-xl max-w-md w-full mx-4 text-center">
               <AlertCircle className="w-12 h-12 text-red-600 dark:text-red-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-black dark:text-white mb-3">Erreur de chargement</h3>
+              <h3 className="text-xl font-bold text-black dark:text-white mb-3">{t('notifications.loadError')}</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {(error as any)?.cause === "auth"
                   ? "Votre session a expiré. Veuillez vous reconnecter."
@@ -192,7 +194,7 @@ const Notifications = () => {
               {/* Aujourd'hui */}
               {(isLoading || today.length > 0) && (
                 <section>
-                  <h2 className="text-xl font-bold text-black dark:text-white mb-4">Aujourd'hui</h2>
+                  <h2 className="text-xl font-bold text-black dark:text-white mb-4">{t('notifications.today')}</h2>
                   <div className="space-y-4">
                     {isLoading ? (
                       [...Array(3)].map((_, i) => (
@@ -241,7 +243,7 @@ const Notifications = () => {
               {/* Hier */}
               {yesterday.length > 0 && (
                 <section>
-                  <h2 className="text-xl font-bold text-black dark:text-white mb-4">Hier</h2>
+                  <h2 className="text-xl font-bold text-black dark:text-white mb-4">{t('notifications.yesterday')}</h2>
                   <div className="space-y-4">
                     {yesterday.map((n) => (
                       <div
@@ -270,7 +272,7 @@ const Notifications = () => {
               {/* Plus ancien */}
               {older.length > 0 && (
                 <section>
-                  <h2 className="text-xl font-bold text-black dark:text-white mb-4">Plus ancien</h2>
+                  <h2 className="text-xl font-bold text-black dark:text-white mb-4">{t('notifications.older')}</h2>
                   <div className="space-y-4">
                     {older.map((n) => (
                       <div
@@ -302,8 +304,8 @@ const Notifications = () => {
                   <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Bell className="w-10 h-10 text-gray-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-black dark:text-white mb-3">Aucune notification</h3>
-                  <p className="text-lg text-gray-600 dark:text-gray-400">Vous êtes parfaitement à jour !</p>
+                  <h3 className="text-2xl font-bold text-black dark:text-white mb-3">{t('notifications.noNotifications')}</h3>
+                  <p className="text-lg text-gray-600 dark:text-gray-400">{t('notifications.upToDate')}</p>
                 </div>
               )}
             </div>

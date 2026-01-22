@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, AlertCircle, ArrowLeft, Download, Eye, Share2 } from "lucide-react";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Link, useParams } from "react-router-dom";
@@ -12,6 +13,7 @@ import { getCookie } from "@/lib/cookies";
 const ReceiptDetails = () => {
   const { id } = useParams();
   const companyId = getCookie("company_id") || null;
+  const { t } = useTranslation();
   const token = getCookie("token") || null;
   const [receipt, setReceipt] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -190,7 +192,7 @@ const ReceiptDetails = () => {
       <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-10 h-10 animate-spin text-black dark:text-white" />
-          <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Chargement du reçu...</p>
+          <p className="text-lg font-medium text-gray-700 dark:text-gray-300">{t('receipts.loading')}</p>
         </div>
       </div>
     );
@@ -202,8 +204,8 @@ const ReceiptDetails = () => {
       <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 flex items-center justify-center px-4">
         <div className="bg-white dark:bg-gray-900 border border-red-200 dark:border-red-800 rounded-xl p-8 text-center shadow-lg max-w-md">
           <AlertCircle className="w-12 h-12 text-red-600 dark:text-red-500 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-black dark:text-white mb-2">Reçu introuvable</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">Le reçu demandé n'existe pas ou a été supprimé.</p>
+          <h3 className="text-xl font-bold text-black dark:text-white mb-2">{t('receipts.receiptNotFound')}</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{t('receipts.receiptDeleted')}</p>
           <Link to="/receipts">
             <Button className="bg-black hover:bg-black/90 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black rounded-lg">
               Retour à l'historique
@@ -216,7 +218,7 @@ const ReceiptDetails = () => {
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
-      <Header title="Détails du reçu" showMenu={true} />
+      <Header title={t('pages.receipt_details')} showMenu={true} />
 
       <main className="pt-6 px-1 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
         {/* Message d'erreur temporaire (téléchargement) */}
@@ -250,7 +252,7 @@ const ReceiptDetails = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <div className="flex items-center gap-4 mb-2">
-                <h1 className="text-3xl font-bold text-black dark:text-white">Reçu #{receipt.id}</h1>
+                <h1 className="text-3xl font-bold text-black dark:text-white">{t('receipts.receiptDetails')}{receipt.id}</h1>
                 <Badge className={cn("px-4 py-1.5 text-sm font-medium rounded-full", getStatusBadge(receipt.status))}>
                   {receipt.status}
                 </Badge>
@@ -279,49 +281,49 @@ const ReceiptDetails = () => {
         {/* Infos Client & Entreprise */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-shadow">
-            <h3 className="text-xl font-bold text-black dark:text-white mb-5">Informations du client</h3>
+            <h3 className="text-xl font-bold text-black dark:text-white mb-5">{t('receipts.clientInfo')}</h3>
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Nom</p>
-                <p className="text-lg font-semibold text-black dark:text-white">{receipt.client.name}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('receipts.name')}</p>
+                <p className="text-base font-semibold text-black dark:text-white">{receipt.client.name}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Téléphone</p>
-                <p className="text-lg font-semibold text-black dark:text-white">{receipt.client.phone}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('receipts.phone')}</p>
+                <p className="text-base font-semibold text-black dark:text-white">{receipt.client.phone}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
-                <p className="text-lg font-semibold text-black dark:text-white">{receipt.client.email}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('receipts.email')}</p>
+                <p className="text-base font-semibold text-black dark:text-white">{receipt.client.email}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Adresse</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('receipts.address')}</p>
                 <p className="text-lg font-semibold text-black dark:text-white">{receipt.client.address}</p>
               </div>
             </div>
           </div>
 
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-shadow">
-            <h3 className="text-xl font-bold text-black dark:text-white mb-5">Informations de l'entreprise</h3>
+            <h3 className="text-xl font-bold text-black dark:text-white mb-5">{t('receipts.companyInfo')}</h3>
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Nom</p>
-                <p className="text-lg font-semibold text-black dark:text-white">{receipt.company.name}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('receipts.name')}</p>
+                <p className="text-base font-semibold text-black dark:text-white">{receipt.company.name}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Téléphone</p>
-                <p className="text-lg font-semibold text-black dark:text-white">{receipt.company.phone}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('receipts.phone')}</p>
+                <p className="text-base font-semibold text-black dark:text-white">{receipt.company.phone}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('receipts.email')}</p>
                 <p className="text-lg font-semibold text-black dark:text-white">{receipt.company.email}</p>
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">NIF</p>
-                  <p className="text-lg font-semibold text-black dark:text-white">{receipt.company.nif}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('auth.nif')}</p>
+                  <p className="text-base font-semibold text-black dark:text-white">{receipt.company.nif}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">RCCM</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('auth.rccm')}</p>
                   <p className="text-lg font-semibold text-black dark:text-white">{receipt.company.rccm}</p>
                 </div>
               </div>
@@ -332,7 +334,7 @@ const ReceiptDetails = () => {
         {/* Articles */}
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-md transition-shadow mb-6 overflow-hidden">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-xl font-bold text-black dark:text-white">Articles ({receipt.items.length})</h3>
+            <h3 className="text-xl font-bold text-black dark:text-white">{t('receipts.items')} ({receipt.items.length})</h3>
           </div>
           <div className="divide-y divide-gray-100 dark:divide-gray-800">
             {receipt.items.map((item, index) => (
@@ -355,14 +357,14 @@ const ReceiptDetails = () => {
 
         {/* Récapitulatif financier */}
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-shadow">
-          <h3 className="text-xl font-bold text-black dark:text-white mb-6">Récapitulatif financier</h3>
+          <h3 className="text-xl font-bold text-black dark:text-white mb-6">{t('receipts.financialSummary')}</h3>
           <div className="space-y-4 text-lg">
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Sous-total HT</span>
+              <span className="text-gray-600 dark:text-gray-400">{t('receipts.subtotal')}</span>
               <span className="font-semibold text-black dark:text-white">{receipt.subtotal.toLocaleString('fr-FR')} FCFA</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">TVA ({receipt.tva}%)</span>
+              <span className="text-gray-600 dark:text-gray-400">{t('receipts.vat')} ({receipt.tva}%)</span>
               <span className="font-semibold text-black dark:text-white">{receipt.tvaAmount.toLocaleString('fr-FR')} FCFA</span>
             </div>
             {receipt.discount > 0 && (
@@ -373,7 +375,7 @@ const ReceiptDetails = () => {
             )}
             <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-4">
               <div className="flex justify-between items-center">
-                <span className="text-2xl font-bold text-black dark:text-white">Total TTC</span>
+                <span className="text-2xl font-bold text-black dark:text-white">{t('receipts.totalIncl')}</span>
                 <span className="text-3xl font-bold text-black dark:text-white">{receipt.total.toLocaleString('fr-FR')} FCFA</span>
               </div>
             </div>

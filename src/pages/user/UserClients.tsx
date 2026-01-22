@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Search, Trash2, Users, Phone, Mail, MapPin, Plus, AlertCircle } from "lucide-react";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import {
@@ -97,6 +98,7 @@ const deleteClient = async ({ clientId, token }) => {
 const UserClients = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const companyId = getCookie("company_id") || null;
+  const { t } = useTranslation();
   const token = getCookie("token") || null;
   const queryClient = useQueryClient();
 
@@ -139,7 +141,7 @@ const UserClients = () => {
     <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
       <Toaster position="top-right" />
 
-      <Header title="Gestion des Clients" showMenu={true} />
+      <Header title={t('pages.clients')} showMenu={true} />
 
       <main className="pt-6 px-1 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
         <QuickNav userType="user" />
@@ -149,7 +151,7 @@ const UserClients = () => {
           <div className="fixed inset-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="w-10 h-10 animate-spin text-black dark:text-white" />
-              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Chargement des clients...</p>
+              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">{t('clients.loading')}</p>
             </div>
           </div>,
           document.body
@@ -160,7 +162,7 @@ const UserClients = () => {
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8 shadow-xl max-w-md w-full mx-4 text-center">
               <AlertCircle className="w-12 h-12 text-red-600 dark:text-red-400 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-black dark:text-white mb-3">Erreur de chargement</h3>
+              <h3 className="text-xl font-bold text-black dark:text-white mb-3">{t('clients.loadError')}</h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 {error.message.includes("ID de l'entreprise")
                   ? "Session invalide. Veuillez vous reconnecter."
@@ -185,8 +187,8 @@ const UserClients = () => {
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:shadow-md transition-shadow mb-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <h1 className="text-3xl font-bold text-black dark:text-white mb-2">Mes Clients</h1>
-              <p className="text-lg text-gray-600 dark:text-gray-400">Gérez et suivez votre base de clientèle</p>
+              <h1 className="text-3xl font-bold text-black dark:text-white mb-2">{t('clients.title')}</h1>
+              <p className="text-lg text-gray-600 dark:text-gray-400">{t('clients.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -196,7 +198,7 @@ const UserClients = () => {
           <div className="relative">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 dark:text-gray-400" />
             <Input
-              placeholder="Rechercher par nom, email ou téléphone..."
+              placeholder={t('placeholders.searchByName')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-14 h-14 text-lg rounded-xl border-gray-300 dark:border-gray-600 focus:border-black dark:focus:border-white bg-white dark:bg-gray-800 text-black dark:text-white"
@@ -301,7 +303,7 @@ const UserClients = () => {
                               <span>{client.address}</span>
                             </div>
                             <div className="flex items-center gap-3">
-                              <span className="text-gray-500 dark:text-gray-400">Dernière commande :</span>
+                              <span className="text-gray-500 dark:text-gray-400">{t('clients.lastOrder')}</span>
                               <span className="font-medium text-black dark:text-white">{client.lastOrder}</span>
                             </div>
                           </div>
@@ -335,7 +337,7 @@ const UserClients = () => {
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter className="mt-6">
-                              <AlertDialogCancel className="rounded-lg dark:border-gray-600 dark:text-white dark:hover:bg-gray-800">Annuler</AlertDialogCancel>
+                              <AlertDialogCancel className="rounded-lg dark:border-gray-600 dark:text-white dark:hover:bg-gray-800">{t('clients.cancel')}</AlertDialogCancel>
                               <AlertDialogAction
                                 className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white rounded-lg"
                                 onClick={() => deleteMutation.mutate({ clientId: client.id, token })}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, AlertCircle, Search, Download, Eye, Filter, Calendar,FileText } from "lucide-react";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Link, useNavigate } from "react-router-dom";
@@ -15,13 +16,13 @@ const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg", className)} />
 );
 
-const ErrorPopup = ({ message, onClose, actionButton }) => createPortal(
+const ErrorPopup = ({ message, onClose, actionButton, errorTitle }) => createPortal(
   <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10000]">
     <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-xl max-w-md w-full mx-4">
       <div className="flex items-start gap-4">
         <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400 flex-shrink-0" />
         <div className="flex-1">
-          <h3 className="text-xl font-bold text-black dark:text-white mb-2">Erreur</h3>
+          <h3 className="text-xl font-bold text-black dark:text-white mb-2">{errorTitle}</h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6">{message}</p>
           <div className="flex justify-end gap-3">
             {actionButton}
@@ -117,6 +118,7 @@ const ReceiptHistory = () => {
   const [downloadProgress, setDownloadProgress] = useState<Record<string | number, number>>({});
   const [downloadError, setDownloadError] = useState(null);
   const companyId = getCookie("company_id") || null;
+  const { t } = useTranslation();
   const token = getCookie("token") || null;
   const navigate = useNavigate();
 
@@ -184,7 +186,7 @@ const ReceiptHistory = () => {
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
-      <Header title="Historique des reçus" showMenu={true} />
+      <Header title={t('pages.receipts_history')} showMenu={true} />
 
       <main className="pt-6 px-1 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
         <QuickNav userType="user" />
@@ -194,7 +196,7 @@ const ReceiptHistory = () => {
           <div className="fixed inset-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm flex items-center justify-center z-[10000]">
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="w-10 h-10 animate-spin text-black dark:text-white" />
-              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Chargement des reçus...</p>
+              <p className="text-lg font-medium text-gray-700 dark:text-gray-300">{t('receipts.loading')}</p>
             </div>
           </div>,
           document.body
@@ -203,6 +205,7 @@ const ReceiptHistory = () => {
         {/* Error Popups */}
         {error && errorType === "server" && (
           <ErrorPopup
+            errorTitle={t('receipts.error')}
             message="Une erreur est survenue lors de la récupération des reçus. Veuillez réessayer."
             onClose={() => {}}
             actionButton={
@@ -218,6 +221,7 @@ const ReceiptHistory = () => {
 
         {error && errorType === "auth" && (
           <ErrorPopup
+            errorTitle={t('receipts.error')}
             message="Votre session a expiré. Veuillez vous reconnecter."
             onClose={() => navigate("/login")}
             actionButton={
@@ -233,6 +237,7 @@ const ReceiptHistory = () => {
 
         {downloadError && (
           <ErrorPopup
+            errorTitle={t('receipts.error')}
             message={downloadError}
             onClose={() => setDownloadError(null)}
             actionButton={null}
@@ -245,8 +250,8 @@ const ReceiptHistory = () => {
             <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
               <FileText className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-black dark:text-white mb-2">Aucun reçu</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">Vous n'avez pas encore généré de reçu.</p>
+            <h3 className="text-xl font-semibold text-black dark:text-white mb-2">{t('receipts.noReceipts')}</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">{t('receipts.noReceiptsYet')}</p>
             <Link to="/generate">
               <Button className="bg-black dark:bg-white hover:bg-black/90 dark:hover:bg-gray-100 text-white dark:text-black rounded-lg px-6 h-11 font-medium">
                 Créer mon premier reçu
@@ -280,7 +285,7 @@ const ReceiptHistory = () => {
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 dark:text-gray-400" />
               <Input
-                placeholder="Rechercher par client ou numéro de reçu..."
+                placeholder={t('placeholders.searchByClient')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-12 h-12 rounded-xl border-gray-300 dark:border-gray-600 focus:border-black dark:focus:border-white bg-white dark:bg-gray-800 text-black dark:text-white"
@@ -317,7 +322,7 @@ const ReceiptHistory = () => {
             <div className="md:hidden">
               {filteredReceipts.length === 0 ? (
                 <div className="p-12 text-center">
-                  <p className="text-gray-500 dark:text-gray-400">Aucun résultat pour cette recherche.</p>
+                  <p className="text-gray-500 dark:text-gray-400">{t('receipts.noResults')}</p>
                 </div>
               ) : (
                 filteredReceipts.map((receipt) => (
@@ -372,13 +377,13 @@ const ReceiptHistory = () => {
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Reçu</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Client</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Montant</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Articles</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Statut</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('receipts.receiptNumber')}</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('receipts.client')}</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('receipts.amount')}</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('receipts.date')}</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('receipts.items')}</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('receipts.status')}</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('receipts.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
