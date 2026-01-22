@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ import { setCookie } from "@/lib/cookies";
 import ReactCountryFlag from "react-country-flag";
 
 const RegisterStep1 = () => {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
@@ -84,20 +86,20 @@ const RegisterStep1 = () => {
       !formData.password ||
       !formData.confirmPassword
     ) {
-      setErrorMessage("Veuillez remplir tous les champs obligatoires.");
+      setErrorMessage(t('toast.error.missingFields'));
       setShowErrorPopup(true);
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setErrorMessage("Les mots de passe ne correspondent pas.");
+      setErrorMessage(t('toast.error.passwordMismatch') || "Passwords do not match");
       setShowErrorPopup(true);
       return;
     }
 
     const phoneRegex = /^\+\d+\s\d+$/;
     if (!phoneRegex.test(formData.user_phone)) {
-      setErrorMessage("Veuillez entrer un numéro de téléphone valide (ex. +227 12345678).");
+      setErrorMessage(t('toast.error.invalidPhone') || "Invalid phone number");
       setShowErrorPopup(true);
       return;
     }
@@ -159,7 +161,7 @@ const RegisterStep1 = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="w-10 h-10 text-gray-800 animate-spin" />
-            <p className="text-white font-medium">Inscription en cours...</p>
+            <p className="text-white font-medium">{t('auth.registering')}</p>
           </div>
         </div>
       )}
@@ -176,7 +178,7 @@ const RegisterStep1 = () => {
             Tikiita
           </h1>
           <p className="mt-2 text-sm sm:text-base text-gray-600">
-            Créez votre compte en quelques étapes
+            {t('auth.createAccountSubtitle')}
           </p>
         </motion.div>
 
@@ -189,7 +191,7 @@ const RegisterStep1 = () => {
                 1
               </div>
               <span className="mt-2 text-xs sm:text-sm text-gray-900 font-medium hidden sm:block">
-                Informations
+                {t('auth.step1Info')}
               </span>
             </div>
 
@@ -202,7 +204,7 @@ const RegisterStep1 = () => {
                 2
               </div>
               <span className="mt-2 text-xs sm:text-sm text-gray-500 hidden sm:block">
-                Configuration
+                {t('auth.step2Config')}
               </span>
             </div>
           </div>
@@ -217,9 +219,9 @@ const RegisterStep1 = () => {
           <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
             <CardHeader className="text-center pb-6 pt-8 px-6">
               <CardTitle className="text-2xl sm:text-3xl font-semibold text-gray-900">
-                Créer un compte
+                {t('auth.createAccount')}
               </CardTitle>
-              <p className="mt-2 text-gray-600">Étape 1 : Vos informations personnelles</p>
+              <p className="mt-2 text-gray-600">{t('auth.step1PersonalInfo')}</p>
             </CardHeader>
 
             <CardContent className="px-6 pb-8">
@@ -227,12 +229,12 @@ const RegisterStep1 = () => {
                 {/* Nom complet */}
                 <div className="space-y-2">
                   <Label htmlFor="fullName" className="text-gray-700 font-medium text-sm sm:text-base">
-                    Nom complet
+                    {t('auth.fullName')}
                   </Label>
                   <Input
                     id="fullName"
                     type="text"
-                    placeholder="Votre nom complet"
+                    placeholder={t('placeholders.fullName')}
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     required
@@ -244,12 +246,12 @@ const RegisterStep1 = () => {
                 {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-gray-700 font-medium text-sm sm:text-base">
-                    Adresse email
+                    {t('auth.emailAddress')}
                   </Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="votre@email.com"
+                    placeholder={t('placeholders.email')}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
@@ -261,11 +263,11 @@ const RegisterStep1 = () => {
                 {/* Pays */}
                 <div className="space-y-2">
                   <Label htmlFor="country" className="text-gray-700 font-medium text-sm sm:text-base">
-                    Pays
+                    {t('auth.country')}
                   </Label>
                   <Select onValueChange={handleCountryChange} value={formData.country} disabled={isLoading}>
                     <SelectTrigger className="h-12 sm:h-14 rounded-xl border-gray-300 focus:border-gray-900 focus:ring-2 focus:ring-gray-900/20">
-                      <SelectValue placeholder="Sélectionnez votre pays">
+                      <SelectValue placeholder={t('auth.selectCountry')}>
                         {selectedCountry && (
                           <div className="flex items-center gap-3">
                             <ReactCountryFlag
@@ -303,7 +305,7 @@ const RegisterStep1 = () => {
                 {/* Téléphone */}
                 <div className="space-y-2">
                   <Label htmlFor="user_phone" className="text-gray-700 font-medium text-sm sm:text-base">
-                    Numéro de téléphone
+                    {t('auth.phoneNumber')}
                   </Label>
                   <Input
                     id="user_phone"
@@ -320,13 +322,13 @@ const RegisterStep1 = () => {
                 {/* Mot de passe */}
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-gray-700 font-medium text-sm sm:text-base">
-                    Mot de passe
+                    {t('auth.password')}
                   </Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      placeholder={t('placeholders.password')}
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       required
@@ -349,13 +351,13 @@ const RegisterStep1 = () => {
                 {/* Confirmation mot de passe */}
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" className="text-gray-700 font-medium text-sm sm:text-base">
-                    Confirmer le mot de passe
+                    {t('auth.confirmPassword')}
                   </Label>
                   <div className="relative">
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      placeholder={t('placeholders.password')}
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                       required
@@ -387,18 +389,18 @@ const RegisterStep1 = () => {
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Inscription...
+                      {t('auth.registering')}
                     </span>
                   ) : (
-                    "Continuer"
+                    t('auth.continue')
                   )}
                 </Button>
               </form>
 
               <div className="mt-8 text-center text-sm sm:text-base text-gray-600">
-                Déjà un compte ?{" "}
+                {t('auth.alreadyHaveAccount')}{" "}
                 <Link to="/login" className="font-medium text-gray-900 hover:underline transition">
-                  Se connecter
+                  {t('auth.signIn')}
                 </Link>
               </div>
             </CardContent>
@@ -409,7 +411,7 @@ const RegisterStep1 = () => {
         <Dialog open={showErrorPopup} onOpenChange={setShowErrorPopup}>
           <DialogContent className="sm:max-w-md rounded-2xl">
             <DialogHeader>
-              <DialogTitle className="text-gray-900">Erreur</DialogTitle>
+              <DialogTitle className="text-gray-900">{t('auth.error')}</DialogTitle>
               <DialogDescription className="text-gray-600 mt-2">
                 {errorMessage}
               </DialogDescription>
@@ -420,7 +422,7 @@ const RegisterStep1 = () => {
                 onClick={() => setShowErrorPopup(false)}
                 className="w-full sm:w-auto"
               >
-                Fermer
+                {t('auth.close')}
               </Button>
             </DialogFooter>
           </DialogContent>

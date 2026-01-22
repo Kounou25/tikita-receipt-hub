@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { motion } from "framer-motion";
 import { setCookie } from "@/lib/cookies";
 
 const Login = () => {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -39,7 +41,7 @@ const Login = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Échec de la connexion. Vérifiez vos identifiants.");
+        throw new Error(errorData.message || t('toast.error.invalidCredentials') || "Login failed");
       }
 
       const { user, token, company_id } = await response.json();
@@ -55,13 +57,13 @@ const Login = () => {
         if (user.role === "user") {
           navigate("/dashboard");
         } else {
-          setError("Rôle non autorisé pour cette redirection.");
+          setError(t('toast.error.unauthorizedRole') || "Unauthorized role");
         }
       } else {
-        setError("Réponse inattendue du serveur.");
+        setError(t('toast.error.unexpectedResponse') || "Unexpected response");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur s'est produite. Veuillez réessayer.");
+      setError(err instanceof Error ? err.message : t('toast.error.generic'));
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +76,7 @@ const Login = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="w-10 h-10 text-gray-800 animate-spin" />
-            <p className="text-white font-medium">Connexion en cours...</p>
+            <p className="text-white font-medium">{t('auth.loggingIn')}</p>
           </div>
         </div>
       )}
@@ -88,7 +90,7 @@ const Login = () => {
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">Tikiita</h1>
-          <p className="mt-2 text-sm sm:text-base text-gray-600">Connectez-vous à votre compte</p>
+          <p className="mt-2 text-sm sm:text-base text-gray-600">{t('auth.loginSubtitle')}</p>
         </motion.div>
 
         {/* Form Card - Responsive */}
@@ -100,7 +102,7 @@ const Login = () => {
           <Card className="border-0 shadow-lg bg-white rounded-2xl overflow-hidden">
             <CardHeader className="text-center pb-6 pt-8 px-6">
               <CardTitle className="text-2xl sm:text-3xl font-semibold text-gray-900">
-                Se connecter
+                {t('auth.loginTitle')}
               </CardTitle>
             </CardHeader>
 
@@ -114,12 +116,12 @@ const Login = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-gray-700 font-medium text-sm sm:text-base">
-                    Email ou téléphone
+                    {t('auth.emailOrPhone')}
                   </Label>
                   <Input
                     id="email"
                     type="text"
-                    placeholder="votre@email.com ou +227 XX XX XX XX"
+                    placeholder={t('placeholders.emailOrPhone')}
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
@@ -130,13 +132,13 @@ const Login = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="password" className="text-gray-700 font-medium text-sm sm:text-base">
-                    Mot de passe
+                    {t('auth.password')}
                   </Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      placeholder={t('placeholders.password')}
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       required
@@ -169,14 +171,14 @@ const Login = () => {
                       disabled={isLoading}
                     />
                     <Label htmlFor="remember" className="text-gray-700 cursor-pointer font-medium">
-                      Se souvenir de moi
+                      {t('auth.rememberMe')}
                     </Label>
                   </div>
                   <Link
                     to="/forgot-password"
                     className="text-gray-600 hover:text-gray-900 underline-offset-4 hover:underline transition text-right"
                   >
-                    Mot de passe oublié ?
+                    {t('auth.forgotPassword')}
                   </Link>
                 </div>
 
@@ -188,21 +190,21 @@ const Login = () => {
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Connexion...
+                      {t('auth.loggingIn')}
                     </span>
                   ) : (
-                    "Se connecter"
+                    t('auth.loginTitle')
                   )}
                 </Button>
               </form>
 
               <div className="mt-8 text-center text-sm sm:text-base text-gray-600">
-                Pas encore de compte ?{" "}
+                {t('auth.noAccount')}{" "}
                 <Link
                   to="/register"
                   className="font-medium text-gray-900 hover:underline transition"
                 >
-                  Inscrivez-vous
+                  {t('auth.signUp')}
                 </Link>
               </div>
             </CardContent>
