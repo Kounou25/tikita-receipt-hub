@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import LineChart from "@/components/charts/LineChart";
@@ -11,6 +12,7 @@ import { Users, UserCheck, FileText, DollarSign, TrendingUp, Activity, Bell, Ale
 import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
+  const { t } = useTranslation();
   const stats = [
     { title: "Utilisateurs totaux", value: "2,456", icon: Users, color: "text-blue-600", bg: "bg-blue-50", growth: "+12%" },
     { title: "Partenaires actifs", value: "89", icon: UserCheck, color: "text-green-600", bg: "bg-green-50", growth: "+8%" },
@@ -62,7 +64,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
-      <Header title="Dashboard Administrateur" />
+      <Header title={t('pages.admin_dashboard')} />
       
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="admin" />

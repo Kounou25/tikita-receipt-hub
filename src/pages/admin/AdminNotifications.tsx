@@ -3,11 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Bell, Check, Trash2, Settings, AlertCircle, Users, Shield, TrendingUp, DollarSign, UserCheck } from "lucide-react";
 
 const AdminNotifications = () => {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([
     {
       id: 1,
@@ -103,7 +105,7 @@ const AdminNotifications = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
-      <Header title="Notifications Admin" />
+      <Header title={t('pages.admin_notifications')} />
       
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="admin" />

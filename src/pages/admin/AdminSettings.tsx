@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Save, Settings, Bell, Shield, CreditCard, Mail } from "lucide-react";
@@ -53,7 +54,9 @@ const AdminSettings = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
-      <Header title="Paramètres Système" />
+      const { t } = useTranslation();
+
+      <Header title={t('pages.admin_settings')} />
       
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="admin" />

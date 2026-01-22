@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Search, UserPlus, Users, UserCheck, PowerOff, Star, DollarSign } from "lucide-react";
@@ -201,7 +202,9 @@ const AdminUsers = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 mobile-nav-padding">
-      <Header title="Gestion des Utilisateurs" />
+      const { t } = useTranslation();
+
+      <Header title={t('pages.admin_users')} />
       
       <main className="p-4 md:p-6 space-y-6">
         <QuickNav userType="admin" />
