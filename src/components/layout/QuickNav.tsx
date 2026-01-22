@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface QuickNavProps {
   userType?: "user" | "partner" | "admin";
@@ -22,29 +23,30 @@ interface QuickNavProps {
 
 const QuickNav = ({ userType = "user" }: QuickNavProps) => {
   const location = useLocation();
+  const { t } = useTranslation();
   const [style, setStyle] = useState<React.CSSProperties | undefined>(undefined);
 
   const userNavItems = [
-    { icon: Home, label: "Dashboard", path: "/dashboard" },
-    { icon: Plus, label: "Nouveau reçu", path: "/generate" },
-    { icon: FileText, label: "Mes reçus", path: "/receipts" },
-    { icon: Users, label: "Mes clients", path: "/clients" },
-    { icon: User, label: "Profil", path: "/profile" },
+    { icon: Home, labelKey: "pages.dashboard", path: "/dashboard" },
+    { icon: Plus, labelKey: "sidebar.newReceipt", path: "/generate" },
+    { icon: FileText, labelKey: "sidebar.myReceipts", path: "/receipts" },
+    { icon: Users, labelKey: "sidebar.myClients", path: "/clients" },
+    { icon: User, labelKey: "sidebar.profile", path: "/profile" },
   ];
 
   const partnerNavItems = [
-    { icon: Home, label: "Dashboard", path: "/partner/dashboard" },
-    { icon: FileText, label: "Mes reçus", path: "/partner/receipts" },
-    { icon: User, label: "Profil", path: "/partner/profile" },
-    { icon: Key, label: "Clé API", path: "/partner/api" },
+    { icon: Home, labelKey: "pages.dashboard", path: "/partner/dashboard" },
+    { icon: FileText, labelKey: "sidebar.myReceipts", path: "/partner/receipts" },
+    { icon: User, labelKey: "sidebar.profile", path: "/partner/profile" },
+    { icon: Key, labelKey: "sidebar.apiKey", path: "/partner/api" },
   ];
 
   const adminNavItems = [
-    { icon: Home, label: "Dashboard", path: "/admin/dashboard" },
-    { icon: Users, label: "Utilisateurs", path: "/admin/users" },
-    { icon: DollarSign, label: "Paiements", path: "/admin/payments" },
-    { icon: UserCheck, label: "Partenaires", path: "/admin/partners" },
-    { icon: Settings, label: "Paramètres", path: "/admin/settings" },
+    { icon: Home, labelKey: "pages.dashboard", path: "/admin/dashboard" },
+    { icon: Users, labelKey: "sidebar.users", path: "/admin/users" },
+    { icon: DollarSign, labelKey: "sidebar.payments", path: "/admin/payments" },
+    { icon: UserCheck, labelKey: "sidebar.partners", path: "/admin/partners" },
+    { icon: Settings, labelKey: "sidebar.settings", path: "/admin/settings" },
   ];
 
   const getNavItems = () => {
@@ -125,7 +127,7 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
                     )}
                   >
                     <item.icon className="w-4 h-4" />
-                    <span>{item.label}</span>
+                    <span>{t(item.labelKey)}</span>
                   </Button>
                 </Link>
               );
@@ -139,7 +141,7 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
                   className="h-11 justify-start px-4 rounded-xl font-medium text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center gap-2.5"
                 >
                   <CreditCard className="w-4 h-4" />
-                  Abonnement
+                  {t('sidebar.subscription')}
                 </Button>
               </Link>
 
@@ -149,7 +151,7 @@ const QuickNav = ({ userType = "user" }: QuickNavProps) => {
                   className="h-11 justify-start px-4 rounded-xl font-medium text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center gap-2.5"
                 >
                   <HeadphonesIcon className="w-4 h-4" />
-                  Support
+                  {t('sidebar.support')}
                 </Button>
               </Link>
             </div>
