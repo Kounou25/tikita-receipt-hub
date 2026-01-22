@@ -1,4 +1,5 @@
 
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,8 @@ const DocumentCard = ({
   isPremium = false, 
   onSelect 
 }: DocumentCardProps) => {
+  const { t } = useTranslation();
+  
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-md group border">
       <div className="aspect-[3/4] overflow-hidden relative bg-gray-50">
@@ -28,7 +31,7 @@ const DocumentCard = ({
           <div className="absolute top-2 right-2">
             <Badge className="bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-600 hover:to-amber-600 border-0">
               <Star className="h-3 w-3 mr-1 fill-white" />
-              Premium
+              {t('common.premium')}
             </Badge>
           </div>
         )}
@@ -39,7 +42,7 @@ const DocumentCard = ({
               <Eye className="h-4 w-4" />
             </Button>
             <Button size="sm" onClick={onSelect} className="bg-primary-500 hover:bg-primary-600">
-              Utiliser
+              {t('common.use')}
             </Button>
           </div>
         </div>

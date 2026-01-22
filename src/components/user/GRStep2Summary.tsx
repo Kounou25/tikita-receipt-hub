@@ -1,29 +1,32 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
 
 const GRStep2Summary = ({ subtotal, tvaAmount, total, receiptInfo, loading, isDownloading, navigate, handleGenerateReceipt }: any) => {
+  const { t } = useTranslation();
+  
   return (
     <Card className="shadow-2xl bg-white dark:bg-gray-900 dark:border-gray-700 sticky top-24">
       <CardHeader className="pb-6">
-        <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">Résumé du reçu</CardTitle>
+        <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">{t('generateReceipt.receiptSummary')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="flex justify-between text-lg">
-            <span className="text-gray-600 dark:text-gray-400">Sous-total</span>
+            <span className="text-gray-600 dark:text-gray-400">{t('generateReceipt.subtotal')}</span>
             <span className="font-bold dark:text-white">{subtotal.toLocaleString()} FCFA</span>
           </div>
           {receiptInfo.tva_rate > 0 && (
             <div className="flex justify-between text-lg">
-              <span className="text-gray-600 dark:text-gray-400">TVA ({receiptInfo.tva_rate}%)</span>
+              <span className="text-gray-600 dark:text-gray-400">{t('generateReceipt.vat')} ({receiptInfo.tva_rate}%)</span>
               <span className="font-bold dark:text-white">+{tvaAmount.toLocaleString()} FCFA</span>
             </div>
           )}
           <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-4">
             <div className="flex justify-between">
-              <span className="text-2xl font-black text-gray-900 dark:text-white">Total</span>
+              <span className="text-2xl font-black text-gray-900 dark:text-white">{t('generateReceipt.total')}</span>
               <span className="text-3xl font-black text-gray-900 dark:text-white">{total.toLocaleString()} FCFA</span>
             </div>
           </div>
@@ -38,7 +41,7 @@ const GRStep2Summary = ({ subtotal, tvaAmount, total, receiptInfo, loading, isDo
             disabled={loading || isDownloading}
           >
             <ArrowLeft className="w-6 h-6 mr-3" />
-            Retour
+            {t('generateReceipt.back')}
           </Button>
           <Button
             size="lg"
@@ -53,11 +56,11 @@ const GRStep2Summary = ({ subtotal, tvaAmount, total, receiptInfo, loading, isDo
             {isDownloading ? (
               <>
                 <Loader2 className="w-7 h-7 animate-spin" />
-                Génération...
+                {t('common.loading')}
               </>
             ) : (
               <>
-                Générer le reçu
+                {t('generateReceipt.generate')}
                 <ArrowRight className="w-7 h-7" />
               </>
             )}

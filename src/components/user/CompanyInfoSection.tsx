@@ -1,19 +1,22 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Building2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 const CompanyInfoSection = ({ displayedProfile, isEditing, setProfileState }: any) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-8 hover:shadow-md transition-shadow">
       <h2 className="text-2xl font-bold text-black dark:text-white mb-6 flex items-center gap-3">
         <Building2 className="w-8 h-8" />
-        Informations entreprise
+        {t('profile.companyInfo')}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="companyName" className="dark:text-gray-200">Nom de l'entreprise</Label>
+          <Label htmlFor="companyName" className="dark:text-gray-200">{t('auth.companyName')}</Label>
           <Input
             id="companyName"
             value={displayedProfile.companyName || ''}
@@ -23,7 +26,7 @@ const CompanyInfoSection = ({ displayedProfile, isEditing, setProfileState }: an
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="slogan" className="dark:text-gray-200">Slogan</Label>
+          <Label htmlFor="slogan" className="dark:text-gray-200">{t('auth.slogan')}</Label>
           <Input
             id="slogan"
             value={displayedProfile.slogan || ''}
@@ -33,7 +36,7 @@ const CompanyInfoSection = ({ displayedProfile, isEditing, setProfileState }: an
           />
         </div>
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="address" className="dark:text-gray-200">Adresse</Label>
+          <Label htmlFor="address" className="dark:text-gray-200">{t('auth.address')}</Label>
           <Textarea
             id="address"
             value={displayedProfile.address || ''}
@@ -44,7 +47,7 @@ const CompanyInfoSection = ({ displayedProfile, isEditing, setProfileState }: an
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="nif" className="dark:text-gray-200">NIF</Label>
+          <Label htmlFor="nif" className="dark:text-gray-200">{t('auth.nif')}</Label>
           <Input
             id="nif"
             value={displayedProfile.nif || ''}
@@ -54,7 +57,7 @@ const CompanyInfoSection = ({ displayedProfile, isEditing, setProfileState }: an
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="rccm" className="dark:text-gray-200">RCCM</Label>
+          <Label htmlFor="rccm" className="dark:text-gray-200">{t('auth.rccm')}</Label>
           <Input
             id="rccm"
             value={displayedProfile.rccm || ''}
