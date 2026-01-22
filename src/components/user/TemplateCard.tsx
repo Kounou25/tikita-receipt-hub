@@ -1,9 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const TemplateCard = ({ template, selectedTemplate, onSelect }: any) => (
+const TemplateCard = ({ template, selectedTemplate, onSelect }: any) => {
+  const { t } = useTranslation();
+  
+  return (
   <Card
     key={template.id}
     className={cn(
@@ -18,7 +22,7 @@ const TemplateCard = ({ template, selectedTemplate, onSelect }: any) => (
       <div className="relative">
         {template.popular && (
           <div className="absolute -top-3 -right-3 bg-gray-900 dark:bg-white text-white dark:text-black text-xs font-bold px-3 py-1 rounded-full z-10">
-            Populaire
+            {t('common.popular')}
           </div>
         )}
         {selectedTemplate === template.id && (
@@ -29,15 +33,16 @@ const TemplateCard = ({ template, selectedTemplate, onSelect }: any) => (
         <div className="aspect-[3/4] bg-gray-100 dark:bg-gray-800 rounded-2xl overflow-hidden mb-6 shadow-inner">
           <img
             src={template.thumbnail}
-            alt={template.name}
+            alt={t(template.nameKey)}
             className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
         </div>
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{template.name}</h3>
-        <p className="text-base text-gray-600 dark:text-gray-400">{template.description}</p>
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t(template.nameKey)}</h3>
+        <p className="text-base text-gray-600 dark:text-gray-400">{t(template.descriptionKey)}</p>
       </div>
     </CardContent>
   </Card>
-);
+  );
+};
 
 export default TemplateCard;
