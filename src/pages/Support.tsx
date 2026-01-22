@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { MessageSquare, Mail, FileText, HelpCircle } from "lucide-react";
@@ -32,7 +33,9 @@ const Support = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 mobile-nav-padding">
-      <Header title="Support" />
+      const { t } = useTranslation();
+
+      <Header title={t('pages.support')} />
       
       <main className="p-4 md:p-6 space-y-6">
         {/* Header */}

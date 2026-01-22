@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Header from "./Header";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
+  const { t } = useTranslation();
   const [headerHeight, setHeaderHeight] = useState(0);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <Header title="Application" showMenu />
+      <Header title={t('pages.application')} showMenu />
       <main id="main-content" className="px-4 md:px-6">
         {children}
       </main>

@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Header from "@/components/layout/Header";
+import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
 import { Check, Zap, Star, Briefcase } from "lucide-react";
@@ -26,6 +27,7 @@ const Skeleton = ({ className }) => (
 );
 
 const Subscription = () => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [plansLoading, setPlansLoading] = useState(true);
   const [plans, setPlans] = useState([]);
@@ -359,7 +361,7 @@ const Subscription = () => {
     <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
       <Toaster position="top-right" />
 
-      <Header title="Abonnement" showMenu={true} />
+      <Header title={t('pages.subscription')} showMenu={true} />
 
       <main className="pt-6 px-1 md:px-6 lg:px-8 pb-24 max-w-[1400px] mx-auto">
         <QuickNav userType="user" />

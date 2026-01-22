@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText, Home, ArrowLeft } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const NotFound = () => {
+  const { t } = useTranslation();
   const location = useLocation();
 
   return (
@@ -28,18 +30,18 @@ const NotFound = () => {
             </div>
             
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Page introuvable
+              {t('notFound.title')}
             </h1>
             
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
+              {t('notFound.description')}
             </p>
             
             <div className="space-y-3">
               <Link to="/dashboard">
                 <Button className="w-full bg-primary hover:bg-primary/90">
                   <Home className="w-4 h-4 mr-2" />
-                  Retour au tableau de bord
+                  {t('notFound.backToDashboard')}
                 </Button>
               </Link>
               
@@ -49,7 +51,7 @@ const NotFound = () => {
                 onClick={() => window.history.back()}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Page précédente
+                {t('notFound.goBack')}
               </Button>
             </div>
           </CardContent>

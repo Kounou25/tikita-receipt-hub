@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Bell, Menu, User, LogOut, UserCircle, CreditCard, HeadphonesIcon, ChevronDown, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -12,6 +13,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { getCookie, clearAllCookies } from "@/lib/cookies";
+import { fetchProfileData } from "@/lib/api";
 
 interface HeaderProps {
   title: string;
@@ -26,6 +28,12 @@ const Header = ({ title, showMenu = false, onMenuClick }: HeaderProps) => {
   const token = getCookie("token");
   const { theme, toggleTheme } = useTheme();
   const [companyAvatar, setCompanyAvatar] = useState<string | null>(null);
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    try { localStorage.setItem("lang", lng); } catch (e) {}
+  };
 
   const handleLogout = () => {
     clearAllCookies(); // Plus propre : tout effacer d'un coup
@@ -37,18 +45,9 @@ const Header = ({ title, showMenu = false, onMenuClick }: HeaderProps) => {
       if (!companyId || !token) return;
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}/user/profile/${companyId}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.logos && data.logos.length > 0) {
-            setCompanyAvatar(data.logos[0].logo_url);
-          }
+        const data = await fetchProfileData(companyId, token);
+        if (data && data.avatar) {
+          setCompanyAvatar(data.avatar);
         }
       } catch (error) {
         console.error("Erreur lors de la récupération de l'avatar:", error);
@@ -144,13 +143,13 @@ const Header = ({ title, showMenu = false, onMenuClick }: HeaderProps) => {
                   </div>
                   <div className="hidden sm:flex flex-col items-start">
                     <span className="text-sm font-semibold">{username}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Compte personnel</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{t('header.accountType')}</span>
                   </div>
                   <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-400 hidden sm:block" />
                 </Button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent
+                <DropdownMenuContent
                 align="end"
                 className="w-72 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-3 mt-2"
               >
@@ -189,8 +188,8 @@ const Header = ({ title, showMenu = false, onMenuClick }: HeaderProps) => {
                     >
                       <UserCircle className="w-5 h-5" />
                       <div>
-                        <p className="font-medium">Mon Profil</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Paramètres du compte</p>
+                        <p className="font-medium">{t('menu.profile')}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t('header.accountType')}</p>
                       </div>
                     </Link>
                   </DropdownMenuItem>
@@ -202,7 +201,7 @@ const Header = ({ title, showMenu = false, onMenuClick }: HeaderProps) => {
                     >
                       <CreditCard className="w-5 h-5" />
                       <div>
-                        <p className="font-medium">Abonnement</p>
+                        <p className="font-medium">{t('menu.subscription')}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">Gérer votre plan</p>
                       </div>
                     </Link>
@@ -215,7 +214,7 @@ const Header = ({ title, showMenu = false, onMenuClick }: HeaderProps) => {
                     >
                       <HeadphonesIcon className="w-5 h-5" />
                       <div>
-                        <p className="font-medium">Support</p>
+                        <p className="font-medium">{t('menu.support')}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">Aide et contact</p>
                       </div>
                     </Link>
@@ -224,16 +223,22 @@ const Header = ({ title, showMenu = false, onMenuClick }: HeaderProps) => {
 
                 <DropdownMenuSeparator className="my-2 bg-gray-100 dark:bg-gray-800" />
 
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <div>
-                    <p className="font-medium">Déconnexion</p>
-                    <p className="text-xs text-gray-500">Fermer la session</p>
+                <div className="px-3 py-2 flex items-center justify-between">
+                  <div className="flex gap-2">
+                    <button onClick={() => changeLanguage('fr')} className="text-sm px-3 py-1 rounded-md hover:bg-gray-100">FR</button>
+                    <button onClick={() => changeLanguage('en')} className="text-sm px-3 py-1 rounded-md hover:bg-gray-100">EN</button>
                   </div>
-                </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <div>
+                      <p className="font-medium">{t('menu.logout')}</p>
+                      <p className="text-xs text-gray-500">Fermer la session</p>
+                    </div>
+                  </DropdownMenuItem>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
