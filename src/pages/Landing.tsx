@@ -1,8 +1,32 @@
-import { ArrowRight, ReceiptText } from "lucide-react";
+import { ArrowRight, ReceiptText, Globe } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import ReactCountryFlag from "react-country-flag";
+import { useState, useEffect } from "react";
+import { getCookie } from "@/lib/cookies";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 const Landing = () => {
+  const { t, i18n } = useTranslation();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = getCookie('token');
+    setIsLoggedIn(!!token);
+  }, []);
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem('language', lng);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 overflow-hidden">
       {/* Navbar */}
@@ -23,47 +47,125 @@ const Landing = () => {
 
           {/* Desktop */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/login">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white transition"
-              >
-                Connexion
-              </motion.button>
-            </Link>
-            <Link to="/register">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-2xl shadow-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition flex items-center gap-3"
-              >
-                Inscription gratuite
-                <ArrowRight className="w-5 h-5" />
-              </motion.button>
-            </Link>
+            {/* Language Selector */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Globe className="h-4 w-4" />
+                  <ReactCountryFlag
+                    countryCode={i18n.language === 'fr' ? 'FR' : 'GB'}
+                    svg
+                    style={{ width: '20px', height: '15px' }}
+                  />
+                  <span className="uppercase text-sm">{i18n.language}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => changeLanguage('fr')} className="gap-2">
+                  <ReactCountryFlag countryCode="FR" svg style={{ width: '20px', height: '15px' }} />
+                  Français
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('en')} className="gap-2">
+                  <ReactCountryFlag countryCode="GB" svg style={{ width: '20px', height: '15px' }} />
+                  English
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {isLoggedIn ? (
+              <Link to="/dashboard">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-2xl shadow-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition flex items-center gap-3"
+                >
+                  {t('pages.dashboard')}
+                  <ArrowRight className="w-5 h-5" />
+                </motion.button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-6 py-3 text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white transition"
+                  >
+                    {t('auth.login')}
+                  </motion.button>
+                </Link>
+                <Link to="/register">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-8 py-3.5 bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-2xl shadow-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition flex items-center gap-3"
+                  >
+                    {t('auth.registerFree')}
+                    <ArrowRight className="w-5 h-5" />
+                  </motion.button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile - Boutons plus gros et espacés */}
-          <div className="md:hidden flex items-center gap-3">
-            <Link to="/login" className="flex-1">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full px-5 py-3 text-base font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-2xl"
-              >
-                Connexion
-              </motion.button>
-            </Link>
-            <Link to="/register" className="flex-1">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full px-5 py-3 text-base font-semibold bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl shadow-lg"
-              >
-                S'inscrire
-              </motion.button>
-            </Link>
+          <div className="md:hidden flex items-center gap-2">
+            {/* Language Selector Mobile */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="px-2">
+                  <ReactCountryFlag
+                    countryCode={i18n.language === 'fr' ? 'FR' : 'GB'}
+                    svg
+                    style={{ width: '20px', height: '15px' }}
+                  />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => changeLanguage('fr')} className="gap-2">
+                  <ReactCountryFlag countryCode="FR" svg style={{ width: '20px', height: '15px' }} />
+                  FR
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => changeLanguage('en')} className="gap-2">
+                  <ReactCountryFlag countryCode="GB" svg style={{ width: '20px', height: '15px' }} />
+                  EN
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {isLoggedIn ? (
+              <Link to="/dashboard" className="flex-1">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full px-5 py-3 text-base font-semibold bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl shadow-lg flex items-center justify-center gap-2"
+                >
+                  {t('pages.dashboard')}
+                  <ArrowRight className="w-5 h-5" />
+                </motion.button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="flex-1">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full px-5 py-3 text-base font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-2xl"
+                  >
+                    {t('auth.login')}
+                  </motion.button>
+                </Link>
+                <Link to="/register" className="flex-1">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full px-5 py-3 text-base font-semibold bg-gray-900 dark:bg-white text-white dark:text-black rounded-2xl shadow-lg"
+                  >
+                    {t('auth.signUp')}
+                  </motion.button>
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </header>
@@ -90,21 +192,21 @@ const Landing = () => {
               transition={{ delay: 0.2, duration: 0.7 }}
               className="inline-flex items-center bg-gray-900 dark:bg-white text-white dark:text-black px-6 py-3 sm:px-8 sm:py-4 rounded-full text-sm sm:text-base font-semibold shadow-2xl"
             >
-              La gestion de reçus réinventée
+              {t('landing.badge')}
             </motion.div>
 
             {/* Titre responsive */}
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 dark:text-white leading-none">
-              Reçus pro.
+              {t('landing.title1')}
               <br />
-              <motion.span
-                className="inline-block bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-              >
-                Instantanés.
-              </motion.span>
+                <motion.span
+                  className="inline-block bg-gradient-to-r from-gray-900 to-gray-700 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent"
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.8 }}
+                >
+                  {t('landing.title2')}
+                </motion.span>
             </h1>
 
             {/* Sous-titre */}
@@ -114,8 +216,7 @@ const Landing = () => {
               transition={{ delay: 0.7, duration: 0.8 }}
               className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed font-light px-4"
             >
-              Créez des reçus numériques personnalisés et conformes en quelques secondes.
-              Idéal pour les commerçants, freelances et entrepreneurs.
+              {t('landing.subtitle')}
             </motion.p>
 
             {/* CTA principal - Très gros sur mobile */}
@@ -140,7 +241,7 @@ const Landing = () => {
                   className="group relative w-full sm:w-auto px-10 sm:px-12 py-5 sm:py-6 bg-gray-900 dark:bg-white text-white dark:text-black text-lg sm:text-xl font-bold rounded-3xl shadow-2xl overflow-hidden flex items-center justify-center gap-4"
                 >
                   <ReceiptText className="w-7 h-7 sm:w-8 sm:h-8 group-hover:scale-110 transition" />
-                  Commencer gratuitement
+                  {t('landing.cta')}
                   <ArrowRight className="w-7 h-7 sm:w-8 sm:h-8 group-hover:translate-x-3 transition-transform" />
 
                   {/* Brillance */}
@@ -169,10 +270,10 @@ const Landing = () => {
                   <div className="h-full flex flex-col items-center justify-center p-8 text-center">
                     <ReceiptText className="w-20 h-20 sm:w-32 sm:h-32 text-gray-400 dark:text-gray-500 mb-6" />
                     <p className="text-2xl sm:text-4xl font-bold text-gray-700 dark:text-gray-300">
-                      Votre interface Tikiita
+                      {t('landing.mockupTitle')}
                     </p>
                     <p className="text-lg sm:text-xl text-gray-500 dark:text-gray-400 mt-3">
-                      Simple. Moderne. Efficace.
+                      {t('landing.mockupSubtitle')}
                     </p>
                   </div>
                 </div>
@@ -180,7 +281,7 @@ const Landing = () => {
                 {/* Petit mockup mobile (visible seulement sur md+) */}
                 <div className="hidden md:block absolute -bottom-12 -left-12 w-48 aspect-[9/16] bg-gray-800 rounded-3xl shadow-2xl transform -rotate-12 hover:-rotate-6 transition-transform duration-700 overflow-hidden border border-gray-700">
                   <div className="h-full bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center">
-                    <p className="text-white font-bold text-xl rotate-90">Mobile</p>
+                    <p className="text-white font-bold text-xl rotate-90">{t('landing.mobileMockup')}</p>
                   </div>
                 </div>
               </div>
