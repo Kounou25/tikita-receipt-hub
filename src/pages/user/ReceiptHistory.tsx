@@ -11,6 +11,7 @@ import QuickNav from "@/components/layout/QuickNav";
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { getCookie } from "@/lib/cookies";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg", className)} />
@@ -114,6 +115,7 @@ const downloadPDF = async ({ id, token }) => {
 };
 
 const ReceiptHistory = () => {
+  useScrollToTop();
   const [searchTerm, setSearchTerm] = useState("");
   const [downloadProgress, setDownloadProgress] = useState<Record<string | number, number>>({});
   const [downloadError, setDownloadError] = useState(null);

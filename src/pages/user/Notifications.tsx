@@ -11,6 +11,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { getCookie } from "@/lib/cookies";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg", className)} />
@@ -81,6 +82,7 @@ const fetchNotifications = async (companyId, token) => {
 };
 
 const Notifications = () => {
+  useScrollToTop();
   const companyId = getCookie("company_id") || null;
   const { t } = useTranslation();
   const token = getCookie("token") || null;

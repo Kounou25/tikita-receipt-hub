@@ -33,6 +33,7 @@ interface DashboardData {
 import Header from "@/components/layout/Header";
 import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import QuickNav from "@/components/layout/QuickNav";
 import LineChart from "@/components/charts/LineChart";
 import { Link, useNavigate } from "react-router-dom";
@@ -279,6 +280,7 @@ const StatCard = ({ stat, isLoading }) => {
 };
 
 const UserDashboard = () => {
+  useScrollToTop();
   const [show500Error, setShow500Error] = useState(false);
   const [showSessionExpired, setShowSessionExpired] = useState(false);
   const username = getCookie("user_name") || "Utilisateur";

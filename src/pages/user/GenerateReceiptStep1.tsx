@@ -6,12 +6,14 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/layout/Header";
 import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import QuickNav from "@/components/layout/QuickNav";
 import { cn } from "@/lib/utils"; // ← Import ajouté
 import TemplateCard from '@/components/user/TemplateCard';
 import { getCookie, setCookie } from '@/lib/cookies';
 
 const GenerateReceiptStep1 = () => {
+  useScrollToTop();
   const { t } = useTranslation();
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [filteredTemplates, setFilteredTemplates] = useState<any[]>([]);

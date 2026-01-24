@@ -9,8 +9,10 @@ import QuickNav from "@/components/layout/QuickNav";
 import { Link, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { getCookie } from "@/lib/cookies";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const ReceiptDetails = () => {
+  useScrollToTop();
   const { id } = useParams();
   const companyId = getCookie("company_id") || null;
   const { t } = useTranslation();

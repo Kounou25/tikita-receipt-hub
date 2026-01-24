@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { getCookie, setCookie } from "@/lib/cookies";
 import { fetchProfileData, saveProfileData } from "@/lib/api";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg", className)} />
@@ -29,6 +30,7 @@ const Skeleton = ({ className }) => (
 // API functions moved to `src/lib/api.ts` and imported above to centralize requests.
 
 const UserProfile = () => {
+  useScrollToTop();
   const [isEditing, setIsEditing] = useState(false);
   const companyId = getCookie("company_id") || null;
   const token = getCookie("token") || null;

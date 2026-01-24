@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import toast, { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const Skeleton = ({ className }) => (
   <div className={cn("animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg", className)} />
@@ -96,6 +97,7 @@ const deleteClient = async ({ clientId, token }) => {
 };
 
 const UserClients = () => {
+  useScrollToTop();
   const [searchTerm, setSearchTerm] = useState("");
   const companyId = getCookie("company_id") || null;
   const { t } = useTranslation();

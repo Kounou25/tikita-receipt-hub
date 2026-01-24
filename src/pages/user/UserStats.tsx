@@ -11,8 +11,10 @@ import LineChart from "@/components/charts/LineChart";
 import PieChart from "@/components/charts/PieChart";
 import BarChart from "@/components/charts/BarChart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const UserStats = () => {
+  useScrollToTop();
   const [period, setPeriod] = useState("month");
 
   const stats = {

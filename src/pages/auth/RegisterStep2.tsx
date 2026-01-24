@@ -21,9 +21,11 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { getCookie, setCookie } from "@/lib/cookies";
+import imageCompression from "browser-image-compression";
 
 const RegisterStep2 = () => {
   const [formData, setFormData] = useState({
@@ -40,6 +42,8 @@ const RegisterStep2 = () => {
     userId: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isCompressingLogo, setIsCompressingLogo] = useState(false);
+  const [isCompressingStamp, setIsCompressingStamp] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -98,8 +102,61 @@ const RegisterStep2 = () => {
     setFormData((prev) => ({ ...prev, userId }));
   }, []);
 
-  const handleFileChange = (field: "logo" | "stamp", file: File | null) => {
-    setFormData({ ...formData, [field]: file });
+  const compressImage = async (file: File): Promise<File> => {
+    const options = {
+      maxSizeMB: 0.5, // Taille maximale en MB
+      maxWidthOrHeight: 1024, // Dimension maximale
+      useWebWorker: true,
+      fileType: 'image/jpeg', // Convertir en JPEG pour une meilleure compression
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      // Créer un nouveau fichier avec le nom original mais avec l'extension .jpg
+      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+      return new File([compressedFile], `${nameWithoutExt}.jpg`, {
+        type: 'image/jpeg',
+        lastModified: Date.now(),
+      });
+    } catch (error) {
+      console.error('Erreur lors de la compression:', error);
+      toast.error('Erreur lors de la compression de l\'image');
+      return file; // Retourner le fichier original en cas d'erreur
+    }
+  };
+
+  const handleFileChange = async (field: "logo" | "stamp", file: File | null) => {
+    if (!file) {
+      setFormData({ ...formData, [field]: file });
+      return;
+    }
+
+    // Activer l'état de chargement pour le champ concerné
+    if (field === "logo") {
+      setIsCompressingLogo(true);
+    } else {
+      setIsCompressingStamp(true);
+    }
+    
+    try {
+      const compressedFile = await compressImage(file);
+      const originalSizeKB = (file.size / 1024).toFixed(2);
+      const compressedSizeKB = (compressedFile.size / 1024).toFixed(2);
+      const reductionPercent = (((file.size - compressedFile.size) / file.size) * 100).toFixed(0);
+      
+      toast.success(`Image compressée: ${originalSizeKB}KB → ${compressedSizeKB}KB (-${reductionPercent}%)`);
+      setFormData({ ...formData, [field]: compressedFile });
+    } catch (error) {
+      console.error('Erreur lors de la compression:', error);
+      setFormData({ ...formData, [field]: file });
+    } finally {
+      // Désactiver l'état de chargement
+      if (field === "logo") {
+        setIsCompressingLogo(false);
+      } else {
+        setIsCompressingStamp(false);
+      }
+    }
   };
 
   const handleCountryChange = (value: string) => {
@@ -443,28 +500,37 @@ const RegisterStep2 = () => {
                   <Label className="text-gray-700 font-medium text-sm sm:text-base">
                     Logo (optionnel)
                   </Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50">
+                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 relative">
                     <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                     <p className="text-sm text-gray-600 mb-4">Glissez ou cliquez pour ajouter un logo</p>
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => handleFileChange("logo", e.target.files?.[0] || null)}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        handleFileChange("logo", file);
+                      }}
                       className="hidden"
                       id="logo-upload"
-                      disabled={isLoading}
+                      disabled={isLoading || isCompressingLogo}
                     />
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => document.getElementById("logo-upload")?.click()}
-                      disabled={isLoading}
+                      disabled={isLoading || isCompressingLogo}
                       className="rounded-xl"
                     >
                       Choisir un fichier
                     </Button>
                     {formData.logo && (
                       <p className="mt-3 text-sm text-gray-900 font-medium">{formData.logo.name}</p>
+                    )}
+                    {isCompressingLogo && (
+                      <div className="mt-4 space-y-2">
+                        <Progress value={100} className="h-2 animate-pulse" />
+                        <p className="text-xs text-gray-600">Compression en cours...</p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -474,28 +540,37 @@ const RegisterStep2 = () => {
                   <Label className="text-gray-700 font-medium text-sm sm:text-base">
                     Cachet (optionnel)
                   </Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50">
+                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center bg-gray-50 relative">
                     <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                     <p className="text-sm text-gray-600 mb-4">Glissez ou cliquez pour ajouter un cachet</p>
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => handleFileChange("stamp", e.target.files?.[0] || null)}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        handleFileChange("stamp", file);
+                      }}
                       className="hidden"
                       id="stamp-upload"
-                      disabled={isLoading}
+                      disabled={isLoading || isCompressingStamp}
                     />
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => document.getElementById("stamp-upload")?.click()}
-                      disabled={isLoading}
+                      disabled={isLoading || isCompressingStamp}
                       className="rounded-xl"
                     >
                       Choisir un fichier
                     </Button>
                     {formData.stamp && (
                       <p className="mt-3 text-sm text-gray-900 font-medium">{formData.stamp.name}</p>
+                    )}
+                    {isCompressingStamp && (
+                      <div className="mt-4 space-y-2">
+                        <Progress value={100} className="h-2 animate-pulse" />
+                        <p className="text-xs text-gray-600">Compression en cours...</p>
+                      </div>
                     )}
                   </div>
                 </div>
