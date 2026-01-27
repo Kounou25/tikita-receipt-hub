@@ -8,6 +8,7 @@ import QuickNav from "@/components/layout/QuickNav";
 import LineChart from "@/components/charts/LineChart";
 import BarChart from "@/components/charts/BarChart";
 import PieChart from "@/components/charts/PieChart";
+import { formatCurrency } from "@/utils/currencyFormatter";
 import { FileText, Users, DollarSign, TrendingUp, Eye, Download, Bell } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -145,7 +146,7 @@ const PartnerDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Revenus partagés</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.revenue.toLocaleString()} FCFA</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.revenue)}</p>
                 </div>
                 <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                   <DollarSign className="w-5 h-5 text-orange-600" />
