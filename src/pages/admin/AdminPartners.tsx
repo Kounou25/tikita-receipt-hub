@@ -8,6 +8,7 @@ import Header from "@/components/layout/Header";
 import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
+import { formatCurrency } from "@/utils/currencyFormatter";
 import { Search, Eye, Edit, UserPlus, Building } from "lucide-react";
 
 const AdminPartners = () => {
@@ -148,7 +149,7 @@ const AdminPartners = () => {
           <Card className="border-gray-200">
             <CardContent className="p-4 text-center">
               <p className="text-2xl font-bold text-purple-600">
-                {partners.reduce((sum, p) => sum + p.revenue, 0).toLocaleString()} FCFA
+                {formatCurrency(partners.reduce((sum, p) => sum + p.revenue, 0))}
               </p>
               <p className="text-sm text-gray-600">Revenus générés</p>
             </CardContent>
@@ -190,7 +191,7 @@ const AdminPartners = () => {
                 <div className="pt-2 border-t border-gray-100">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-gray-600">Revenus générés</span>
-                    <span className="font-bold text-primary">{partner.revenue.toLocaleString()} FCFA</span>
+                    <span className="font-bold text-primary">{formatCurrency(partner.revenue)}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Membre depuis</span>

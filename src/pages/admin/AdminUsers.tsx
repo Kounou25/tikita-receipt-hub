@@ -9,6 +9,7 @@ import Header from "@/components/layout/Header";
 import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
+import { formatCurrency } from "@/utils/currencyFormatter";
 import { Search, UserPlus, Users, UserCheck, PowerOff, Star, DollarSign } from "lucide-react";
 
 interface User {
@@ -320,7 +321,7 @@ const AdminUsers = () => {
                   <DollarSign className="w-5 h-5 text-primary" />
                 </div>
                 <p className="text-2xl font-bold text-primary">
-                  {users.reduce((sum, u) => sum + u.revenue, 0).toLocaleString()} FCFA
+                  {formatCurrency(users.reduce((sum, u) => sum + u.revenue, 0))}
                 </p>
                 <p className="text-sm text-gray-600">Revenus totaux</p>
               </CardContent>
@@ -392,7 +393,7 @@ const AdminUsers = () => {
                           <span className="font-medium">{user.receipts}</span>
                         </td>
                         <td className="py-3 px-2">
-                          <span className="font-bold text-primary">{user.revenue.toLocaleString()} FCFA</span>
+                          <span className="font-bold text-primary">{formatCurrency(user.revenue)}</span>
                         </td>
                         <td className="py-3 px-2">
                           <Badge className={getStatusColor(user.status)}>

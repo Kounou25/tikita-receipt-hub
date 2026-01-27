@@ -8,6 +8,7 @@ import Header from "@/components/layout/Header";
 import { useTranslation } from "react-i18next";
 import MobileNav from "@/components/layout/MobileNav";
 import QuickNav from "@/components/layout/QuickNav";
+import { formatCurrency } from "@/utils/currencyFormatter";
 import { Search, DollarSign, CreditCard, CheckCircle, AlertCircle } from "lucide-react";
 
 interface Payment {
@@ -205,7 +206,7 @@ const AdminPayments = () => {
                 <DollarSign className="w-5 h-5 text-primary" />
               </div>
               <p className="text-2xl font-bold text-primary">
-                {payments.reduce((sum, p) => sum + (p.status === "Payé" ? p.amount : 0), 0).toLocaleString()} FCFA
+                {formatCurrency(payments.reduce((sum, p) => sum + (p.status === "Payé" ? p.amount : 0), 0))}
               </p>
               <p className="text-sm text-gray-600">Revenus totaux</p>
             </CardContent>
@@ -252,7 +253,7 @@ const AdminPayments = () => {
                         </Badge>
                       </td>
                       <td className="py-3 px-2">
-                        <span className="font-medium">{payment.amount.toLocaleString()} FCFA</span>
+                        <span className="font-medium">{formatCurrency(payment.amount)}</span>
                       </td>
                       <td className="py-3 px-2">
                         <span className="text-sm">{payment.payment_date}</span>
