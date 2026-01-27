@@ -11,6 +11,7 @@ import QuickNav from "@/components/layout/QuickNav";
 import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { getCookie } from "@/lib/cookies";
+import { formatCurrency, getCurrencyRate, getCurrencySymbol, getLocaleForCurrency } from "@/utils/currencyFormatter";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const Skeleton = ({ className }) => (
@@ -84,8 +85,7 @@ const fetchReceipts = async (companyId, token) => {
     id: receipt.receipt_id,
     receipt_number: receipt.receipt_number,
     client: receipt.client_name || "Client inconnu",
-    amount: `${receipt.total_amount.toLocaleString('fr-FR')} FCFA`,
-    raw_amount: receipt.total_amount || 0,
+    amount: receipt.total_amount || 0,
     date: receipt.receipt_date
       ? new Date(receipt.receipt_date).toLocaleDateString('fr-FR', {
           year: 'numeric',
@@ -123,6 +123,10 @@ const ReceiptHistory = () => {
   const { t } = useTranslation();
   const token = getCookie("token") || null;
   const navigate = useNavigate();
+
+  // Get currency rate and symbol
+  const rate = getCurrencyRate();
+  const currencySymbol = getCurrencySymbol();
 
   const { data: receipts = [], isLoading, error } = useQuery({
     queryKey: ['receipts', companyId],
@@ -184,7 +188,8 @@ const ReceiptHistory = () => {
   );
 
   const errorType = getErrorType(error);
-  const totalRevenue = receipts.reduce((sum, receipt) => sum + receipt.raw_amount, 0);
+  const totalRevenue = receipts.reduce((sum, receipt) => sum + receipt.amount, 0);
+  const convertedTotalRevenue = formatCurrency(totalRevenue, currencySymbol, rate);
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
@@ -315,7 +320,7 @@ const ReceiptHistory = () => {
                   Mes reçus ({filteredReceipts.length})
                 </h2>
                 <p className="text-lg font-medium text-gray-600 dark:text-gray-400">
-                  Total généré : <span className="text-black dark:text-white font-bold">{totalRevenue.toLocaleString('fr-FR')} FCFA</span>
+                  Total généré : <span className="text-black dark:text-white font-bold">{convertedTotalRevenue}</span>
                 </p>
               </div>
             </div>
@@ -345,7 +350,7 @@ const ReceiptHistory = () => {
                     </div>
                     <div className="flex justify-between items-end">
                       <div>
-                        <p className="text-2xl font-bold text-black dark:text-white">{receipt.amount}</p>
+                        <p className="text-2xl font-bold text-black dark:text-white">{formatCurrency(receipt.amount, currencySymbol, rate)}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{receipt.date} • {receipt.items} article{receipt.items > 1 ? 's' : ''}</p>
                       </div>
                       <div className="flex gap-3">
@@ -403,7 +408,7 @@ const ReceiptHistory = () => {
                         </td>
                         <td className="px-6 py-5 text-gray-700 dark:text-gray-300">{receipt.client}</td>
                         <td className="px-6 py-5">
-                          <p className="font-bold text-black dark:text-white">{receipt.amount}</p>
+                          <p className="font-bold text-black dark:text-white">{formatCurrency(receipt.amount, currencySymbol, rate)}</p>
                         </td>
                         <td className="px-6 py-5 text-gray-600 dark:text-gray-400">{receipt.date}</td>
                         <td className="px-6 py-5 text-gray-600 dark:text-gray-400">{receipt.items}</td>

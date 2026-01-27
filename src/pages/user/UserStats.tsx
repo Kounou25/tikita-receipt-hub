@@ -12,6 +12,7 @@ import PieChart from "@/components/charts/PieChart";
 import BarChart from "@/components/charts/BarChart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
+import { formatCurrency } from "@/utils/currencyFormatter";
 
 const UserStats = () => {
   useScrollToTop();
@@ -181,7 +182,7 @@ const UserStats = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Chiffre d'affaires</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalRevenue.toLocaleString()} <span className="text-base">FCFA</span></p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(stats.totalRevenue)}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                   <DollarSign className="w-6 h-6 text-green-600" />
@@ -200,7 +201,7 @@ const UserStats = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Panier moyen</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.avgReceiptValue.toLocaleString()} <span className="text-base">FCFA</span></p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(stats.avgReceiptValue)}</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-100 dark:bg-purple-950/30 rounded-full flex items-center justify-center">
                   <BarChart3 className="w-6 h-6 text-purple-600 dark:text-purple-400" />

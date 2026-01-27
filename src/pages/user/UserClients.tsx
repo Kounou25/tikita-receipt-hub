@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCookie } from "@/lib/cookies";
+import { formatCurrency } from "@/utils/currencyFormatter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -67,7 +68,7 @@ const fetchClients = async (companyId, token) => {
       phone: client.client_phone || "Non renseigné",
       address: client.client_address || "Non renseignée",
       totalOrders: client.total_receipts || 0,
-      totalAmount: `${Math.round(client.total_spent || 0).toLocaleString('fr-FR')} FCFA`,
+      totalAmount: Math.round(client.total_spent || 0),
       lastOrder: lastOrderDate.toLocaleDateString('fr-FR', {
         day: '2-digit',
         month: 'short',
@@ -133,11 +134,15 @@ const UserClients = () => {
     client.phone.includes(searchTerm)
   );
 
+  // Convert client amounts
+  const convertedClients = filteredClients.map(client => ({
+    ...client,
+    totalAmountFormatted: formatCurrency(client.totalAmount)
+  }));
+
   const activeClients = clients.filter(c => c.status === "Actif").length;
-  const totalRevenue = clients.reduce((sum, c) => {
-    const amount = parseInt(c.totalAmount.replace(/[^\d]/g, ""), 10) || 0;
-    return sum + amount;
-  }, 0);
+  const totalRevenue = clients.reduce((sum, c) => sum + c.totalAmount, 0);
+  const convertedTotalRevenue = formatCurrency(totalRevenue);
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-gray-950 mobile-nav-padding">
@@ -238,7 +243,7 @@ const UserClients = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Revenus Total</p>
-                <p className="text-3xl font-bold text-black dark:text-white mt-2">{totalRevenue.toLocaleString('fr-FR')} FCFA</p>
+                <p className="text-3xl font-bold text-black dark:text-white mt-2">{convertedTotalRevenue}</p>
               </div>
               <div className="w-14 h-14 bg-black dark:bg-white rounded-xl flex items-center justify-center">
                 <span className="text-white dark:text-black text-xl font-bold">₣</span>
@@ -272,7 +277,7 @@ const UserClients = () => {
               </div>
             ) : (
               <div className="divide-y divide-gray-100 dark:divide-gray-800">
-                {filteredClients.map((client) => (
+                {convertedClients.map((client) => (
                   <div key={client.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                       <div className="flex items-start gap-5 flex-1">
@@ -314,7 +319,7 @@ const UserClients = () => {
 
                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                         <div className="text-right sm:text-left">
-                          <p className="text-2xl font-bold text-black dark:text-white">{client.totalAmount}</p>
+                          <p className="text-2xl font-bold text-black dark:text-white">{client.totalAmountFormatted}</p>
                           <p className="text-gray-600 dark:text-gray-400">{client.totalOrders} commande{client.totalOrders > 1 ? 's' : ''}</p>
                         </div>
 
