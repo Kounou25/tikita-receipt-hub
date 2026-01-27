@@ -169,7 +169,10 @@
   },
   "header": {
     "accountType": "Personal account",
-    "start": "Start"
+    "start": "Start",
+    "currency": "Currency",
+    "selectCurrency": "Select a currency",
+    "searchCurrency": "Search currency..."
   },
   "profile": {
     "title": "My profile",
@@ -287,8 +290,62 @@
     "expired": "Expired",
     "plan": "Plan",
     "activeUntil": "Active until",
-    "usage": "Documents usage",
-    "remaining": "documents remaining this month"
+    "usage": "Usage this month",
+    "remaining": "documents remaining",
+    "currentPlanLabel": "Current plan",
+    "freePlan": "Free",
+    "chooseYourPlan": "Choose your plan",
+    "boostExperience": "Boost your experience with the perfect subscription for your professional needs.",
+    "perfectToStart": "Perfect to start",
+    "mostPopular": "Most popular",
+    "forLargeCompanies": "For large companies",
+    "customPlan": "Custom plan",
+    "receiptsPerMonth": "{{count}} receipts per month",
+    "receiptTemplates": "{{count}} receipt templates",
+    "support247": "24/7 Support",
+    "historyMonths": "{{count}} months history",
+    "unlimitedReceipts": "Unlimited receipts",
+    "unlimitedTemplates": "Unlimited templates",
+    "unlimitedHistory": "Unlimited history",
+    "detailedStatsComing": "Detailed statistics (coming soon)",
+    "customFeatures": "Custom features",
+    "month": "month",
+    "currentPlan": "Current Plan",
+    "choosePlan": "Choose this Plan",
+    "errors": {
+      "selectPaymentMethod": "Please select a payment method and enter a reference.",
+      "selectValidPlan": "Please select a valid plan.",
+      "invalidPlan": "Selected plan is invalid.",
+      "subscriptionFailed": "Error creating subscription or payment.",
+      "loadPlansFailed": "Error loading plans.",
+      "loadSubscriptionFailed": "Error loading subscription data."
+    },
+    "success": {
+      "pleaseWait": "Please wait while we activate your subscription. This may take some time",
+      "subscriptionCreated": "{{planName}} subscription created successfully!"
+    },
+    "payment": {
+      "buyPlan": "Buy {{planName}} Plan",
+      "selectMethod": "Select a payment method and follow the instructions to complete the payment.",
+      "paymentMethod": "Payment method",
+      "chooseMethod": "Choose a payment method",
+      "nitaInstructions": "Scan the QR code above or make an account-to-account transfer to the number +227 94591058, then enter the transaction code or reference below.",
+      "amanataInstructions": "Make an account-to-account transfer to the number +227 88715276, then enter the transaction code or reference below.",
+      "rechargeCode": "Recharge code or reference",
+      "enterCode": "Enter the code or reference",
+      "confirmPayment": "Confirm Payment"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "changePlan": {
+        "question": "Can I change my plan at any time?",
+        "answer": "Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately."
+      },
+      "freeTrial": {
+        "question": "Is there a free trial period?",
+        "answer": "Yes, all new users get 1 month free trial on the \"Free\" plan."
+      }
+    }
   },
   "personalization": {
     "title": "Personalization",

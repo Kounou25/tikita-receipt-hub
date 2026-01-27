@@ -196,7 +196,10 @@
   },
   "header": {
     "accountType": "Compte personnel",
-    "start": "Démarrer"
+    "start": "Démarrer",
+    "currency": "Devise",
+    "selectCurrency": "Sélectionner une devise",
+    "searchCurrency": "Rechercher une devise..."
   },
   "profile": {
     "title": "Mon Profil",
@@ -314,8 +317,62 @@
     "expired": "Expiré",
     "plan": "Plan",
     "activeUntil": "Actif jusqu'au",
-    "usage": "Utilisation des documents",
-    "remaining": "documents restants ce mois"
+    "usage": "Utilisation ce mois",
+    "remaining": "documents restants",
+    "currentPlanLabel": "Plan actuel",
+    "freePlan": "Gratuit",
+    "chooseYourPlan": "Choisissez votre plan",
+    "boostExperience": "Boostez votre expérience avec l'abonnement parfait pour vos besoins professionnels.",
+    "perfectToStart": "Parfait pour débuter",
+    "mostPopular": "Le plus populaire",
+    "forLargeCompanies": "Pour les grandes entreprises",
+    "customPlan": "Plan personnalisé",
+    "receiptsPerMonth": "{{count}} reçus par mois",
+    "receiptTemplates": "{{count}} modèle de reçus",
+    "support247": "Support 24h/24",
+    "historyMonths": "Historique {{count}} mois",
+    "unlimitedReceipts": "Reçus illimités",
+    "unlimitedTemplates": "Modèles illimités",
+    "unlimitedHistory": "Historique illimité",
+    "detailedStatsComing": "Statistiques détaillées (à venir)",
+    "customFeatures": "Fonctionnalités personnalisées",
+    "month": "mois",
+    "currentPlan": "Plan Actuel",
+    "choosePlan": "Choisir ce Plan",
+    "errors": {
+      "selectPaymentMethod": "Veuillez sélectionner un mode de paiement et entrer une référence.",
+      "selectValidPlan": "Veuillez sélectionner un plan valide.",
+      "invalidPlan": "Plan sélectionné invalide.",
+      "subscriptionFailed": "Erreur lors de la création de l'abonnement ou du paiement.",
+      "loadPlansFailed": "Erreur lors du chargement des plans.",
+      "loadSubscriptionFailed": "Erreur lors du chargement des données d'abonnement."
+    },
+    "success": {
+      "pleaseWait": "Veuillez patienter pendant que nous activons votre abonnement. Cela peut prendre un certain temps",
+      "subscriptionCreated": "Abonnement {{planName}} créé avec succès !"
+    },
+    "payment": {
+      "buyPlan": "Acheter le Plan {{planName}}",
+      "selectMethod": "Sélectionnez un mode de paiement et suivez les instructions pour effectuer le paiement.",
+      "paymentMethod": "Mode de paiement",
+      "chooseMethod": "Choisir un mode de paiement",
+      "nitaInstructions": "Scannez le QR code ci-dessus ou effectuez un compte-à-compte au numéro +227 94591058, puis renseignez le code ou la référence de l'opération ci-dessous.",
+      "amanataInstructions": "Effectuez un compte-à-compte au numéro +227 88715276, puis renseignez le code ou la référence de l'opération ci-dessous.",
+      "rechargeCode": "Code de recharge ou référence",
+      "enterCode": "Entrez le code ou la référence",
+      "confirmPayment": "Confirmer le Paiement"
+    },
+    "faq": {
+      "title": "Questions Fréquentes",
+      "changePlan": {
+        "question": "Puis-je changer de plan à tout moment ?",
+        "answer": "Oui, vous pouvez upgrader ou downgrader votre plan à tout moment. Les changements prennent effet immédiatement."
+      },
+      "freeTrial": {
+        "question": "Y a-t-il une période d'essai gratuite ?",
+        "answer": "Oui, tous les nouveaux utilisateurs bénéficient de 1 mois d'essai gratuit sur le plan \"Gratuit\"."
+      }
+    }
   },
   "personalization": {
     "title": "Personnalisation",
