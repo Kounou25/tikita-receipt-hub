@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from '@tanstack/react-query';import { getCookie, removeCookie } from "@/lib/cookies";import { Button } from "@/components/ui/button";
+import { useQuery } from '@tanstack/react-query';import { getCookie, removeCookie } from "@/lib/cookies";import { formatCurrency, getCurrencyRate, getCurrencySymbol, convertStringAmount } from "@/utils/currencyFormatter";import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle, TrendingUp, TrendingDown, ArrowUpRight, ArrowRight, Receipt, FileText, Users, Wallet, Calendar, DollarSign, Activity } from "lucide-react";
 
 interface DashboardData {
@@ -54,7 +54,7 @@ const Skeleton = ({ className }) => (
 
 // Fonction pour fetch toutes les données en parallèle
 const fetchDashboardData = async (companyId, token, t) => {
-  const [statsResponse, revenueResponse, clientsResponse, receiptsResponse] = await Promise.all([
+  const [statsResponse, revenueResponse, clientsResponse, receiptsResponse, allReceiptsResponse] = await Promise.all([
     fetch(`${import.meta.env.VITE_BASE_API_URL}/user/stats/${companyId}`, {
       method: "GET",
       headers: {
@@ -77,6 +77,14 @@ const fetchDashboardData = async (companyId, token, t) => {
       },
     }),
     fetch(`${import.meta.env.VITE_BASE_API_URL}/user/receipt/list/${companyId}/5`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { "Authorization": `Bearer ${token}` }),
+      },
+    }),
+    // Fetch all receipts for accurate total revenue calculation
+    fetch(`${import.meta.env.VITE_BASE_API_URL}/user/receipt/list/${companyId}/0`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -145,18 +153,29 @@ const fetchDashboardData = async (companyId, token, t) => {
     throw new Error(`${t('dashboard.failedLoadReceipts')}: ${receiptsResponse.status} ${receiptsResponse.statusText}`);
   }
 
-  const [statsData, revenueData, clientsData, receiptsData] = await Promise.all([
+  if (!allReceiptsResponse.ok && allReceiptsResponse.status !== 404) {
+    console.warn('Failed to load all receipts for total calculation:', allReceiptsResponse.status);
+  }
+
+  const [statsData, revenueData, clientsData, receiptsData, allReceiptsData] = await Promise.all([
     statsResponse.json(),
     revenueResponse.json(),
     clientsResponse.json(),
     receiptsResponse.json(),
+    allReceiptsResponse.ok ? allReceiptsResponse.json() : [],
   ]);
+
+  // Calculate total revenue from actual receipts for consistency with ReceiptHistory page
+  let calculatedTotalRevenue = 0;
+  if (Array.isArray(allReceiptsData) && allReceiptsData.length > 0) {
+    calculatedTotalRevenue = allReceiptsData.reduce((sum, receipt) => sum + (receipt.total_amount || 0), 0);
+  }
 
   let stats = [
     { titleKey: "receiptsGenerated", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
     { titleKey: "items", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
     { titleKey: "activeClients", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
-    { titleKey: "totalRevenue", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
+    { titleKey: "totalRevenue", value: formatCurrency(0), icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
   ];
 
   if (Array.isArray(statsData) && statsData.length > 0) {
@@ -165,7 +184,7 @@ const fetchDashboardData = async (companyId, token, t) => {
       { titleKey: "receiptsGenerated", value: apiStats.total_receipts?.toString() || "0", icon: Receipt, trend: "+12%", trendUp: true, color: "yellow" },
       { titleKey: "items", value: apiStats.total_items?.toString() || "0", icon: FileText, trend: "+8%", trendUp: true, color: "blue" },
       { titleKey: "activeClients", value: apiStats.total_clients?.toString() || "0", icon: Users, trend: "+23%", trendUp: true, color: "green" },
-      { titleKey: "totalRevenue", value: apiStats.total_revenue ? `${apiStats.total_revenue.toLocaleString('fr-FR')} FCFA` : "0 FCFA", icon: Wallet, trend: "+15%", trendUp: true, color: "purple" },
+      { titleKey: "totalRevenue", value: formatCurrency(calculatedTotalRevenue), icon: Wallet, trend: "+15%", trendUp: true, color: "purple" },
     ];
   }
 
@@ -192,7 +211,7 @@ const fetchDashboardData = async (companyId, token, t) => {
     clientsTransformed = clientsData.map(client => ({
       name: client.client_name,
       purchases: client.total_items,
-      amount: `${client.total_purchases.toLocaleString('fr-FR')} FCFA`,
+      amount: formatCurrency(client.total_purchases || 0),
     }));
   }
 
@@ -201,7 +220,7 @@ const fetchDashboardData = async (companyId, token, t) => {
     receiptsTransformed = receiptsData.map(receipt => ({
       id: receipt.receipt_number,
       client: receipt.client_name,
-      amount: `${receipt.total_amount.toLocaleString('fr-FR')} FCFA`,
+      amount: formatCurrency(receipt.total_amount || 0),
       type: "Reçu",
       statusKey: receipt.payment_status === "paid" ? "paid" : "pending",
       date: new Date(receipt.receipt_date).toLocaleDateString('fr-FR', {
@@ -252,19 +271,16 @@ const StatCard = ({ stat, isLoading }) => {
       colors.bg
     )}>
       <div className="relative z-10">
-        <h3 className="text-sm font-semibold text-black/80 mb-3">
+        <h3 className="text-sm font-semibold text-black/80 mb-3 truncate" title={t(`dashboard.${stat.titleKey}`)}>
           {t(`dashboard.${stat.titleKey}`)}
         </h3>
-        <div className="flex items-baseline gap-2 mb-4">
-          <span className="text-4xl font-bold text-black">
-            {stat.value.split(' ')[0]}
+        <div className="flex items-baseline gap-2 mb-4 overflow-hidden">
+          <span className="text-4xl font-bold text-black break-words line-clamp-2" title={stat.value}>
+            {stat.value}
           </span>
-          {stat.value.includes('FCFA') && (
-            <span className="text-xl font-semibold text-black/70">FCFA</span>
-          )}
         </div>
-        <p className="text-xs font-medium text-black/60">
-          {stat.value.includes('FCFA') ? `${stat.value} ${t('dashboard.total')}` : `${stat.value} ${t('dashboard.total')}`}
+        <p className="text-xs font-medium text-black/60 truncate">
+          {t('dashboard.total')}
         </p>
       </div>
       
@@ -289,6 +305,10 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  // Apply currency conversion
+  const rate = getCurrencyRate();
+  const currencySymbol = getCurrencySymbol();
+
   const { data, isLoading, error } = useQuery<DashboardData>({
     queryKey: ['dashboardData', companyId],
     queryFn: () => fetchDashboardData(companyId, token, t),
@@ -311,10 +331,16 @@ const UserDashboard = () => {
     { titleKey: "receiptsGenerated", value: "0", icon: Receipt, trend: "+0%", trendUp: false, color: "yellow" },
     { titleKey: "items", value: "0", icon: FileText, trend: "+0%", trendUp: false, color: "blue" },
     { titleKey: "activeClients", value: "0", icon: Users, trend: "+0%", trendUp: false, color: "green" },
-    { titleKey: "totalRevenue", value: "0 FCFA", icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
+    { titleKey: "totalRevenue", value: formatCurrency(0), icon: Wallet, trend: "+0%", trendUp: false, color: "purple" },
   ];
 
-  const revenueData = data?.revenueData || [{
+  const revenueData = data?.revenueData.map(series => ({
+    ...series,
+    data: series.data.map(point => ({
+      ...point,
+      y: point.y / rate
+    }))
+  })) || [{
     id: "revenus",
     color: "#000000",
     data: Array.from({ length: 12 }, (_, i) => {
