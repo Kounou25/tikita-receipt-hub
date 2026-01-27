@@ -21,6 +21,7 @@ import { Check, Zap, Star, Briefcase } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import { getCookie } from "@/lib/cookies";
+import { formatCurrency, getCurrencyRate, getCurrencySymbol } from "@/utils/currencyFormatter";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const Skeleton = ({ className }) => (
@@ -39,6 +40,8 @@ const Subscription = () => {
   const [paymentCode, setPaymentCode] = useState("");
   const companyId = getCookie("company_id");
   const token = getCookie("token") || null;
+  const currencyRate = getCurrencyRate();
+  const currencySymbol = getCurrencySymbol();
 
   // Map plan names to icons and colors
   const planStyles = {
@@ -111,7 +114,7 @@ const Subscription = () => {
         setPlans(transformedPlans);
       } catch (error) {
         console.error("Erreur lors de la récupération des plans :", error);
-        toast.error(error.message || "Erreur lors du chargement des plans.", { duration: 5000 });
+        toast.error(error.message || t('subscription.errors.loadPlansFailed'), { duration: 5000 });
       } finally {
         setPlansLoading(false);
       }
@@ -123,13 +126,13 @@ const Subscription = () => {
   const getPlanDescription = (planName) => {
     switch (planName) {
       case "Gratuit":
-        return "Parfait pour débuter";
+        return t('subscription.perfectToStart');
       case "Tikiita plus":
-        return "Le plus populaire";
+        return t('subscription.mostPopular');
       case "Tikiita pro":
-        return "Pour les grandes entreprises";
+        return t('subscription.forLargeCompanies');
       default:
-        return "Plan personnalisé";
+        return t('subscription.customPlan');
     }
   };
 
@@ -139,28 +142,28 @@ const Subscription = () => {
     switch (planName) {
       case "Gratuit":
         return [
-          "5 reçus par mois",
-          "1 modèle de reçus",
-          "Support 24h/24",
-          "Historique 3 mois",
+          t('subscription.receiptsPerMonth', { count: 5 }),
+          t('subscription.receiptTemplates', { count: 1 }),
+          t('subscription.support247'),
+          t('subscription.historyMonths', { count: 3 }),
         ];
       case "Tikiita plus":
         return [
-          "140 reçus par mois",
-          "3 modèles de reçus",
-          "Support 24/7",
-          "Historique 5 mois",
+          t('subscription.receiptsPerMonth', { count: 140 }),
+          t('subscription.receiptTemplates', { count: 3 }),
+          t('subscription.support247'),
+          t('subscription.historyMonths', { count: 5 }),
         ];
       case "Tikiita pro":
         return [
-          "Reçus illimités",
-          "Modèles illimités",
-          "Support 24h/7",
-          "Historique illimité",
-          "Statistiques détaillées (à venir)",
+          t('subscription.unlimitedReceipts'),
+          t('subscription.unlimitedTemplates'),
+          t('subscription.support247'),
+          t('subscription.unlimitedHistory'),
+          t('subscription.detailedStatsComing'),
         ];
       default:
-        return ["Fonctionnalités personnalisées"];
+        return [t('subscription.customFeatures')];
     }
   };
 
@@ -202,7 +205,7 @@ const Subscription = () => {
         });
       } catch (error) {
         console.error("Erreur lors de la récupération des données d'abonnement :", error);
-        toast.error(error.message || "Erreur lors du chargement des données d'abonnement.", { duration: 5000 });
+        toast.error(error.message || t('subscription.errors.loadSubscriptionFailed'), { duration: 5000 });
       } finally {
         setIsLoading(false);
       }
@@ -211,28 +214,28 @@ const Subscription = () => {
   }, [companyId, token]);
 
   const handlePurchase = async () => {
-    console.log("Démarrage de handlePurchase", {
-      companyId,
-      token: token ? "Présent" : "Absent",
-      selectedPlan,
-      paymentMethod,
-      paymentCode,
-      date: new Date().toISOString(),
-    });
+    // console.log("Démarrage de handlePurchase", {
+    //   companyId,
+    //   token: token ? "Présent" : "Absent",
+    //   selectedPlan,
+    //   paymentMethod,
+    //   paymentCode,
+    //   date: new Date().toISOString(),
+    // });
     if (!paymentMethod || !paymentCode) {
       console.warn("Validation échouée : méthode de paiement ou code manquant", { paymentMethod, paymentCode });
-      toast.error("Veuillez sélectionner un mode de paiement et entrer une référence.", { duration: 5000 });
+      toast.error(t('subscription.errors.selectPaymentMethod'), { duration: 5000 });
       return;
     }
     if (!selectedPlan || !selectedPlan.plan_id || !selectedPlan.name) {
       console.warn("Validation échouée : plan sélectionné invalide", { selectedPlan });
-      toast.error("Veuillez sélectionner un plan valide.", { duration: 5000 });
+      toast.error(t('subscription.errors.selectValidPlan'), { duration: 5000 });
       return;
     }
     const selectedPlanData = plans.find((plan) => plan.plan_id === selectedPlan.plan_id);
     if (!selectedPlanData) {
       console.warn("Plan sélectionné non trouvé dans la liste des plans", { selectedPlan, plans });
-      toast.error("Plan sélectionné invalide.", { duration: 5000 });
+      toast.error(t('subscription.errors.invalidPlan'), { duration: 5000 });
       return;
     }
     try {
@@ -325,8 +328,8 @@ const Subscription = () => {
         throw new Error(errorMessage);
       }
       // Mettre à jour l'état après succès
-      toast.success(`Veuillez patienter pendant que nous activons votre abonnement. \n cela peut prendre un certain temps`, { duration: 7000 });
-      toast.success(`Abonnement ${selectedPlan.name} créé avec succès !`, { duration: 7000 });
+      toast.success(t('subscription.success.pleaseWait'), { duration: 7000 });
+      toast.success(t('subscription.success.subscriptionCreated', { planName: selectedPlan.name }), { duration: 7000 });
 
       setCurrentPlanData({
         name: selectedPlan.name,
@@ -345,7 +348,7 @@ const Subscription = () => {
       setPaymentCode("");
     } catch (error) {
       console.error("Erreur lors de l'achat :", error);
-      toast.error(error.message || "Erreur lors de la création de l'abonnement ou du paiement.", { duration: 5000 });
+      toast.error(error.message || t('subscription.errors.subscriptionFailed'), { duration: 5000 });
     }
   };
 
@@ -380,19 +383,19 @@ const Subscription = () => {
             <>
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-8">
                 <div>
-                  <h2 className="text-4xl font-bold text-black dark:text-white mb-3">Plan actuel : {currentPlanData?.name || "Gratuit"}</h2>
-                  <p className="text-xl text-gray-600 dark:text-gray-400">Actif jusqu'au {currentPlanData?.endDate || "-"}</p>
+                  <h2 className="text-4xl font-bold text-black dark:text-white mb-3">{t('subscription.currentPlanLabel')}: {currentPlanData?.name || t('subscription.freePlan')}</h2>
+                  <p className="text-xl text-gray-600 dark:text-gray-400">{t('subscription.activeUntil')} {currentPlanData?.endDate || "-"}</p>
                 </div>
                 <div className="text-right">
                   <div className={cn("w-5 h-5 rounded-full inline-block mr-3 animate-pulse", getGaugeColor())} />
                   <span className="text-2xl font-bold text-black dark:text-white">
-                    {currentPlanData?.status === "active" ? "Actif" : currentPlanData?.status === "inactive" ? "Inactif" : "Expiré"}
+                    {currentPlanData?.status === "active" ? t('subscription.active') : currentPlanData?.status === "inactive" ? t('subscription.inactive') : t('subscription.expired')}
                   </span>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between text-xl">
-                  <span className="text-gray-700 dark:text-gray-300">Utilisation ce mois</span>
+                  <span className="text-gray-700 dark:text-gray-300">{t('subscription.usage')}</span>
                   <span className="font-bold text-black dark:text-white">
                     {currentPlanData?.receiptsUsed || 0} / {currentPlanData?.receiptsTotal || 0}
                   </span>
@@ -404,7 +407,7 @@ const Subscription = () => {
                   />
                 </div>
                 <p className="text-lg text-gray-600 text-center">
-                  {currentPlanData?.receiptsRemaining || 0} documents restants
+                  {currentPlanData?.receiptsRemaining || 0} {t('subscription.remaining')}
                 </p>
               </div>
             </>
@@ -413,9 +416,9 @@ const Subscription = () => {
 
         {/* Plans Section */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-black dark:text-white mb-4">Choisissez votre plan</h1>
+          <h1 className="text-5xl font-bold text-black dark:text-white mb-4">{t('subscription.chooseYourPlan')}</h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Boostez votre expérience avec l'abonnement parfait pour vos besoins professionnels.
+            {t('subscription.boostExperience')}
           </p>
         </div>
 
@@ -447,7 +450,7 @@ const Subscription = () => {
               >
                 {plan.popular && (
                   <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-black dark:bg-white text-white dark:text-black px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-                    Recommandé
+                    {t('common.popular')}
                   </div>
                 )}
 
@@ -457,8 +460,8 @@ const Subscription = () => {
                   </div>
                   <h3 className="text-3xl font-bold text-black dark:text-white mb-2">{plan.name}</h3>
                   <div className="my-6">
-                    <span className="text-5xl font-extrabold text-black dark:text-white">{plan.price}</span>
-                    <span className="text-xl text-gray-600 dark:text-gray-400"> FCFA/{plan.period}</span>
+                    <span className="text-5xl font-extrabold text-black dark:text-white">{formatCurrency(parseFloat(plan.price.replace(/\s/g, '')) || 0, currencySymbol, currencyRate)}</span>
+                    <span className="text-xl text-gray-600 dark:text-gray-400">/{t('subscription.month')}</span>
                   </div>
                   <p className="text-lg text-gray-600 dark:text-gray-400">{plan.description}</p>
                 </div>
@@ -493,26 +496,26 @@ const Subscription = () => {
                         });
                       }}
                     >
-                      {currentPlanData && currentPlanData.name === plan.name ? "Plan Actuel" : "Choisir ce Plan"}
+                      {currentPlanData && currentPlanData.name === plan.name ? t('subscription.currentPlan') : t('subscription.choosePlan')}
                     </Button>
                   </AlertDialogTrigger>
 
                   <AlertDialogContent className="max-w-2xl rounded-xl bg-white">
                     <AlertDialogHeader>
                       <AlertDialogTitle className="text-2xl font-bold text-black">
-                        Acheter le Plan {plan.name}
+                        {t('subscription.payment.buyPlan', { planName: plan.name })}
                       </AlertDialogTitle>
                       <AlertDialogDescription className="text-base text-gray-600">
-                        Sélectionnez un mode de paiement et suivez les instructions pour effectuer le paiement.
+                        {t('subscription.payment.selectMethod')}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
 
                     <div className="space-y-8 py-6">
                       <div className="space-y-3">
-                        <Label className="text-lg font-medium">Mode de paiement</Label>
+                        <Label className="text-lg font-medium">{t('subscription.payment.paymentMethod')}</Label>
                         <Select onValueChange={setPaymentMethod} value={paymentMethod}>
                           <SelectTrigger className="h-14 text-base rounded-xl">
-                            <SelectValue placeholder="Choisir un mode de paiement" />
+                            <SelectValue placeholder={t('subscription.payment.chooseMethod')} />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="NITA">
@@ -547,7 +550,7 @@ const Subscription = () => {
                             className="mx-auto w-64 h-64 object-contain rounded-xl border border-gray-200"
                           />
                           <p className="text-gray-700 text-lg">
-                            Scannez le QR code ci-dessus ou effectuez un compte-à-compte au numéro <span className="font-semibold">+227 94591058</span>, puis renseignez le code ou la référence de l'opération ci-dessous.
+                            {t('subscription.payment.nitaInstructions')}
                           </p>
                         </div>
                       )}
@@ -555,17 +558,17 @@ const Subscription = () => {
                       {paymentMethod === "Amanata" && (
                         <div className="text-center space-y-6">
                           <p className="text-gray-700 text-lg">
-                            Effectuez un compte-à-compte au numéro <span className="font-semibold">+227 88715276</span>, puis renseignez le code ou la référence de l'opération ci-dessous.
+                            {t('subscription.payment.amanataInstructions')}
                           </p>
                         </div>
                       )}
 
                       <div className="space-y-3">
-                        <Label className="text-lg font-medium">Code de recharge ou référence</Label>
+                        <Label className="text-lg font-medium">{t('subscription.payment.rechargeCode')}</Label>
                         <Input
                           value={paymentCode}
                           onChange={(e) => setPaymentCode(e.target.value)}
-                          placeholder="Entrez le code ou la référence"
+                          placeholder={t('subscription.payment.enterCode')}
                           className="h-14 text-base rounded-xl"
                         />
                       </div>
@@ -579,13 +582,13 @@ const Subscription = () => {
                           setPaymentCode("");
                         }}
                       >
-                        Annuler
+                        {t('common.cancel')}
                       </AlertDialogCancel>
                       <AlertDialogAction
                         className="h-12 px-8 rounded-xl bg-black hover:bg-black/90 text-white font-medium"
                         onClick={handlePurchase}
                       >
-                        Confirmer le Paiement
+                        {t('subscription.payment.confirmPayment')}
                       </AlertDialogAction>
                     </div>
                   </AlertDialogContent>
@@ -597,24 +600,22 @@ const Subscription = () => {
 
         {/* FAQ Section */}
         <div className="mt-16 bg-white border border-gray-200 rounded-xl p-10 hover:shadow-md transition-shadow">
-          <h2 className="text-3xl font-bold text-black mb-8 text-center">Questions Fréquentes</h2>
+          <h2 className="text-3xl font-bold text-black mb-8 text-center">{t('subscription.faq.title')}</h2>
           <div className="space-y-8 max-w-4xl mx-auto">
             <div>
               <h4 className="text-xl font-semibold text-black mb-3">
-                Puis-je changer de plan à tout moment ?
+                {t('subscription.faq.changePlan.question')}
               </h4>
               <p className="text-gray-600 text-lg">
-                Oui, vous pouvez upgrader ou downgrader votre plan à tout moment.
-                Les changements prennent effet immédiatement.
+                {t('subscription.faq.changePlan.answer')}
               </p>
             </div>
             <div>
               <h4 className="text-xl font-semibold text-black mb-3">
-                Y a-t-il une période d'essai gratuite ?
+                {t('subscription.faq.freeTrial.question')}
               </h4>
               <p className="text-gray-600 text-lg">
-                Oui, tous les nouveaux utilisateurs bénéficient de 1 mois d'essai
-                gratuit sur le plan "Gratuit".
+                {t('subscription.faq.freeTrial.answer')}
               </p>
             </div>
           </div>
