@@ -128,14 +128,15 @@ const ReceiptDetails = () => {
             unitPrice: item.unit_price || 0,
             total: item.total || 0
           })) || [],
-          subtotal: receiptData.total_ht || 0,
+          subtotal: receiptData.total_ht_display || 0,
           tva: receiptData.tva_rate || 0,
-          tvaAmount: receiptData.tva_amount || 0,
+          tvaAmount: receiptData.tva_amount_display || 0,
           discount: 0,
           discountAmount: 0,
-          total: receiptData.total_ttc || 0,
+          total: receiptData.total_ttc_display || 0,
           paymentMethod: receiptData.payment_method || "Non spécifié",
-          receipt_number: receiptData.receipt_number
+          receipt_number: receiptData.receipt_number,
+          currency: receiptData.display_currency || "FCFA"
         };
 
         setReceipt(transformedReceipt);
@@ -172,7 +173,8 @@ const ReceiptDetails = () => {
           discountAmount: 12685,
           total: 241015,
           paymentMethod: "Mobile Money",
-          receipt_number: "R001234"
+          receipt_number: "R001234",
+          currency: "FCFA"
         });
       } finally {
         setIsLoading(false);
@@ -345,11 +347,11 @@ const ReceiptDetails = () => {
                   <div className="flex-1">
                     <h4 className="text-lg font-semibold text-black dark:text-white">{item.designation}</h4>
                     <p className="text-gray-600 dark:text-gray-400 mt-1">
-                      {item.quantity} × {item.unitPrice.toLocaleString('fr-FR')} FCFA
+                      {item.quantity} × {item.unitPrice.toLocaleString('fr-FR')} {receipt.currency}
                     </p>
                   </div>
                   <p className="text-xl font-bold text-black dark:text-white ml-6">
-                    {item.total.toLocaleString('fr-FR')} FCFA
+                    {item.total.toLocaleString('fr-FR')} {receipt.currency}
                   </p>
                 </div>
               </div>
@@ -363,22 +365,22 @@ const ReceiptDetails = () => {
           <div className="space-y-4 text-lg">
             <div className="flex justify-between">
               <span className="text-gray-600 dark:text-gray-400">{t('receipts.subtotal')}</span>
-              <span className="font-semibold text-black dark:text-white">{receipt.subtotal.toLocaleString('fr-FR')} FCFA</span>
+              <span className="font-semibold text-black dark:text-white">{receipt.subtotal.toLocaleString('fr-FR')} {receipt.currency}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600 dark:text-gray-400">{t('receipts.vat')} ({receipt.tva}%)</span>
-              <span className="font-semibold text-black dark:text-white">{receipt.tvaAmount.toLocaleString('fr-FR')} FCFA</span>
+              <span className="font-semibold text-black dark:text-white">{receipt.tvaAmount.toLocaleString('fr-FR')} {receipt.currency}</span>
             </div>
             {receipt.discount > 0 && (
               <div className="flex justify-between text-red-600 dark:text-red-400">
                 <span>Réduction ({receipt.discount}%)</span>
-                <span className="font-semibold">-{receipt.discountAmount.toLocaleString('fr-FR')} FCFA</span>
+                <span className="font-semibold">-{receipt.discountAmount.toLocaleString('fr-FR')} {receipt.currency}</span>
               </div>
             )}
             <div className="border-t-2 border-gray-200 dark:border-gray-700 pt-4">
               <div className="flex justify-between items-center">
                 <span className="text-2xl font-bold text-black dark:text-white">{t('receipts.totalIncl')}</span>
-                <span className="text-3xl font-bold text-black dark:text-white">{receipt.total.toLocaleString('fr-FR')} FCFA</span>
+                <span className="text-3xl font-bold text-black dark:text-white">{receipt.total.toLocaleString('fr-FR')} {receipt.currency}</span>
               </div>
             </div>
             <div className="flex justify-between text-gray-600 dark:text-gray-400 pt-2">
